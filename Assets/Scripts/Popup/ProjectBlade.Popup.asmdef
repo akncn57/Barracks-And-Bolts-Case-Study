@@ -1,0 +1,18 @@
+{
+    "name": "ProjectBlade.Popup",
+    "rootNamespace": "",
+    "references": [
+        "VContainer",
+        "UnityEngine.UI",
+        "DOTween.Modules"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
