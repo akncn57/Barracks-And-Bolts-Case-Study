@@ -188,7 +188,7 @@ Bu değerler ScriptableObject üzerinden ayarlanabilir olacak, ileride değişti
 - Her renk için bir **renk seti** (ScriptableObject) tanımlanır: o rengin bina ve birim sprite'ları. Yeni renk eklemek için yeni bir klasör ve yeni bir set yeterlidir.
 - Mevcut renkler: **Kırmızı** ve **Sarı** (ikisi de tam set).
 - Oyunda baltayla koşma animasyonu kullanılmayacak. Köylü her durumda normal `Run` animasyonuyla koşar.
-- Renk setleri arasında küçük farklar var: Sarıda `Pawn_Interact_Axe` (odun kesme) eksik, eklenecek. Sarıda `Warrior_Guard` var, Kırmızıda yok. Kod, bir animasyon eksikse varsayılan animasyona (Idle / Run) düşmelidir.
+- Renk setleri arasında küçük bir fark var: Sarıda `Warrior_Guard` var, Kırmızıda yok. Kod, bir animasyon eksikse varsayılan animasyona (Idle / Run) düşmelidir.
 - **Dost ateşi yok:** Oyuncu kendi birimlerine ve binalarına saldırma emri veremez.
 - **Düşman yerleşkeleri (ileride konuşulacak):** Haritada rastgele küçük düşman yerleşkeleri olabilir. Böylece PDF'teki "binaya saldırma" maddesi düşman binaları üzerinden de karşılanır.
 
