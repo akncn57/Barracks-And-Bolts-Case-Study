@@ -51,6 +51,7 @@ Assets/
 ├── Scripts/                    (bkz. Bölüm 3)
 ├── Settings/                   URP, Renderer2D, Input Actions
 ├── Textures/                   Texture_<Klasör yolu>_<İsim>.png (renge göre: Red/, Yellow/)
+│   └── Markers/<Renk>/         Dünya üzerindeki işaretler (ör. toplanma bayrağı)
 ├── Tiles/
 │   ├── Palettes/               Palette_<İsim>.prefab
 │   └── <Kategori>/             Tile_<Kategori>_<İsim>.asset

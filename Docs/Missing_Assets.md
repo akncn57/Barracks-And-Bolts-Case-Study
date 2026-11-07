@@ -6,18 +6,18 @@
 ## Mevcut UI Assetlerinin Eşleştirmesi (eksik olmayanlar)
 | Asset | Kullanım |
 |---|---|
-| `Icon_01` çekiç | İnşa / tamir butonu |
-| `Icon_02` odun, `Icon_03` altın, `Icon_04` et | Kaynak ikonları (odun, altın, yemek) |
-| `Icon_05` kılıç, `Icon_06` kalkan | Saldırı / savunma (bilgi panelindeki istatistikler) |
-| `Icon_07` / `Icon_08` oklar | İleri / geri butonları |
-| `Icon_09` çarpı | İptal, kapat, geçersiz |
-| `Icon_10` dişli, `Icon_11` bilgi, `Icon_12` müzik | Ayarlar, bilgi, ses ayarı |
-| `Avatars_06–10` | Birim portreleri: Şövalye, Mızrakçı, Okçu, Rahip, Köylü (eşleşme Unity'de kontrol edilecek) |
-| `Cursor_01–03` | Varsayılan imleç, tıklanabilir (el), yasak |
-| `Cursor_04` köşe çerçevesi | Seçim / hedef göstergesi |
-| `Tool_01–04` çekiç, balta, kılıç, kazma | İmleç durumları: inşa/tamir, odun, saldırı, maden |
-| `BigBar` / `SmallBar` | Can barı, ilerleme barı |
-| `SmallRibbons`, `Banner`, `Banner_Slots`, `Papers`, `WoodTable` | Panel arka planları, başlıklar, slotlar |
+| `Texture_UI_Icons_Hammer` | İnşa / tamir butonu |
+| `Texture_UI_Icons_Wood`, `_Gold`, `_Meat` | Kaynak ikonları (odun, altın, yemek) |
+| `Texture_UI_Icons_Sword`, `_Shield` | Saldırı / savunma (bilgi panelindeki istatistikler) |
+| `Texture_UI_Icons_Arrow_Green`, `_Arrow_Orange` | İleri / geri butonları |
+| `Texture_UI_Icons_Cancel` | İptal, kapat, geçersiz |
+| `Texture_UI_Icons_Settings`, `_Info`, `_Music` | Ayarlar, bilgi, ses ayarı |
+| `Texture_UI_Avatars_01–05` | Birim portreleri: Şövalye, Mızrakçı, Okçu, Rahip, Köylü (eşleşme Unity'de kontrol edilecek) |
+| `Texture_Cursors_Default`, `_Pointer`, `_Forbidden` | Varsayılan imleç, tıklanabilir (el), yasak |
+| `Texture_Cursors_Selection` (köşe çerçevesi) | Seçim / hedef göstergesi |
+| `Texture_UI_Tools_Hammer`, `_Axe`, `_Sword`, `_Pickaxe` | İmleç durumları: inşa/tamir, odun, saldırı, maden |
+| `Texture_UI_Bars_Big_*`, `_Small_*` | Can barı, ilerleme barı |
+| `Texture_UI_Ribbons_Small`, `_Banners_*`, `_Papers_*`, `_WoodTable_*` | Panel arka planları, başlıklar, slotlar |
 
 ---
 
@@ -28,19 +28,19 @@
 | 2 | ~~İkinci renk binalar~~ | ✅ Sarı set eklendi (Castle, Barracks, House, Monastery, Tower, Archery) | – |
 | 2a | ~~Sarı `Pawn_Interact_Axe`~~ | ✅ Eklendi | – |
 | 3 | Yerleştirme önizlemesi (yeşil/kırmızı hücre) | PDF: geçersiz alan kırmızı | 💻 Beyaz kare sprite + renk |
-| 4 | Seçim göstergesi (birimin altında halka/elips) | Neyin seçili olduğunu göstermek | 💻 Basit elips sprite. Alternatif: `Cursor_04` köşeleri |
+| 4 | Seçim göstergesi (birimin altında halka/elips) | Neyin seçili olduğunu göstermek | 💻 Basit elips sprite. Alternatif: `Texture_Cursors_Selection` köşeleri |
 | 5 | Kutu seçimi dikdörtgeni | Sürükleyerek seçim | 💻 UI Image (9-slice) |
 | 6 | Hareket/saldırı emri işareti (tıklanan yerde kısa efekt) | Sağ tık geri bildirimi | 💻 / 🔍 |
-| 7 | Ölüm efekti (birim) ve yıkılma efekti (bina) | HP 0 olduğunda yok olma | 🔍 Tiny Swords "Effects" klasöründe Dead, Explosion, Fire var. Alternatif: DOTween ile fade + sallanma |
+| 7 | ~~Ölüm ve yıkılma efekti~~ | ✅ Paketin Particle FX klasöründen alındı: `Texture_VFX_Dust_01/02`, `_Explosion_01/02`, `_Fire_01/02/03`, `_Water_Splash` (kare kare kesildi) | – |
 
 ## P1 – Oyun döngüsü
 | # | Eksik | Neden Gerekli | Çözüm |
 |---|---|---|---|
-| 8 | **Taş ikonu** (UI) | Kaynak barı, maliyetler | 🛠 `Rock1` küçültülerek veya 🔍 |
-| 9 | **Nüfus ikonu** | Nüfus göstergesi | 🛠 `Avatars_10` küçük hali veya 🔍 |
+| 8 | **Taş ikonu** (UI) | Kaynak barı, maliyetler | 🛠 `Texture_Terrain_Resources_Rocks_Rock_01` küçültülerek veya 🔍 |
+| 9 | **Nüfus ikonu** | Nüfus göstergesi | 🛠 Köylü avatarının küçük hali veya 🔍 |
 | 10 | Gün / gece / takvim ikonu | Takvim UI'ı | 🔍 / 🛠 |
-| 11 | Baskın uyarı ikonu ve ekran kenarı yön oku | Baskın bildirimi | 🛠 `Icon_05` kılıç + `Icon_07` ok |
-| 12 | Koyun kesme imleci | Yemek toplama | 🛠 `Icon_04` et veya `Tool_03` kılıç |
+| 11 | Baskın uyarı ikonu ve ekran kenarı yön oku | Baskın bildirimi | 🛠 Kılıç ikonu + ok ikonu |
+| 12 | Koyun kesme imleci | Yemek toplama | 🛠 Et ikonu veya kılıç aracı |
 | 13 | Kaynak taşıyan köylü (odun/altın/et taşırken) | Görsel geri bildirim (opsiyonel) | 🔍 Tiny Swords'ta var. Alternatif: köylünün üstünde küçük kaynak ikonu |
 | 14 | Kaynak toplama ve hasar sayıları (ör. "+5", "-10") | Geri bildirim | 💻 TextMeshPro (`MedievalSharp` fontu var) |
 | 15 | Ana menü arka planı | Ana menü | 🛠 Oyun sahnesinden bir görüntü veya Banner/Paper ile |
@@ -49,31 +49,29 @@
 ## P2 – Derinlik
 | # | Eksik | Neden Gerekli | Çözüm |
 |---|---|---|---|
-| 17 | **Depo binaları (4 adet):** Oduncu Deposu, Taş Deposu, Ambar, Hazine | Depo sistemi | 🛠 House/Barracks + kaynak yığınları (`Wood Resource`, `Gold_Resource`, `Meat Resource`, `Rock`) ile kompozisyon ya da renk değişimi |
-| 18 | **Karakol** | Bölge sistemi | 🛠 Kullanılmayan `Archery` veya `Tower` + bayrak |
+| 17 | ~~Depo binaları (4 adet)~~ | ✅ Üretildi: Archery sundurması (hedefler silindi) + avluda tek kaynak yığını. `Texture_Buildings_<Renk>_Storage_Wood/Food/Gold/Stone` | – |
+| 18 | ~~Karakol~~ | ✅ Tower + takım renginde bayrak: `Texture_Buildings_<Renk>_Outpost` | – |
 | 19 | İnşa halindeki bina (iskele) | Köylünün inşa etmesi | 🔍 Tiny Swords'ta "Construction" varyantları var. Alternatif: 💻 yarı saydam bina ve alttan dolan maske |
-| 20 | Hasarlı bina efekti (duman/ateş) | HP düşük geri bildirimi | 🔍 Tiny Swords Effects/Fire |
+| 20 | ~~Hasarlı bina efekti~~ | ✅ `Texture_VFX_Fire_*` | – |
 | 21 | Rütbe / seviye simgesi (asker ve bina seviyesi) | Yükseltme sistemi | 🛠 / 💻 Küçük yıldız veya çizgiler |
 | 22 | Bölge sınırı görseli | Bölge sistemi | 💻 Tilemap overlay veya shader |
-| 23 | Mini harita çerçevesi | Mini harita | 🛠 `Papers` / `WoodTable` 9-slice |
+| 23 | Mini harita çerçevesi | Mini harita | 🛠 `Papers_*` / `WoodTable_*` 9-slice |
 | 24 | Kuledeki okçu | Kule savunması | 🛠 `Archer` sprite'ı kulenin üstünde |
-| 25 | Toplanma noktası bayrağı | Rally point | 🔍 / 🛠 |
+| 25 | ~~Toplanma noktası bayrağı~~ | ✅ Kurdeleden üretildi: `Textures/Markers/<Renk>/Texture_Markers_<Renk>_RallyFlag` (atlas'a eklendi) | – |
 
 ## P3 – Cila
 | # | Eksik | Neden Gerekli | Çözüm |
 |---|---|---|---|
-| 26 | **Tarla** | Yemek üretimi | 🔍 |
+| 26 | **Tarla** | Yemek üretimi | 🔍 Üretilen deneme zayıf kaldı; hazır bir ekin asset'i bulunacak ya da Aseprite'ta çizilecek |
 | 27 | **Müzik:** ana menü, gündüz, baskın | Atmosfer | 🔍 (CC0: OpenGameArt, Pixabay) |
 | 28 | **SFX:** UI tıklama, bina yerleştirme, inşa, odun kesme, maden kazma, kılıç vuruşu, ok atışı, ölüm, bina yıkılması, borozan, iyileştirme, kazanma, kaybetme, hata | Geri bildirim | 🔍 (Kenney CC0 paketleri) |
-| 29 | Tutorial göstergeleri (vurgulama çerçevesi, ok) | Tutorial | 🛠 `Cursor_04` + `Icon_07` |
-| 30 | Kayıt slotu ve ayarlar paneli görselleri | Kayıt / ayarlar | 🛠 `Banner_Slots`, `Papers` |
+| 29 | Tutorial göstergeleri (vurgulama çerçevesi, ok) | Tutorial | 🛠 Seçim imleci + ok ikonu |
+| 30 | Kayıt slotu ve ayarlar paneli görselleri | Kayıt / ayarlar | 🛠 `Banners_Slots`, `Papers_*` |
 
 ---
 
 ## En Önemli Eksikler (önce bunlar)
-1. **Ölüm ve yıkılma efektleri** (Tiny Swords Effects klasörü) 🔍
-2. **Taş ve nüfus ikonları** (kaynak barı) 🛠 / 🔍
-3. **Depo binaları ve Karakol** (P2, mevcut assetlerden üretilecek) 🛠
+1. **Taş ve nüfus ikonları** (kaynak barı) 🛠 / 🔍
 
 ## Lisans Notu
 Dışarıdan eklenen her asset için kaynak ve lisans bilgisi README'ye "Credits" bölümüne yazılacak.

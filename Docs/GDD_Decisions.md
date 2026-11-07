@@ -111,7 +111,7 @@ Bu değerler ScriptableObject üzerinden ayarlanabilir olacak, ileride değişti
 | Kilise | `Texture_Buildings_Monastery` | 192x320 | 3x3 |
 | Kule | `Texture_Buildings_Tower` | 128x256 | 2x2 |
 | House | `Texture_Buildings_House` | 128x192 | 2x2 |
-| *(şimdilik kullanılmıyor)* | `Texture_Buildings_Archery` | 192x256 | 3x3 |
+| Depolar (Odun, Yemek, Altın, Taş) | `Texture_Buildings_<Renk>_Storage_*` (Archery sundurması + avluda kaynak yığını, üretildi) | 192x256 | 3x3 (kesinleşecek) |
 | Köylü | `Pawn` (Idle, Run, Axe, Pickaxe, Hammer) | 192 kare | 1x1 |
 | Şövalye | `Warrior` | 192 kare | 1x1 |
 | Mızrakçı | `Lancer` | 320 kare | 1x1 |
@@ -128,7 +128,7 @@ Bu değerler ScriptableObject üzerinden ayarlanabilir olacak, ileride değişti
 - **Taban** binanın grid'de kapladığı alandır. Sprite'ın üst kısmı (çatı) tabanın dışına taşar ve üstteki hücreleri örter (pivot altta).
 - Assette olmayanlar (üretilecek): Depolar (4 adet), Karakol, Tarla, ses ve müzik. Düşman renkli birimleri kullanıcı ekleyecek.
 - Oyun içi sprite'ların PPU değeri 64'e çekildi (1 tile = 1 Unity birimi = 1 grid hücresi). UI ve imleç texture'ları 100'de kaldı.
-- **Archery:** Şimdilik oyunda kullanılmayacak. PDF'e uymak için şövalye, mızrakçı ve okçunun üçünü de Barracks üretir. Archery ileride başka bir görevle (ör. Karakol) değerlendirilebilir.
+- **Archery:** Asker üretmiyor; PDF'e uymak için şövalye, mızrakçı ve okçunun üçünü de Barracks üretir. Archery'nin sundurması, hedefleri silinip dört depo binasının ortak görseli oldu. Karakol için başka bir görsel bulunacak.
 - Zeminde su olduğu kesin: su yürünemez alan olacak. Tileset yükseltilmiş zemin ve uçurum da içeriyorsa onlar da kullanılabilir.
 
 ## Gameplay Kuralları
@@ -208,7 +208,7 @@ Bu değerler ScriptableObject üzerinden ayarlanabilir olacak, ileride değişti
 
 ### Bölge (Territory) Sistemi
 - Castle'ın çevresinde belirli bir yarıçapta bir **bölge** vardır. Oyuncu bina sadece kendi bölgesinin içine koyabilir.
-- **Karakol (Outpost):** Bölgeyi genişletmek için kullanılan yeni bir binadır. Bölgenin içine, sınıra yakın bir yere konur ve çevresinde yeni bir bölge açar. Karakol yükseltilince yarıçapı büyür. Asseti mevcut assetlerden üretilecek (ör. küçük bir kule ve bayrak).
+- **Karakol (Outpost):** Bölgeyi genişletmek için kullanılan yeni bir binadır. Bölgenin içine, sınıra yakın bir yere konur ve çevresinde yeni bir bölge açar. Karakol yükseltilince yarıçapı büyür. Görseli: Tower + takım renginde bayrak (`Texture_Buildings_<Renk>_Outpost`). Savunma kulesiyle karışmaması için bilgi panelinde adı ve bayrağı ayırt edici.
 - **Kule** de küçük bir yarıçapta bölge açar. Bu sayede savunmayla genişleme birbirine bağlanır.
 - Bina yerleştirme modundayken bölge sınırları zeminde gösterilir. Bölgenin dışı geçersiz alan olarak kırmızı işaretlenir (PDF'teki kırmızı alan maddesiyle uyumlu).
 - Karakol ya da kule yıkılırsa bölge küçülür. Bölge dışında kalan binalar yerinde kalır ve çalışmaya devam eder, ama oraya yeni bina konamaz.
