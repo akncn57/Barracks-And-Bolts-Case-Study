@@ -36,8 +36,8 @@
 ## P1 – Oyun döngüsü
 | # | Eksik | Neden Gerekli | Çözüm |
 |---|---|---|---|
-| 8 | **Taş ikonu** (UI) | Kaynak barı, maliyetler | 🛠 `Texture_Terrain_Resources_Rocks_Rock_01` küçültülerek veya 🔍 |
-| 9 | **Nüfus ikonu** | Nüfus göstergesi | 🛠 Köylü avatarının küçük hali veya 🔍 |
+| 8 | ~~Taş ikonu~~ | ✅ Paketteki kayalardan (gölgesiz, dış hatlı): `Texture_UI_Icons_Stone` | – |
+| 9 | ~~Nüfus ikonu~~ | ✅ Gri köylü avatarından: `Texture_UI_Icons_Population` | – |
 | 10 | Gün / gece / takvim ikonu | Takvim UI'ı | 🔍 / 🛠 |
 | 11 | Baskın uyarı ikonu ve ekran kenarı yön oku | Baskın bildirimi | 🛠 Kılıç ikonu + ok ikonu |
 | 12 | Koyun kesme imleci | Yemek toplama | 🛠 Et ikonu veya kılıç aracı |
@@ -71,7 +71,7 @@
 ---
 
 ## En Önemli Eksikler (önce bunlar)
-1. **Taş ve nüfus ikonları** (kaynak barı) 🛠 / 🔍
+P0 ve P1 için kritik asset eksiği kalmadı. Açık kalanlar: gün/gece ve baskın ikonları (P1, mevcut ikonlardan türetilecek), inşa görseli (P2, kodla), tarla (P3), müzik ve ses efektleri (P3).
 
 ## Lisans Notu
 Dışarıdan eklenen her asset için kaynak ve lisans bilgisi README'ye "Credits" bölümüne yazılacak.
