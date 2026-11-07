@@ -1,10 +1,19 @@
 fileFormatVersion: 2
-guid: 143f1a9929d1a6f4cbeeb70e1af6b46e
+guid: 0272f73a298fc7f4283975e2c7fe6f72
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -2109584214259243861
-    second: SmallBlueRoundButton_Regular - Copy_0
+      213: 6331980819534964110
+    second: Lancer_Right_Attack_0
+  - first:
+      213: 7232042838751349278
+    second: Lancer_Right_Attack_1
+  - first:
+      213: -4157329051755591257
+    second: Lancer_Right_Attack_2
+  - first:
+      213: -4391963831756658790
+    second: Lancer_Right_Attack_3
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -51,7 +60,7 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 100
+  spritePixelsToUnits: 64
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -113,13 +122,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: SmallBlueRoundButton_Regular - Copy_0
+      name: Lancer_Right_Attack_0
       rect:
         serializedVersion: 2
-        x: 19
-        y: 16
-        width: 90
-        height: 96
+        x: 143
+        y: 121
+        width: 165
+        height: 75
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -128,8 +137,74 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: ba46e4d855049b2e0800000000000000
-      internalID: -2109584214259243861
+      spriteID: e85e7f0d107bfd750800000000000000
+      internalID: 6331980819534964110
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Lancer_Right_Attack_1
+      rect:
+        serializedVersion: 2
+        x: 463
+        y: 121
+        width: 157
+        height: 75
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: e1a8e2415a06d5460800000000000000
+      internalID: 7232042838751349278
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Lancer_Right_Attack_2
+      rect:
+        serializedVersion: 2
+        x: 611
+        y: 141
+        width: 17
+        height: 13
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7a942bff0433e46c0800000000000000
+      internalID: -4157329051755591257
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Lancer_Right_Attack_3
+      rect:
+        serializedVersion: 2
+        x: 760
+        y: 121
+        width: 152
+        height: 77
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: a97e7c52a2c9c03c0800000000000000
+      internalID: -4391963831756658790
       vertices: []
       indices: 
       edges: []
@@ -148,7 +223,10 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      SmallBlueRoundButton_Regular - Copy_0: -2109584214259243861
+      Lancer_Right_Attack_0: 6331980819534964110
+      Lancer_Right_Attack_1: 7232042838751349278
+      Lancer_Right_Attack_2: -4157329051755591257
+      Lancer_Right_Attack_3: -4391963831756658790
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
