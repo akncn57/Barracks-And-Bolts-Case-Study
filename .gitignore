@@ -110,3 +110,6 @@ InitTestScene*.unity*
 
 # JetBrains Rider
 .idea/
+
+# Personal study guide (kept local)
+Docs/Code_Guide.md
