@@ -6,7 +6,9 @@
         "BarracksAndBolts.Utils",
         "VContainer",
         "UniTask",
-        "Unity.InputSystem"
+        "Unity.InputSystem",
+        "UnityEngine.UI",
+        "Unity.Cinemachine"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

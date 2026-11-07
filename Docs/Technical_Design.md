@@ -16,6 +16,7 @@
 | Test | Kritik sistemler için **EditMode unit testleri** |
 | Dil | Kod, yorumlar, commit mesajları ve README **İngilizce**. Tasarım dokümanları Türkçe. |
 | Git | Sadece `main` branch'i. Her commit derlenebilir ve çalışır halde olur. |
+| Kamera | **Cinemachine 3** gerçek kamerayı sürer. Input, kaydırma, zoom ve harita sınırları bizim `CameraController`'ımızda; kontrolcü takip hedefini ve lens boyutunu yönetir. |
 | Async | Coroutine yerine **UniTask**. UI animasyonları ve geri bildirim efektleri için **DOTween**. |
 
 ---

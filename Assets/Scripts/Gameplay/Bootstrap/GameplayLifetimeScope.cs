@@ -1,6 +1,8 @@
 using BarracksAndBolts.Core.Events;
 using BarracksAndBolts.Core.Simulation;
+using BarracksAndBolts.Gameplay.CameraControl;
 using BarracksAndBolts.Gameplay.Grid;
+using BarracksAndBolts.Gameplay.Input;
 using VContainer;
 using VContainer.Unity;
 
@@ -19,7 +21,11 @@ namespace BarracksAndBolts.Gameplay.Bootstrap
             builder.Register<GameClock>(Lifetime.Singleton);
             builder.RegisterEntryPoint<SimulationRunner>().AsSelf();
 
+            // One shared instance; VContainer disposes it with the scope.
+            builder.Register<GameInputActions>(Lifetime.Singleton);
+
             RegisterGrid(builder);
+            builder.RegisterComponentInHierarchy<CameraController>();
         }
 
         private static void RegisterGrid(IContainerBuilder builder)
