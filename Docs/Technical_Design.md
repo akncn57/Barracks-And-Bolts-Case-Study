@@ -87,7 +87,7 @@ Gameplay/
 ├── Bootstrap/      GameplayLifetimeScope, GameplayEntryPoint
 ├── Data/           BuildingDefinition, UnitDefinition, TeamColorDefinition ... (ScriptableObject)
 ├── Grid/           GridMap, GridCell, GridCoordinates
-├── Pathfinding/    AStarPathfinder, PathRequest, DestinationSpreader
+├── Pathfinding/    AStarPathfinder, PathStatus, GridSearch
 ├── Placement/      PlacementService, PlacementValidator, PlacementPreviewView
 ├── Buildings/      BuildingService, BuildingModel, BuildingView, Production/
 ├── Units/          UnitService, UnitModel, UnitView, States/
@@ -178,14 +178,14 @@ public interface IEventBus
 ## 8. Grid ve Pathfinding
 - **1 hücre = 1 Unity birimi = 64px** (oyun içi sprite'larda PPU 64). Görsel taraf Unity `Grid` + `Tilemap`, mantık tarafı `GridMap` ile çalışır.
 - `GridMap`, her hücre için şu bilgileri tutar: yürünebilir mi, üzerinde hangi bina veya kaynak var (`GameEntityId`), bölge içinde mi (P2).
-- **Birimler hücre işgal etmez.** Sadece binalar ve kaynaklar engeldir. Bu sayede birimler birbirini kilitleyemez. Üst üste binmeyi `DestinationSpreader` ve hafif bir ayırma (separation) kuvveti önler.
+- **Birimler hücre işgal etmez.** Sadece binalar ve kaynaklar engeldir. Bu sayede birimler birbirini kilitleyemez. Üst üste binmeyi `GridSearch.CollectDestinations` ve hafif bir ayırma (separation) kuvveti önler.
 - **A\***:
   - 8 yönlü hareket. Köşe kesmeye izin verilmez (iki yanı dolu çaprazdan geçilmez).
   - Octile mesafe sezgiseli kullanılır.
   - Açık liste için `MinHeap` kullanılır. .NET Standard 2.1'de `PriorityQueue` olmadığı için kendimiz yazacağız.
   - Arama bitince düğüm tamponları temizlenir ve sonraki aramada tekrar kullanılır, her aramada yeni bellek ayrılmaz.
   - Hedef yürünemezse en yakın yürünebilir hücreye gidilir. Hiç yol yoksa ulaşılabilen en yakın hücreye gidilir.
-- **Grup hareketi:** `DestinationSpreader`, hedef hücreden BFS ile yayılarak her birime ayrı bir boş hücre atar.
+- **Grup hareketi:** `GridSearch.CollectDestinations`, hedefe en yakın boş hücreden başlayıp sadece yürünebilir hücreler üzerinden BFS ile yayılır ve her birime ayrı bir hücre verir.
 - **Dinamik engel:** Bina konunca veya yıkılınca `GridChangedEvent` yayınlanır. Yolu bu değişiklikten etkilenen birimler yollarını yeniden hesaplar.
 
 ---
@@ -311,7 +311,7 @@ GameplayLifetimeScope
 |---|---|
 | A\* | Düz yol, engel etrafından dolaşma, köşe kesmeme, hedef yürünemez, yol yok, başlangıç = hedef, harita sınırı |
 | GridMap / Yerleştirme | Geçerli alan, çakışma, harita dışına taşma, yıkılan binanın hücreleri boşaltması |
-| DestinationSpreader | N birim → N farklı hücre, kalabalık / engelli alan |
+| GridSearch | N birim → N farklı hücre, bina altındaki hedef, suyu geçmeme, en yakın boş hücre |
 | Combat | Hasar, HP'nin 0'ın altına inmemesi, ölümün tek kez tetiklenmesi, ölü hedefe saldırmama, dost ateşi engeli |
 | EventBus | Yayın, abonelikten çıkma, yayın sırasında abonelikten çıkma |
 | Ekonomi (P1) | Yetersiz kaynak, depo kapasitesi, nüfus sınırı |

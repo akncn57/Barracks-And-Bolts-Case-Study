@@ -3,6 +3,7 @@ using BarracksAndBolts.Core.Simulation;
 using BarracksAndBolts.Gameplay.CameraControl;
 using BarracksAndBolts.Gameplay.Grid;
 using BarracksAndBolts.Gameplay.Input;
+using BarracksAndBolts.Gameplay.Pathfinding;
 using VContainer;
 using VContainer.Unity;
 
@@ -35,6 +36,9 @@ namespace BarracksAndBolts.Gameplay.Bootstrap
 
             // Build the grid as soon as the scene starts, so a broken tilemap fails here and not on first use.
             builder.RegisterBuildCallback(container => container.Resolve<GridMap>());
+
+            builder.Register<AStarPathfinder>(Lifetime.Singleton);
+            builder.Register<GridSearch>(Lifetime.Singleton);
         }
     }
 }
