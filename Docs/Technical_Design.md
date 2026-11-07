@@ -122,7 +122,7 @@ Gameplay/
 **Kural:** Bir servis hiçbir zaman bir View'a doğrudan erişmez. View'lar servise erişebilir.
 
 ### Kimlikler
-Her bina ve birimin bir `EntityId` değeri vardır (artan `int`). Servisler birbirine nesne referansı yerine `EntityId` ile başvurur. Böylece:
+Her bina ve birimin bir `GameEntityId` değeri vardır (artan `int`). Servisler birbirine nesne referansı yerine `GameEntityId` ile başvurur. Böylece:
 - Yok olan bir hedefe referans asılı kalmaz. Hedef, `TryGet` ile her seferinde kontrol edilir.
 - Kayıt sistemi kimlikleri doğrudan yazabilir.
 
@@ -173,7 +173,7 @@ public interface IEventBus
 
 ## 8. Grid ve Pathfinding
 - **1 hücre = 1 Unity birimi = 64px** (oyun içi sprite'larda PPU 64). Görsel taraf Unity `Grid` + `Tilemap`, mantık tarafı `GridMap` ile çalışır.
-- `GridMap`, her hücre için şu bilgileri tutar: yürünebilir mi, üzerinde hangi bina veya kaynak var (`EntityId`), bölge içinde mi (P2).
+- `GridMap`, her hücre için şu bilgileri tutar: yürünebilir mi, üzerinde hangi bina veya kaynak var (`GameEntityId`), bölge içinde mi (P2).
 - **Birimler hücre işgal etmez.** Sadece binalar ve kaynaklar engeldir. Bu sayede birimler birbirini kilitleyemez. Üst üste binmeyi `DestinationSpreader` ve hafif bir ayırma (separation) kuvveti önler.
 - **A\***:
   - 8 yönlü hareket. Köşe kesmeye izin verilmez (iki yanı dolu çaprazdan geçilmez).

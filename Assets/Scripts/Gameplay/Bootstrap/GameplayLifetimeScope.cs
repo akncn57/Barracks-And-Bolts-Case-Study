@@ -1,5 +1,6 @@
 using BarracksAndBolts.Core.Events;
 using BarracksAndBolts.Core.Simulation;
+using BarracksAndBolts.Gameplay.Grid;
 using VContainer;
 using VContainer.Unity;
 
@@ -17,6 +18,17 @@ namespace BarracksAndBolts.Gameplay.Bootstrap
 
             builder.Register<GameClock>(Lifetime.Singleton);
             builder.RegisterEntryPoint<SimulationRunner>().AsSelf();
+
+            RegisterGrid(builder);
+        }
+
+        private static void RegisterGrid(IContainerBuilder builder)
+        {
+            builder.RegisterComponentInHierarchy<TilemapGridSource>();
+            builder.Register(resolver => resolver.Resolve<TilemapGridSource>().BuildGridMap(), Lifetime.Singleton);
+
+            // Build the grid as soon as the scene starts, so a broken tilemap fails here and not on first use.
+            builder.RegisterBuildCallback(container => container.Resolve<GridMap>());
         }
     }
 }
