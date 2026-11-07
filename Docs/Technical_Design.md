@@ -90,7 +90,7 @@ Gameplay/
 ├── Combat/         CombatService, Damage, Targeting
 ├── Selection/      SelectionService, BoxSelectionView
 ├── Commands/       CommandService, IUnitCommand, MoveCommand, AttackCommand ...
-├── Teams/          Faction, TeamColor, TeamService
+├── Teams/          Faction, TeamService (TeamColor, menüden taşındığı için Core.Session içinde)
 ├── Economy/        ResourceService, PopulationService, StorageService     (P1)
 ├── Calendar/       CalendarService, DayNightView                          (P1)
 ├── Waves/          WaveService, EnemyAI                                    (P1)
@@ -137,7 +137,7 @@ Her bina ve birimin bir `EntityId` değeri vardır (artan `int`). Servisler birb
 
 - `EventBus` **Gameplay scope'una** kaydedilir. Sahne kapanınca tüm abonelikler de onunla birlikte yok olur, sahneler arası abonelik sızıntısı olmaz.
 - `GameSessionSettings` yeni oyun ayarlarını (mod, renk, zorluk, seed) menüden Gameplay'e taşır.
-- Gameplay sahnesi editörde doğrudan Play'e basılarak açılabilir. Proje scope'u yoksa `GameplayLifetimeScope` varsayılan ayarlarla (Sandbox, Kırmızı, rastgele seed) çalışır.
+- `ProjectLifetimeScope` bir prefab'dır ve `VContainerSettings` asset'inde **Root Lifetime Scope** olarak atanır. VContainer bu prefab'ı her sahne açılışında otomatik oluşturur. Böylece Gameplay sahnesi editörde doğrudan Play'e basılarak açıldığında da proje servisleri hazır olur ve varsayılan ayarlarla (Sandbox, Kırmızı, rastgele seed) çalışır.
 
 ---
 

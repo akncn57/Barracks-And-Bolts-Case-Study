@@ -1,0 +1,23 @@
+{
+    "name": "BarracksAndBolts.UI",
+    "rootNamespace": "BarracksAndBolts.UI",
+    "references": [
+        "BarracksAndBolts.Core",
+        "BarracksAndBolts.Gameplay",
+        "BarracksAndBolts.Popup",
+        "BarracksAndBolts.Utils",
+        "VContainer",
+        "UniTask",
+        "UnityEngine.UI",
+        "Unity.TextMeshPro"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

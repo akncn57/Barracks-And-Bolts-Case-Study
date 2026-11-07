@@ -1,8 +1,10 @@
 {
     "name": "BarracksAndBolts.Core",
-    "rootNamespace": "",
+    "rootNamespace": "BarracksAndBolts.Core",
     "references": [
-        "GUID:b0214a6008ed146ff8f122a6a9c2f6cc"
+        "BarracksAndBolts.Utils",
+        "VContainer",
+        "UniTask"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
