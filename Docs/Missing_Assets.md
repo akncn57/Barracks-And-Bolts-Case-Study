@@ -62,7 +62,7 @@
 ## P3 – Cila
 | # | Eksik | Neden Gerekli | Çözüm |
 |---|---|---|---|
-| 26 | **Tarla** | Yemek üretimi | 🔍 Üretilen deneme zayıf kaldı; hazır bir ekin asset'i bulunacak ya da Aseprite'ta çizilecek |
+| 26 | ~~Tarla~~ | ✅ Paketin çalı sprite'larından fideler, buğday sırası, Archery çitiyle çevrili: `Textures/Buildings/Neutral/Texture_Buildings_Neutral_Farm` | – |
 | 27 | **Müzik:** ana menü, gündüz, baskın | Atmosfer | 🔍 (CC0: OpenGameArt, Pixabay) |
 | 28 | **SFX:** UI tıklama, bina yerleştirme, inşa, odun kesme, maden kazma, kılıç vuruşu, ok atışı, ölüm, bina yıkılması, borozan, iyileştirme, kazanma, kaybetme, hata | Geri bildirim | 🔍 (Kenney CC0 paketleri) |
 | 29 | Tutorial göstergeleri (vurgulama çerçevesi, ok) | Tutorial | 🛠 Seçim imleci + ok ikonu |
@@ -71,7 +71,7 @@
 ---
 
 ## En Önemli Eksikler (önce bunlar)
-P0 ve P1 için kritik asset eksiği kalmadı. Açık kalanlar: gün/gece ve baskın ikonları (P1, mevcut ikonlardan türetilecek), inşa görseli (P2, kodla), tarla (P3), müzik ve ses efektleri (P3).
+P0 ve P1 için kritik asset eksiği kalmadı. Açık kalanlar: gün/gece ve baskın ikonları (P1, mevcut ikonlardan türetilecek), inşa görseli (P2, kodla), müzik ve ses efektleri (P3).
 
 ## Lisans Notu
 Dışarıdan eklenen her asset için kaynak ve lisans bilgisi README'ye "Credits" bölümüne yazılacak.
