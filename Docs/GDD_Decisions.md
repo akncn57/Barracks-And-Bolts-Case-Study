@@ -123,6 +123,8 @@ Bu değerler ScriptableObject üzerinden ayarlanabilir olacak, ileride değişti
 | Taş | `Rock1–4`. Birkaç kaya bir araya gelip bir taş ocağı kümesi oluşturur | 64x64 | 1x1 (her kaya) |
 | Zemin | `Tilemap_color1–5`, `Water Background`, `Water Foam`, `Water Rocks` | 64 tile | – |
 
+- **Klasör yapısı renge göredir:** `Buildings/<Renk>/Texture_Buildings_<Renk>_<Bina>`, `Units/<Renk>/<Birim>/Texture_Units_<Renk>_<Birim>_<Animasyon>`. Renksiz assetler ayrı klasördedir: `Units/Sheep`, `Units/Projectiles` (ok), `VFX`.
+- Tablodaki asset adları renk öneki olmadan yazılmıştır (ör. `Castle` → `Texture_Buildings_Red_Castle`).
 - **Taban** binanın grid'de kapladığı alandır. Sprite'ın üst kısmı (çatı) tabanın dışına taşar ve üstteki hücreleri örter (pivot altta).
 - Assette olmayanlar (üretilecek): Depolar (4 adet), Karakol, Tarla, ses ve müzik. Düşman renkli birimleri kullanıcı ekleyecek.
 - Oyun içi sprite'ların PPU değeri 64'e çekildi (1 tile = 1 Unity birimi = 1 grid hücresi). UI ve imleç texture'ları 100'de kaldı.
@@ -180,8 +182,11 @@ Bu değerler ScriptableObject üzerinden ayarlanabilir olacak, ileride değişti
 - Üretim deterministik olmalıdır: `System.Random(seed)` kullanılır, `UnityEngine.Random` global state'i kullanılmaz.
 - Ayarlar (boyut, kaynak yoğunluğu, spawn sayısı) bir `MapGenerationSettings` ScriptableObject'inde tutulur.
 
-### Düşman Tarafı
-- Düşman birlikleri oyuncunun birlikleriyle aynıdır: Şövalye, Mızrakçı, Okçu ve Rahip. Sadece farklı renktedirler ve ayrı assetleri vardır.
+### Düşman Tarafı ve Renk Seçimi
+- Düşman birlikleri oyuncunun birlikleriyle aynıdır: Şövalye, Mızrakçı, Okçu ve Rahip. Sadece renkleri farklıdır.
+- **Renk taraf belirtmez:** Oyuncu yeni oyun ayarlarında kendi rengini seçer, düşman kalan renklerden birini alır. Kod hiçbir yerde "kırmızı = düşman" gibi bir varsayım yapmaz. Taraf (`Faction`) ve renk (`TeamColor`) ayrı kavramlardır.
+- Her renk için bir **renk seti** (ScriptableObject) tanımlanır: o rengin bina ve birim sprite'ları. Yeni renk eklemek için yeni bir klasör ve yeni bir set yeterlidir.
+- Mevcut renkler: **Kırmızı** (tam set) ve **Mavi** (Castle ve Pawn eksik).
 - **Dost ateşi yok:** Oyuncu kendi birimlerine ve binalarına saldırma emri veremez.
 - **Düşman yerleşkeleri (ileride konuşulacak):** Haritada rastgele küçük düşman yerleşkeleri olabilir. Böylece PDF'teki "binaya saldırma" maddesi düşman binaları üzerinden de karşılanır.
 

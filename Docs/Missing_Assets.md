@@ -24,8 +24,9 @@
 ## P0 – PDF için gerekli
 | # | Eksik | Neden Gerekli | Çözüm |
 |---|---|---|---|
-| 1 | **Düşman renkli birimler** (Warrior, Lancer, Archer, Monk) | Saldırının test edilmesi (dost ateşi yok) | 👤 |
-| 2 | **Düşman renkli binalar** (en az Barracks, House, Castle, Tower) | PDF'teki "binaya saldır" maddesinin test edilmesi | 👤 (Tiny Swords'ta renk varyantları var) |
+| 1 | ~~İkinci renk birimler~~ | ✅ Mavi set eklendi (Warrior, Lancer, Archer, Monk) | – |
+| 2 | ~~İkinci renk binalar~~ | ✅ Mavi set eklendi (Barracks, House, Monastery, Tower, Archery) | – |
+| 2a | **Mavi Castle ve mavi Pawn** | Oyuncu maviyi seçerse ana üs ve köylü gerekir | 👤 |
 | 3 | Yerleştirme önizlemesi (yeşil/kırmızı hücre) | PDF: geçersiz alan kırmızı | 💻 Beyaz kare sprite + renk |
 | 4 | Seçim göstergesi (birimin altında halka/elips) | Neyin seçili olduğunu göstermek | 💻 Basit elips sprite. Alternatif: `Cursor_04` köşeleri |
 | 5 | Kutu seçimi dikdörtgeni | Sürükleyerek seçim | 💻 UI Image (9-slice) |
@@ -70,7 +71,7 @@
 ---
 
 ## En Önemli Eksikler (önce bunlar)
-1. **Düşman renkli birimler ve binalar** (P0'ın saldırı testi buna bağlı) 👤
+1. **Mavi Castle ve mavi Pawn** (renk seçiminin tam çalışması için) 👤
 2. **Ölüm ve yıkılma efektleri** (Tiny Swords Effects klasörü) 🔍
 3. **Taş ve nüfus ikonları** (kaynak barı) 🛠 / 🔍
 4. **Depo binaları ve Karakol** (P2, mevcut assetlerden üretilecek) 🛠
