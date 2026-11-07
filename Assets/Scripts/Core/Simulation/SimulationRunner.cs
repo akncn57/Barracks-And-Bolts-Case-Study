@@ -28,7 +28,7 @@ namespace BarracksAndBolts.Core.Simulation
 
             // Insert after the last system of the same or an earlier phase,
             // so systems within a phase keep their registration order.
-            int index = _systems.FindLastIndex(existing => existing.Phase <= system.Phase) + 1;
+            var index = _systems.FindLastIndex(existing => existing.Phase <= system.Phase) + 1;
             _systems.Insert(index, system);
         }
 
@@ -40,11 +40,11 @@ namespace BarracksAndBolts.Core.Simulation
         /// <summary>Runs one frame with the given real delta. Public so tests can drive the loop.</summary>
         public void Step(float realDeltaTime)
         {
-            float deltaTime = _clock.Advance(realDeltaTime);
+            var deltaTime = _clock.Advance(realDeltaTime);
             if (deltaTime <= 0f)
                 return;
 
-            for (int i = 0; i < _systems.Count; i++)
+            for (var i = 0; i < _systems.Count; i++)
                 _systems[i].Tick(deltaTime);
         }
     }

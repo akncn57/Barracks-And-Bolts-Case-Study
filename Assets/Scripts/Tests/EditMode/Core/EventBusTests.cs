@@ -31,7 +31,7 @@ namespace BarracksAndBolts.Tests.EditMode.Core
         [Test]
         public void Publish_DeliversEventToSubscriber()
         {
-            int received = 0;
+            var received = 0;
             _bus.Subscribe<TestEvent>(e => received = e.Value);
 
             _bus.Publish(new TestEvent(42));
@@ -48,7 +48,7 @@ namespace BarracksAndBolts.Tests.EditMode.Core
         [Test]
         public void Publish_OnlyReachesSubscribersOfThatEventType()
         {
-            bool otherReceived = false;
+            var otherReceived = false;
             _bus.Subscribe<OtherEvent>(_ => otherReceived = true);
 
             _bus.Publish(new TestEvent(1));
@@ -71,8 +71,8 @@ namespace BarracksAndBolts.Tests.EditMode.Core
         [Test]
         public void Dispose_StopsDelivery()
         {
-            int count = 0;
-            IDisposable subscription = _bus.Subscribe<TestEvent>(_ => count++);
+            var count = 0;
+            var subscription = _bus.Subscribe<TestEvent>(_ => count++);
 
             subscription.Dispose();
             _bus.Publish(new TestEvent(1));
@@ -83,7 +83,7 @@ namespace BarracksAndBolts.Tests.EditMode.Core
         [Test]
         public void Dispose_CalledTwice_DoesNotThrow()
         {
-            IDisposable subscription = _bus.Subscribe<TestEvent>(_ => { });
+            var subscription = _bus.Subscribe<TestEvent>(_ => { });
 
             subscription.Dispose();
 
@@ -94,7 +94,7 @@ namespace BarracksAndBolts.Tests.EditMode.Core
         public void Publish_HandlerDisposedByEarlierHandler_IsSkipped()
         {
             IDisposable second = null;
-            bool secondReceived = false;
+            var secondReceived = false;
             _bus.Subscribe<TestEvent>(_ => second.Dispose());
             second = _bus.Subscribe<TestEvent>(_ => secondReceived = true);
 
@@ -106,8 +106,8 @@ namespace BarracksAndBolts.Tests.EditMode.Core
         [Test]
         public void Publish_HandlerSubscribedDuringPublish_ReceivesOnlyNextEvent()
         {
-            int lateCount = 0;
-            bool hasSubscribed = false;
+            var lateCount = 0;
+            var hasSubscribed = false;
             _bus.Subscribe<TestEvent>(_ =>
             {
                 if (hasSubscribed)
@@ -127,7 +127,7 @@ namespace BarracksAndBolts.Tests.EditMode.Core
         [Test]
         public void Publish_HandlerThrows_OtherHandlersStillRun()
         {
-            bool secondReceived = false;
+            var secondReceived = false;
             _bus.Subscribe<TestEvent>(_ => throw new InvalidOperationException("boom"));
             _bus.Subscribe<TestEvent>(_ => secondReceived = true);
 

@@ -32,7 +32,7 @@ namespace BarracksAndBolts.Utils.Disposables
                 return;
 
             _isDisposed = true;
-            foreach (IDisposable item in _items)
+            foreach (var item in _items)
                 item.Dispose();
 
             _items.Clear();

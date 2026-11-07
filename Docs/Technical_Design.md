@@ -258,7 +258,7 @@ public interface IEventBus
 - Her dosyada tek tip olur ve dosya adı tip adıyla aynıdır.
 - Public API'lerde XML doc (`/// <summary>`) yazılır. Yorumlar **neyi** değil, **neden** yapıldığını açıklar.
 - Sihirli sayı kullanılmaz. Değerler ya Definition/Config'te ya da isimli bir sabitte durur.
-- `var`, sadece tip sağ taraftan açıkça okunabiliyorsa kullanılır.
+- Yerel değişkenlerde her zaman `var` kullanılır (`foreach`, `for` ve `out var` dahil). Tek istisna `null` ile başlatılan değişkenlerdir; C# bunlarda tipin yazılmasını zorunlu kılar.
 - `GetComponent` ve `Find` çağrıları runtime'da sık çalışan kodda yapılmaz. Referanslar Inspector'dan ya da Inject ile gelir.
 
 ### Asset

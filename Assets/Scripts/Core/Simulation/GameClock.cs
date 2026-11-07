@@ -35,7 +35,7 @@ namespace BarracksAndBolts.Core.Simulation
             if (IsPaused || realDeltaTime <= 0f)
                 return 0f;
 
-            float gameDeltaTime = Mathf.Min(realDeltaTime, MaxFrameDelta) * TimeScale;
+            var gameDeltaTime = Mathf.Min(realDeltaTime, MaxFrameDelta) * TimeScale;
             ElapsedTime += gameDeltaTime;
             return gameDeltaTime;
         }

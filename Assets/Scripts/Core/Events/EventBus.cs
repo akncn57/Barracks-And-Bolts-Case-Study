@@ -13,7 +13,7 @@ namespace BarracksAndBolts.Core.Events
 
         public void Publish<TEvent>(in TEvent gameEvent) where TEvent : struct, IGameEvent
         {
-            if (_channels.TryGetValue(typeof(TEvent), out object channel))
+            if (_channels.TryGetValue(typeof(TEvent), out var channel))
                 ((Channel<TEvent>)channel).Publish(gameEvent);
         }
 
@@ -22,7 +22,7 @@ namespace BarracksAndBolts.Core.Events
             if (handler == null)
                 throw new ArgumentNullException(nameof(handler));
 
-            if (!_channels.TryGetValue(typeof(TEvent), out object channel))
+            if (!_channels.TryGetValue(typeof(TEvent), out var channel))
             {
                 channel = new Channel<TEvent>();
                 _channels.Add(typeof(TEvent), channel);
@@ -55,7 +55,7 @@ namespace BarracksAndBolts.Core.Events
                     _isSnapshotDirty = false;
                 }
 
-                foreach (Subscription subscription in _snapshot)
+                foreach (var subscription in _snapshot)
                 {
                     // A handler earlier in this loop may have disposed this one.
                     if (!subscription.IsActive)
