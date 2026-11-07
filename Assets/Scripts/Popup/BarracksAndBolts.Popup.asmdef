@@ -1,6 +1,6 @@
 {
-    "name": "ProjectBlade.Popup",
-    "rootNamespace": "",
+    "name": "BarracksAndBolts.Popup",
+    "rootNamespace": "BarracksAndBolts.Popup",
     "references": [
         "VContainer",
         "UnityEngine.UI",
