@@ -1,5 +1,7 @@
 # Barracks & Bolts – Öncelik ve Takvim
 
+> **Durum (7 Kasım akşamı):** Altyapı, grid, kamera, A* (algoritma) ve tüm P0/P1 assetleri hazır. 102 EditMode testi. **Sıradaki adım:** veri tanımları (BuildingDefinition / UnitDefinition) → bina yerleştirme → Production Menu (sonsuz scroll + pooling) → Information Panel.
+
 > **Teslim tarihi:** 13 Kasım 2026, Cuma
 > **Ana kural:** Her öncelik seviyesi bitmeden bir sonrakine geçilmez. `main` branch'i her zaman çalışan ve build alınabilen bir halde tutulur.
 > Detaylı tasarım kararları için: [GDD_Decisions.md](GDD_Decisions.md)
@@ -9,9 +11,9 @@
 ## P0 – PDF Zorunlulukları (olmazsa olmaz)
 Bu seviye bittiğinde PDF'teki her madde karşılanmış olur. **Hedef: 10 Kasım Salı akşamı.** Bu noktada `v1.0-pdf` tag'i ile bir build alınır.
 
-- [ ] Proje iskeleti: klasör yapısı, sahne hiyerarşisi, isimlendirme standartları, teknik doküman
-- [ ] Grid sistemi (A* ve bina yerleştirme aynı grid'i kullanır). Bu aşamada sabit veya basit bir harita
-- [ ] Kamera: kaydırma ve zoom, harita sınırlarına göre kısıtlı, farklı ekran oranlarında çalışır
+- [x] Proje iskeleti: klasör yapısı, sahne hiyerarşisi, isimlendirme standartları, teknik doküman (+ DI scope'ları, EventBus, simülasyon döngüsü, Bootstrap/MainMenu/Gameplay sahneleri)
+- [x] Grid sistemi (A* ve bina yerleştirme aynı grid'i kullanır). Bu aşamada sabit veya basit bir harita
+- [x] Kamera: kaydırma ve zoom, harita sınırlarına göre kısıtlı, farklı ekran oranlarında çalışır (Cinemachine)
 - [ ] Veri odaklı bina ve birim tanımları (ScriptableObject: ad, görsel, boyut, HP, hasar)
 - [ ] **Production Menu:** sonsuz scroll view + object pooling
 - [ ] **Bina yerleştirme:** önizleme, geçerli alan yeşil, geçersiz alan kırmızı
@@ -19,11 +21,11 @@ Bu seviye bittiğinde PDF'teki her madde karşılanmış olur. **Hedef: 10 Kası
 - [ ] **Information Panel:** seçilen binanın görseli. Üretim yapan binada üretilebilir birimlerin listesi
 - [ ] Barracks'tan 3 asker üretimi (10 HP; 10 / 5 / 2 hasar), süre yok, sınırsız. Spawn point (doluysa en yakın boş hücre)
 - [ ] Seçim: sol tık ve kutu seçimi
-- [ ] **A\* pathfinding:** sağ tıkla hareket, binaların etrafından dolaşma, grup halinde gidince hedefin etrafına dağılma
+- [ ] **A\* pathfinding:** sağ tıkla hareket, binaların etrafından dolaşma, grup halinde gidince hedefin etrafına dağılma *(algoritma ve GridSearch hazır + testli; birim hareketine bağlanması kaldı)*
 - [ ] **Saldırı:** sağ tıkla birime ya da binaya saldırma
 - [ ] HP 0 olunca yok olma: seçim ve panel temizlenir, grid hücreleri boşalır, saldıranlar hedefini bırakır
 - [ ] **Minimal Sandbox:** düşman birimi ve binası yerleştirme. Dost ateşi olmadığı için saldırı maddesinin test edilebilmesi buna bağlı
-- [ ] Ana menü (Sandbox ile başlama ve çıkış yeterli)
+- [x] Ana menü (Sandbox ile başlama ve çıkış yeterli)
 - [ ] SetPass < 20 kontrolü (Sprite Atlas, Frame Debugger ile ölçüm)
 - [ ] Resizable Windows build
 - [ ] README: nasıl oynanır, kontroller, mimari özeti, PDF maddelerinin nasıl karşılandığı
