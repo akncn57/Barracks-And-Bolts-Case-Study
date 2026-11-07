@@ -25,9 +25,10 @@ namespace BarracksAndBolts.Gameplay.Grid
             if (groundTilemap == null)
                 throw new InvalidOperationException($"{name}: ground tilemap is not assigned.");
 
-            // GridMap treats one cell as one world unit.
-            if (groundTilemap.layoutGrid.cellSize != Vector3.one)
-                throw new InvalidOperationException($"{name}: grid cell size must be (1, 1, 1), got {groundTilemap.layoutGrid.cellSize}.");
+            // GridMap treats one cell as one world unit. Z is unused in 2D, so only X and Y are checked.
+            var cellSize = (Vector2)groundTilemap.layoutGrid.cellSize;
+            if (cellSize != Vector2.one)
+                throw new InvalidOperationException($"{name}: grid cell size must be 1x1, got {cellSize.x}x{cellSize.y}.");
 
             // Painting and erasing can leave empty rows at the edges; shrink to the painted area.
             groundTilemap.CompressBounds();

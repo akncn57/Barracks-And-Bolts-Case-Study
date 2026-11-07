@@ -50,6 +50,9 @@ Assets/
 ├── Scripts/                    (bkz. Bölüm 3)
 ├── Settings/                   URP, Renderer2D, Input Actions
 ├── Textures/                   Texture_<Klasör yolu>_<İsim>.png (renge göre: Red/, Yellow/)
+├── Tiles/
+│   ├── Palettes/               Palette_<İsim>.prefab
+│   └── <Kategori>/             Tile_<Kategori>_<İsim>.asset
 └── TextMesh Pro/
 ```
 
@@ -271,6 +274,8 @@ public interface IEventBus
 | Animator | `Animator_<Birim>` / `AnimatorOverride_<Renk>_<Birim>` | `AnimatorOverride_Yellow_Lancer` |
 | Material | `Material_<İsim>` | `Material_TerritoryOverlay` |
 | Ses | `SFX_<Kategori>_<İsim>`, `Music_<İsim>` | `SFX_Combat_SwordHit` |
+| Tile | `Tile_<Kategori>_<İsim>` | `Tile_Terrain_Ground_Color_01_00` |
+| Tile Palette | `Palette_<İsim>` | `Palette_Terrain` |
 | Sahne | PascalCase | `Gameplay` |
 
 ### Sahne Hiyerarşisi (Gameplay)
