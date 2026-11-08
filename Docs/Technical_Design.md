@@ -226,6 +226,7 @@ public interface IEventBus
 ## 11. Object Pooling ve Sonsuz Scroll
 - `PoolService`, Unity'nin `UnityEngine.Pool.ObjectPool<T>` sınıfını prefab bazında sarar. Birimler, mermiler, efektler ve hasar sayıları pool'dan gelir. Pool'a geri dönen nesne `IPoolable.OnDespawn` ile durumunu sıfırlar.
 - **Production Menu (sonsuz scroll):** `RecyclingScrollView`
+- **Kaynak barı:** `ResourceBarView`, ekranın üstünde tam genişlik. Üstteki paneller barın altından başlar.
 - **Sol kenardan açılan panel:** `SlideOutPanel` (DOTween). Production Menu kapalı başlar; panel kapalıyken de kendi butonu ekranda kalır.
   - ScrollRect kullanılmaz; sürükleme, fırlatma ve tekerlek bileşenin kendisindedir. Kaydırma tek bir offset değeridir.
   - Sadece görünen satır sayısı + 1 kadar satır oluşturulur (kaydırırken üstte ve altta aynı anda yarım satır görünebilir).

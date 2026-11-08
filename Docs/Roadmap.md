@@ -39,6 +39,7 @@ Oyunu deneyince çıkan kullanılabilirlik istekleri. Sandbox'ta da olmalı, bui
 - [x] **Production Menu tooltip:** Hücrenin üstünde durunca bina bilgisi açılır (boyut, HP, ürettikleri). Maliyet satırı P1'de maliyetler gelince eklenir
 - [x] **Production Menu açılır kapanır:** Kapalı başlar, butona basınca soldan DOTween ile kayarak gelir. Haritayı kapatmasın diye
 - [x] **Esc ve panel kapatma:** Esc her basışta en üstteki katmanı kapatır: yerleştirme, seçim, Production Menu. Information Panel'in köşesinde kapatma butonu var
+- [x] **Kaynak barı:** Ekranın üstünde odun, taş, yemek, altın ve nüfus. Sandbox'ta hepsi ∞. Üstteki UI barın altına indi
 - [x] **Birim kartı:** Asker seçilince alt ortada küçük kart çıkar, mouse'u yakalamaz. Büyük panel sadece binada açılır
 
 ## P1 – Oyun Döngüsü (bu seviyeyle bir "oyun" ortaya çıkar)
@@ -47,7 +48,7 @@ Oyunu deneyince çıkan kullanılabilirlik istekleri. Sandbox'ta da olmalı, bui
 - [ ] Kaynaklar (odun, taş, yemek, altın) ve haritadaki kaynak noktaları (tükenme, koyunların çoğalması)
 - [ ] Köylü: Castle'dan üretim, kaynak toplama, Castle'a taşıma
 - [ ] Bina ve birim maliyetleri (Production Menu hücresinde ve tooltip'te gösterilir)
-- [ ] Ekranda mevcut kaynakların ve nüfusun görünmesi (HUD)
+- [ ] Üstteki kaynak barının gerçek miktarlara bağlanması (bar P0+'ta geldi; Normal modda şimdilik 0 yazıyor)
 - [ ] Nüfus sistemi (House ile kapasite artışı)
 - [ ] Takvim: gündüz/gece döngüsü, saldırı günleri, baskın sırasında zamanın durması
 - [ ] Düşman AI: Castle'a yürür, yolundakine saldırır, kapalı yolda engel yıkar
