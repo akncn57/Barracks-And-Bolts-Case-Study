@@ -4,8 +4,10 @@ using BarracksAndBolts.Gameplay.Buildings;
 using BarracksAndBolts.Gameplay.Data;
 using BarracksAndBolts.Gameplay.Entities;
 using BarracksAndBolts.Gameplay.Grid;
+using BarracksAndBolts.Gameplay.Pathfinding;
 using BarracksAndBolts.Gameplay.Placement;
 using BarracksAndBolts.Gameplay.Teams;
+using BarracksAndBolts.Gameplay.Units;
 using NUnit.Framework;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -17,7 +19,9 @@ namespace BarracksAndBolts.Tests.EditMode.Gameplay
         private GridMap _map;
         private EventBus _eventBus;
         private BuildingService _buildings;
+        private UnitService _units;
         private PlacementService _placement;
+        private UnitDefinition _knight;
         private BuildingDefinition _house;
         private BuildingDefinition _barracks;
 
@@ -26,8 +30,11 @@ namespace BarracksAndBolts.Tests.EditMode.Gameplay
         {
             _map = new GridMap(10, 10, Vector2.zero);
             _eventBus = new EventBus();
-            _buildings = new BuildingService(_map, new GameEntityIdGenerator(), _eventBus);
-            _placement = new PlacementService(_map, _buildings, _eventBus);
+            var ids = new GameEntityIdGenerator();
+            _buildings = new BuildingService(_map, ids, _eventBus);
+            _units = new UnitService(_map, new GridSearch(_map), ids, _eventBus);
+            _placement = new PlacementService(_map, _buildings, _units, _eventBus);
+            _knight = TestDefinitions.CreateUnit("knight");
             _house = TestDefinitions.CreateBuilding("house", new Vector2Int(2, 2), maxHp: 50);
             _barracks = TestDefinitions.CreateBuilding("barracks", new Vector2Int(3, 3));
         }
@@ -37,6 +44,7 @@ namespace BarracksAndBolts.Tests.EditMode.Gameplay
         {
             Object.DestroyImmediate(_house);
             Object.DestroyImmediate(_barracks);
+            Object.DestroyImmediate(_knight);
         }
 
         [Test]
@@ -167,6 +175,41 @@ namespace BarracksAndBolts.Tests.EditMode.Gameplay
             Assert.IsFalse(_placement.IsActive);
             Assert.AreEqual(1, endedCount);
             Assert.AreEqual(0, _buildings.Count);
+        }
+
+        [Test]
+        public void UnitInsideFootprint_MakesAreaInvalidAndBlocksConfirm()
+        {
+            _units.TrySpawn(_knight, new Vector2Int(5, 5), Faction.Player, out _);
+            _placement.Begin(_house, Faction.Player);
+            _placement.MoveTo(new Vector2(5f, 5f));
+
+            Assert.IsFalse(_placement.IsAreaValid);
+            Assert.IsFalse(_placement.TryConfirm(keepPlacing: false));
+            Assert.IsTrue(_placement.IsActive);
+            Assert.AreEqual(0, _buildings.Count);
+        }
+
+        [Test]
+        public void UnitOutsideFootprint_DoesNotBlock()
+        {
+            _units.TrySpawn(_knight, new Vector2Int(8, 8), Faction.Player, out _);
+            _placement.Begin(_house, Faction.Player);
+            _placement.MoveTo(new Vector2(5f, 5f));
+
+            Assert.IsTrue(_placement.IsAreaValid);
+        }
+
+        [Test]
+        public void IsCellFree_FalseForUnitBuildingAndOutsideMap()
+        {
+            _units.TrySpawn(_knight, new Vector2Int(5, 5), Faction.Player, out _);
+            _map.TryOccupy(new RectInt(1, 1, 1, 1), new GameEntityId(99));
+
+            Assert.IsFalse(_placement.IsCellFree(new Vector2Int(5, 5)));
+            Assert.IsFalse(_placement.IsCellFree(new Vector2Int(1, 1)));
+            Assert.IsFalse(_placement.IsCellFree(new Vector2Int(-1, 0)));
+            Assert.IsTrue(_placement.IsCellFree(new Vector2Int(7, 7)));
         }
     }
 }

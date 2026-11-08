@@ -4,6 +4,7 @@ using BarracksAndBolts.Gameplay.Buildings;
 using BarracksAndBolts.Gameplay.Data;
 using BarracksAndBolts.Gameplay.Grid;
 using BarracksAndBolts.Gameplay.Teams;
+using BarracksAndBolts.Gameplay.Units;
 using UnityEngine;
 
 namespace BarracksAndBolts.Gameplay.Placement
@@ -16,12 +17,14 @@ namespace BarracksAndBolts.Gameplay.Placement
     {
         private readonly GridMap _gridMap;
         private readonly BuildingService _buildingService;
+        private readonly UnitService _units;
         private readonly IEventBus _eventBus;
 
-        public PlacementService(GridMap gridMap, BuildingService buildingService, IEventBus eventBus)
+        public PlacementService(GridMap gridMap, BuildingService buildingService, UnitService units, IEventBus eventBus)
         {
             _gridMap = gridMap;
             _buildingService = buildingService;
+            _units = units;
             _eventBus = eventBus;
         }
 
@@ -33,7 +36,12 @@ namespace BarracksAndBolts.Gameplay.Placement
         public bool HasArea { get; private set; }
 
         public RectInt Area { get; private set; }
-        public bool IsAreaValid => HasArea && _gridMap.IsAreaFree(Area);
+
+        // Units don't block the grid, but a building placed on one would trap it.
+        public bool IsAreaValid => HasArea && _gridMap.IsAreaFree(Area) && !_units.HasUnitIn(Area);
+
+        /// <summary>True if this cell of the footprint doesn't stop the building from being placed.</summary>
+        public bool IsCellFree(Vector2Int cell) => _gridMap.IsWalkable(cell) && !_units.HasUnitAt(cell);
 
         /// <summary>Starts placing the building. Calling it while active swaps the building, no cancel needed.</summary>
         public void Begin(BuildingDefinition definition, Faction faction)

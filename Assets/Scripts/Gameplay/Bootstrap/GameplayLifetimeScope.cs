@@ -2,6 +2,7 @@ using System;
 using BarracksAndBolts.Core.Events;
 using BarracksAndBolts.Core.Simulation;
 using BarracksAndBolts.Gameplay.Buildings;
+using BarracksAndBolts.Gameplay.Buildings.Production;
 using BarracksAndBolts.Gameplay.CameraControl;
 using BarracksAndBolts.Gameplay.Data;
 using BarracksAndBolts.Gameplay.Entities;
@@ -11,6 +12,7 @@ using BarracksAndBolts.Gameplay.Pathfinding;
 using BarracksAndBolts.Gameplay.Placement;
 using BarracksAndBolts.Gameplay.Selection;
 using BarracksAndBolts.Gameplay.Teams;
+using BarracksAndBolts.Gameplay.Units;
 using UnityEngine;
 using VContainer;
 using VContainer.Unity;
@@ -44,8 +46,15 @@ namespace BarracksAndBolts.Gameplay.Bootstrap
             builder.Register<TeamService>(Lifetime.Singleton);
 
             RegisterGrid(builder);
+            RegisterUnits(builder);
             RegisterBuildings(builder);
             builder.RegisterComponentInHierarchy<CameraController>();
+        }
+
+        private static void RegisterUnits(IContainerBuilder builder)
+        {
+            builder.Register<UnitService>(Lifetime.Singleton);
+            builder.RegisterComponentInHierarchy<UnitViewSpawner>();
         }
 
         private static void RegisterGrid(IContainerBuilder builder)
@@ -64,6 +73,7 @@ namespace BarracksAndBolts.Gameplay.Bootstrap
         {
             builder.Register<BuildingService>(Lifetime.Singleton);
             builder.RegisterComponentInHierarchy<BuildingViewSpawner>();
+            builder.Register<UnitProductionService>(Lifetime.Singleton);
 
             builder.Register<PlacementService>(Lifetime.Singleton);
             builder.RegisterEntryPoint<PlacementInputHandler>();

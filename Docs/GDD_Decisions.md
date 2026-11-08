@@ -198,6 +198,7 @@ Bu değerler ScriptableObject üzerinden ayarlanabilir olacak, ileride değişti
 ### Spawn Point ve Toplanma Noktası
 - Her üretim binasının (Castle, Barracks, Kilise) bir spawn point'i vardır.
 - Spawn hücresi doluysa ya da kapalıysa birim en yakın boş hücrede doğar.
+- Üzerinde birim duran alana bina konamaz; önizlemede o hücreler kırmızı görünür.
 - Bina seçiliyken sağ tıklanırsa bir toplanma noktası (rally point) belirlenir. Yeni doğan birimler oraya kendiliğinden yürür.
 
 ### Köylü Kaçışı

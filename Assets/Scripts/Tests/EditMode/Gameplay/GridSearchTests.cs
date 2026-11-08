@@ -23,6 +23,25 @@ namespace BarracksAndBolts.Tests.EditMode.Gameplay
         }
 
         [Test]
+        public void TryFindNearestWalkable_WithCondition_SkipsCellsThatFailIt()
+        {
+            var search = new GridSearch(new GridMap(10, 10, Vector2.zero));
+            var taken = new Vector2Int(4, 4);
+
+            Assert.IsTrue(search.TryFindNearestWalkable(taken, cell => cell != taken, out var result));
+
+            Assert.AreEqual(1, (result - taken).sqrMagnitude);
+        }
+
+        [Test]
+        public void TryFindNearestWalkable_ConditionFailsEverywhere_ReturnsFalse()
+        {
+            var search = new GridSearch(new GridMap(4, 4, Vector2.zero));
+
+            Assert.IsFalse(search.TryFindNearestWalkable(Vector2Int.zero, _ => false, out _));
+        }
+
+        [Test]
         public void TryFindNearestWalkable_TargetUnderBuilding_ReturnsClosestFreeCell()
         {
             var map = new GridMap(10, 10, Vector2.zero);

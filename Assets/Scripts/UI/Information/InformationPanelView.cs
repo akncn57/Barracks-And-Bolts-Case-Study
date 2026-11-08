@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using BarracksAndBolts.Core.Events;
 using BarracksAndBolts.Gameplay.Buildings;
+using BarracksAndBolts.Gameplay.Buildings.Production;
 using BarracksAndBolts.Gameplay.Data;
 using BarracksAndBolts.Gameplay.Selection;
 using BarracksAndBolts.Gameplay.Teams;
@@ -39,14 +40,17 @@ namespace BarracksAndBolts.UI.Information
         private SelectionService _selection;
         private BuildingService _buildings;
         private TeamService _teams;
+        private UnitProductionService _production;
         private IEventBus _eventBus;
 
         [Inject]
-        private void Construct(SelectionService selection, BuildingService buildings, TeamService teams, IEventBus eventBus)
+        private void Construct(SelectionService selection, BuildingService buildings, TeamService teams,
+            UnitProductionService production, IEventBus eventBus)
         {
             _selection = selection;
             _buildings = buildings;
             _teams = teams;
+            _production = production;
             _eventBus = eventBus;
         }
 
@@ -93,7 +97,13 @@ namespace BarracksAndBolts.UI.Information
         {
             // Cells are kept and reused; a building never has more than a handful of units.
             while (_cells.Count < units.Count)
-                _cells.Add(Instantiate(producibleCellPrefab, producibleContainer));
+            {
+                var cell = Instantiate(producibleCellPrefab, producibleContainer);
+
+                // Cells are destroyed together with this panel, so the handler never needs to be removed.
+                cell.Clicked += OnUnitClicked;
+                _cells.Add(cell);
+            }
 
             for (var i = 0; i < _cells.Count; i++)
             {
@@ -102,6 +112,13 @@ namespace BarracksAndBolts.UI.Information
                 if (isUsed)
                     _cells[i].Bind(units[i]);
             }
+        }
+
+        private void OnUnitClicked(UnitDefinition unit)
+        {
+            // The selection may have changed since the panel drew, so the building is looked up at click time.
+            if (_buildings.TryGet(_selection.Primary, out var building))
+                _production.TryProduce(building, unit, out _);
         }
     }
 }

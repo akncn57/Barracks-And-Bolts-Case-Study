@@ -92,8 +92,8 @@ Gameplay/
 ├── Grid/           GridMap, GridCell, GridCoordinates
 ├── Pathfinding/    AStarPathfinder, PathStatus, GridSearch
 ├── Placement/      PlacementService, PlacementInputHandler, PlacementPreviewView (bölge kuralı gelince: PlacementValidator)
-├── Buildings/      BuildingService, BuildingModel, BuildingView, BuildingViewSpawner, Production/
-├── Units/          UnitService, UnitModel, UnitView, States/
+├── Buildings/      BuildingService, BuildingModel, BuildingView, BuildingViewSpawner, Production/ (UnitProductionService)
+├── Units/          UnitService, UnitModel, UnitView, UnitViewSpawner, States/
 ├── Combat/         CombatService, Damage, Targeting
 ├── Selection/      SelectionService, SelectionInputHandler (birimler gelince: BoxSelectionView)
 ├── Commands/       CommandService, IUnitCommand, MoveCommand, AttackCommand ...
@@ -181,7 +181,7 @@ public interface IEventBus
 ## 8. Grid ve Pathfinding
 - **1 hücre = 1 Unity birimi = 64px** (oyun içi sprite'larda PPU 64). Görsel taraf Unity `Grid` + `Tilemap`, mantık tarafı `GridMap` ile çalışır.
 - `GridMap`, her hücre için şu bilgileri tutar: yürünebilir mi, üzerinde hangi bina veya kaynak var (`GameEntityId`), bölge içinde mi (P2).
-- **Birimler hücre işgal etmez.** Sadece binalar ve kaynaklar engeldir. Bu sayede birimler birbirini kilitleyemez. Üst üste binmeyi `GridSearch.CollectDestinations` ve hafif bir ayırma (separation) kuvveti önler.
+- **Birimler hücre işgal etmez.** Sadece binalar ve kaynaklar engeldir. Bu sayede birimler birbirini kilitleyemez. Üst üste binmeyi `GridSearch.CollectDestinations` ve hafif bir ayırma (separation) kuvveti önler. Üzerinde birim duran hücreye bina konamaz; yoksa birim binanın içinde kalır.
 - **A\***:
   - 8 yönlü hareket. Köşe kesmeye izin verilmez (iki yanı dolu çaprazdan geçilmez).
   - Octile mesafe sezgiseli kullanılır.
@@ -298,7 +298,7 @@ GameplayLifetimeScope
 ----- WORLD -----
     Buildings          (runtime'da üretilenlerin parent'ı, BuildingViewSpawner)
     PlacementPreview   (yerleştirme önizlemesi)
-    Units
+    Units              (runtime'da üretilenlerin parent'ı, UnitViewSpawner)
     Resources
     Effects
 ----- MANAGERS -----

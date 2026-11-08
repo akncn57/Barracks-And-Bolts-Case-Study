@@ -70,8 +70,8 @@ namespace BarracksAndBolts.Gameplay.Placement
             var cellIndex = 0;
             foreach (var cell in area.allPositionsWithin)
             {
-                // IsWalkable is also false outside the map, so cells sticking out show red too.
-                var isFree = _gridMap.IsWalkable(cell);
+                // Also false outside the map, so cells sticking out show red too.
+                var isFree = _placement.IsCellFree(cell);
                 isAreaFree &= isFree;
 
                 var cellRenderer = _cells[cellIndex++];

@@ -30,6 +30,12 @@ namespace BarracksAndBolts.Gameplay.Pathfinding
         /// </summary>
         public bool TryFindNearestWalkable(Vector2Int target, out Vector2Int result)
         {
+            return TryFindNearestWalkable(target, null, out result);
+        }
+
+        /// <param name="isAllowed">Extra condition a walkable cell must meet, e.g. no unit standing on it. Null means none.</param>
+        public bool TryFindNearestWalkable(Vector2Int target, Predicate<Vector2Int> isAllowed, out Vector2Int result)
+        {
             var maxRadius = Mathf.Max(_grid.Width, _grid.Height);
             for (var radius = 0; radius <= maxRadius; radius++)
             {
@@ -43,7 +49,7 @@ namespace BarracksAndBolts.Gameplay.Pathfinding
                     {
                         var isOnRing = Mathf.Abs(x - target.x) == radius || Mathf.Abs(y - target.y) == radius;
                         var cell = new Vector2Int(x, y);
-                        if (!isOnRing || !_grid.IsWalkable(cell))
+                        if (!isOnRing || !_grid.IsWalkable(cell) || (isAllowed != null && !isAllowed(cell)))
                             continue;
 
                         var distance = (cell - target).sqrMagnitude;

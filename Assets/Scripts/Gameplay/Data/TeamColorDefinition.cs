@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using BarracksAndBolts.Core.Session;
 using UnityEngine;
 
@@ -12,6 +13,7 @@ namespace BarracksAndBolts.Gameplay.Data
     {
         [SerializeField] private TeamColor color;
         [SerializeField] private BuildingSprite[] buildingSprites = Array.Empty<BuildingSprite>();
+        [SerializeField] private UnitSprites[] unitSprites = Array.Empty<UnitSprites>();
 
         public TeamColor Color => color;
 
@@ -29,6 +31,19 @@ namespace BarracksAndBolts.Gameplay.Data
             return null;
         }
 
+        /// <returns>The idle animation, or an empty list if this set has none for the unit.</returns>
+        public IReadOnlyList<Sprite> GetUnitIdleFrames(UnitDefinition unit)
+        {
+            foreach (var entry in unitSprites)
+            {
+                if (entry.Unit == unit)
+                    return entry.IdleFrames;
+            }
+
+            Debug.LogWarning($"{name}: no sprites for {(unit != null ? unit.name : "null")}.", this);
+            return Array.Empty<Sprite>();
+        }
+
         [Serializable]
         private struct BuildingSprite
         {
@@ -37,6 +52,16 @@ namespace BarracksAndBolts.Gameplay.Data
 
             public BuildingDefinition Building => building;
             public Sprite Sprite => sprite;
+        }
+
+        [Serializable]
+        private struct UnitSprites
+        {
+            [SerializeField] private UnitDefinition unit;
+            [SerializeField] private Sprite[] idleFrames;
+
+            public UnitDefinition Unit => unit;
+            public IReadOnlyList<Sprite> IdleFrames => idleFrames;
         }
     }
 }
