@@ -9,6 +9,7 @@ using BarracksAndBolts.Gameplay.Selection;
 using BarracksAndBolts.Gameplay.Teams;
 using BarracksAndBolts.Gameplay.Units;
 using BarracksAndBolts.UI.Common;
+using BarracksAndBolts.UI.Tooltips;
 using BarracksAndBolts.Utils.Disposables;
 using TMPro;
 using UnityEngine;
@@ -50,11 +51,12 @@ namespace BarracksAndBolts.UI.Information
         private UnitProductionService _production;
         private UnitService _units;
         private SandboxService _sandbox;
+        private TooltipView _tooltip;
         private IEventBus _eventBus;
 
         [Inject]
         private void Construct(SelectionService selection, BuildingService buildings, TeamService teams,
-            UnitProductionService production, UnitService units, SandboxService sandbox, IEventBus eventBus)
+            UnitProductionService production, UnitService units, SandboxService sandbox, TooltipView tooltip, IEventBus eventBus)
         {
             _selection = selection;
             _buildings = buildings;
@@ -62,6 +64,7 @@ namespace BarracksAndBolts.UI.Information
             _production = production;
             _units = units;
             _sandbox = sandbox;
+            _tooltip = tooltip;
             _eventBus = eventBus;
         }
 
@@ -166,6 +169,8 @@ namespace BarracksAndBolts.UI.Information
 
                 // Cells are destroyed together with this panel, so the handler never needs to be removed.
                 cell.Clicked += OnUnitClicked;
+                cell.HoverStarted += OnCellHoverStarted;
+                cell.HoverEnded += _ => _tooltip.Hide();
                 _cells.Add(cell);
             }
 
@@ -176,6 +181,11 @@ namespace BarracksAndBolts.UI.Information
                 if (isUsed)
                     _cells[i].Bind(units[i]);
             }
+        }
+
+        private void OnCellHoverStarted(ProducibleUnitCell cell)
+        {
+            _tooltip.Show(cell.Definition.DisplayName, TooltipText.ForUnit(cell.Definition), (RectTransform)cell.transform);
         }
 
         private void OnUnitClicked(UnitDefinition unit)

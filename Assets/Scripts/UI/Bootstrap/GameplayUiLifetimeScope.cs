@@ -2,6 +2,7 @@ using BarracksAndBolts.UI.Feedback;
 using BarracksAndBolts.UI.Information;
 using BarracksAndBolts.UI.Production;
 using BarracksAndBolts.UI.Sandbox;
+using BarracksAndBolts.UI.Tooltips;
 using VContainer;
 using VContainer.Unity;
 
@@ -21,6 +22,7 @@ namespace BarracksAndBolts.UI
             builder.RegisterComponentInHierarchy<SandboxFactionToggleView>();
             builder.RegisterComponentInHierarchy<FloatingTextSpawner>();
             builder.RegisterComponentInHierarchy<HoverLabelView>();
+            builder.RegisterComponentInHierarchy<TooltipView>();
         }
     }
 }

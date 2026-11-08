@@ -4,6 +4,7 @@ using BarracksAndBolts.Gameplay.Placement;
 using BarracksAndBolts.Gameplay.Sandbox;
 using BarracksAndBolts.Gameplay.Teams;
 using BarracksAndBolts.UI.Scroll;
+using BarracksAndBolts.UI.Tooltips;
 using BarracksAndBolts.Utils.Disposables;
 using UnityEngine;
 using VContainer;
@@ -19,17 +20,19 @@ namespace BarracksAndBolts.UI.Production
         private TeamService _teams;
         private PlacementService _placement;
         private SandboxService _sandbox;
+        private TooltipView _tooltip;
         private IEventBus _eventBus;
         private TeamColorDefinition _colors;
         private readonly CompositeDisposable _subscriptions = new();
 
         [Inject]
-        private void Construct(GameDatabase database, TeamService teams, PlacementService placement, SandboxService sandbox, IEventBus eventBus)
+        private void Construct(GameDatabase database, TeamService teams, PlacementService placement, SandboxService sandbox, TooltipView tooltip, IEventBus eventBus)
         {
             _database = database;
             _teams = teams;
             _placement = placement;
             _sandbox = sandbox;
+            _tooltip = tooltip;
             _eventBus = eventBus;
         }
 
@@ -55,6 +58,8 @@ namespace BarracksAndBolts.UI.Production
         {
             // Cells are destroyed together with this menu, so the handler never needs to be removed.
             cell.Clicked += OnBuildingClicked;
+            cell.HoverStarted += OnCellHoverStarted;
+            cell.HoverEnded += _ => _tooltip.Hide();
         }
 
         private void BindCell(ProductionMenuCell cell, int index)
@@ -63,8 +68,14 @@ namespace BarracksAndBolts.UI.Production
             cell.Bind(building, _colors.GetBuildingSprite(building));
         }
 
+        private void OnCellHoverStarted(ProductionMenuCell cell)
+        {
+            _tooltip.Show(cell.Definition.DisplayName, TooltipText.ForBuilding(cell.Definition), cell.RectTransform);
+        }
+
         private void OnBuildingClicked(BuildingDefinition building)
         {
+            _tooltip.Hide();
             _placement.Begin(building, _sandbox.ActiveFaction);
         }
     }
