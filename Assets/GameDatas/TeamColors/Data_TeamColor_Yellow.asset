@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1f43e2003d4c32b4bb792d274d8e381a, type: 3}
+  m_Name: Data_TeamColor_Yellow
+  m_EditorClassIdentifier: BarracksAndBolts.Gameplay::BarracksAndBolts.Gameplay.Data.TeamColorDefinition
+  color: 1
+  buildingSprites:
+  - building: {fileID: 11400000, guid: 7203bca9a6fb4e1aabda4f97f03ce912, type: 2}
+    sprite: {fileID: 21300000, guid: 4c72e0ad8c7c8c2448fe5c5dc1ef0db4, type: 3}
+  - building: {fileID: 11400000, guid: ee40f9169f0246349aee673a63fd2e42, type: 2}
+    sprite: {fileID: 21300000, guid: f9c6a7127ff930640a76d36d636d58dc, type: 3}
+  - building: {fileID: 11400000, guid: b963e66968e640c4a55a996c00888780, type: 2}
+    sprite: {fileID: 21300000, guid: 582f46eef424fd34e88c840876f00dde, type: 3}
+  - building: {fileID: 11400000, guid: b58af5da5df14d3eb4fb3bfbc613f8df, type: 2}
+    sprite: {fileID: 21300000, guid: c06493c231f444c469efbbfba35fa782, type: 3}

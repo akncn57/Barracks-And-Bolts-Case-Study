@@ -39,6 +39,15 @@ namespace BarracksAndBolts.Gameplay.CameraControl
             _actions = inputActions.Camera;
         }
 
+        /// <summary>
+        /// World point under a screen position. Uses this frame's target and zoom; the real camera's
+        /// ScreenToWorldPoint can still hold last frame's values because Cinemachine moves it in LateUpdate.
+        /// </summary>
+        public Vector2 ScreenToWorld(Vector2 screenPosition)
+        {
+            return CameraMath.ScreenToWorld(screenPosition, ScreenSize, transform.position, Zoom);
+        }
+
         private void Start()
         {
             var padding = Vector2.one * config.BoundsPadding;

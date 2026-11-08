@@ -62,6 +62,15 @@ namespace BarracksAndBolts.Gameplay.Grid
             return new Vector2(Origin.x + area.x + area.width * 0.5f, Origin.y + area.y);
         }
 
+        /// <summary>Area of the given size centered as close as possible to the world position. It may stick out of the map.</summary>
+        public RectInt GetAreaCenteredAt(Vector2 worldPosition, Vector2Int size)
+        {
+            // Rounding the corner centers odd sizes on the cell under the point and even sizes on the nearest grid line.
+            // Floor(x + 0.5) instead of RoundToInt, which rounds .5 to the even number and would jump back and forth.
+            var corner = worldPosition - Origin - (Vector2)size * 0.5f;
+            return new RectInt(Mathf.FloorToInt(corner.x + 0.5f), Mathf.FloorToInt(corner.y + 0.5f), size.x, size.y);
+        }
+
         public bool IsTerrainWalkable(Vector2Int cell)
         {
             return IsInBounds(cell) && _isTerrainWalkable[ToIndex(cell)];

@@ -296,6 +296,105 @@ namespace BarracksAndBolts.Gameplay.Input
                     ""isPartOfComposite"": false
                 }
             ]
+        },
+        {
+            ""name"": ""Placement"",
+            ""id"": ""9843f8e7-1813-4b97-898c-7ac4c0a1724a"",
+            ""actions"": [
+                {
+                    ""name"": ""Confirm"",
+                    ""type"": ""Button"",
+                    ""id"": ""4c9a7d59-8edd-4d4e-9c1d-0f9314361c9f"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""ConfirmAndContinue"",
+                    ""type"": ""Button"",
+                    ""id"": ""0b70f839-c564-4ff1-ad99-cfc3c5d5dc0d"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Cancel"",
+                    ""type"": ""Button"",
+                    ""id"": ""9b6e5fe1-c0c4-4cba-9ab8-7b9882101530"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""PointerPosition"",
+                    ""type"": ""Value"",
+                    ""id"": ""0a6030b3-d9ad-4d8b-ad02-901c9609b26c"",
+                    ""expectedControlType"": ""Vector2"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": """",
+                    ""id"": ""175667a8-e366-4517-b9c3-8caa603f583a"",
+                    ""path"": ""<Mouse>/leftButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""Confirm"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""07b3964d-9d2e-41cc-a1d9-be5e7f9a876e"",
+                    ""path"": ""<Keyboard>/shift"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""ConfirmAndContinue"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""b3c1698d-837e-47f6-bd36-6738fc9220cb"",
+                    ""path"": ""<Mouse>/rightButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""Cancel"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""48462bf2-4b17-4a44-b018-dba6100de968"",
+                    ""path"": ""<Keyboard>/escape"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""Cancel"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""0947605f-e111-4d84-84b1-3489e88dc012"",
+                    ""path"": ""<Pointer>/position"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""PointerPosition"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                }
+            ]
         }
     ],
     ""controlSchemes"": [
@@ -324,11 +423,18 @@ namespace BarracksAndBolts.Gameplay.Input
             m_Camera_DragPan = m_Camera.FindAction("DragPan", throwIfNotFound: true);
             m_Camera_PointerDelta = m_Camera.FindAction("PointerDelta", throwIfNotFound: true);
             m_Camera_PointerPosition = m_Camera.FindAction("PointerPosition", throwIfNotFound: true);
+            // Placement
+            m_Placement = asset.FindActionMap("Placement", throwIfNotFound: true);
+            m_Placement_Confirm = m_Placement.FindAction("Confirm", throwIfNotFound: true);
+            m_Placement_ConfirmAndContinue = m_Placement.FindAction("ConfirmAndContinue", throwIfNotFound: true);
+            m_Placement_Cancel = m_Placement.FindAction("Cancel", throwIfNotFound: true);
+            m_Placement_PointerPosition = m_Placement.FindAction("PointerPosition", throwIfNotFound: true);
         }
 
         ~@GameInputActions()
         {
             UnityEngine.Debug.Assert(!m_Camera.enabled, "This will cause a leak and performance issues, GameInputActions.Camera.Disable() has not been called.");
+            UnityEngine.Debug.Assert(!m_Placement.enabled, "This will cause a leak and performance issues, GameInputActions.Placement.Disable() has not been called.");
         }
 
         /// <summary>
@@ -540,6 +646,135 @@ namespace BarracksAndBolts.Gameplay.Input
         /// Provides a new <see cref="CameraActions" /> instance referencing this action map.
         /// </summary>
         public CameraActions @Camera => new CameraActions(this);
+
+        // Placement
+        private readonly InputActionMap m_Placement;
+        private List<IPlacementActions> m_PlacementActionsCallbackInterfaces = new List<IPlacementActions>();
+        private readonly InputAction m_Placement_Confirm;
+        private readonly InputAction m_Placement_ConfirmAndContinue;
+        private readonly InputAction m_Placement_Cancel;
+        private readonly InputAction m_Placement_PointerPosition;
+        /// <summary>
+        /// Provides access to input actions defined in input action map "Placement".
+        /// </summary>
+        public struct PlacementActions
+        {
+            private @GameInputActions m_Wrapper;
+
+            /// <summary>
+            /// Construct a new instance of the input action map wrapper class.
+            /// </summary>
+            public PlacementActions(@GameInputActions wrapper) { m_Wrapper = wrapper; }
+            /// <summary>
+            /// Provides access to the underlying input action "Placement/Confirm".
+            /// </summary>
+            public InputAction @Confirm => m_Wrapper.m_Placement_Confirm;
+            /// <summary>
+            /// Provides access to the underlying input action "Placement/ConfirmAndContinue".
+            /// </summary>
+            public InputAction @ConfirmAndContinue => m_Wrapper.m_Placement_ConfirmAndContinue;
+            /// <summary>
+            /// Provides access to the underlying input action "Placement/Cancel".
+            /// </summary>
+            public InputAction @Cancel => m_Wrapper.m_Placement_Cancel;
+            /// <summary>
+            /// Provides access to the underlying input action "Placement/PointerPosition".
+            /// </summary>
+            public InputAction @PointerPosition => m_Wrapper.m_Placement_PointerPosition;
+            /// <summary>
+            /// Provides access to the underlying input action map instance.
+            /// </summary>
+            public InputActionMap Get() { return m_Wrapper.m_Placement; }
+            /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.Enable()" />
+            public void Enable() { Get().Enable(); }
+            /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.Disable()" />
+            public void Disable() { Get().Disable(); }
+            /// <inheritdoc cref="UnityEngine.InputSystem.InputActionMap.enabled" />
+            public bool enabled => Get().enabled;
+            /// <summary>
+            /// Implicitly converts an <see ref="PlacementActions" /> to an <see ref="InputActionMap" /> instance.
+            /// </summary>
+            public static implicit operator InputActionMap(PlacementActions set) { return set.Get(); }
+            /// <summary>
+            /// Adds <see cref="InputAction.started"/>, <see cref="InputAction.performed"/> and <see cref="InputAction.canceled"/> callbacks provided via <param cref="instance" /> on all input actions contained in this map.
+            /// </summary>
+            /// <param name="instance">Callback instance.</param>
+            /// <remarks>
+            /// If <paramref name="instance" /> is <c>null</c> or <paramref name="instance"/> have already been added this method does nothing.
+            /// </remarks>
+            /// <seealso cref="PlacementActions" />
+            public void AddCallbacks(IPlacementActions instance)
+            {
+                if (instance == null || m_Wrapper.m_PlacementActionsCallbackInterfaces.Contains(instance)) return;
+                m_Wrapper.m_PlacementActionsCallbackInterfaces.Add(instance);
+                @Confirm.started += instance.OnConfirm;
+                @Confirm.performed += instance.OnConfirm;
+                @Confirm.canceled += instance.OnConfirm;
+                @ConfirmAndContinue.started += instance.OnConfirmAndContinue;
+                @ConfirmAndContinue.performed += instance.OnConfirmAndContinue;
+                @ConfirmAndContinue.canceled += instance.OnConfirmAndContinue;
+                @Cancel.started += instance.OnCancel;
+                @Cancel.performed += instance.OnCancel;
+                @Cancel.canceled += instance.OnCancel;
+                @PointerPosition.started += instance.OnPointerPosition;
+                @PointerPosition.performed += instance.OnPointerPosition;
+                @PointerPosition.canceled += instance.OnPointerPosition;
+            }
+
+            /// <summary>
+            /// Removes <see cref="InputAction.started"/>, <see cref="InputAction.performed"/> and <see cref="InputAction.canceled"/> callbacks provided via <param cref="instance" /> on all input actions contained in this map.
+            /// </summary>
+            /// <remarks>
+            /// Calling this method when <paramref name="instance" /> have not previously been registered has no side-effects.
+            /// </remarks>
+            /// <seealso cref="PlacementActions" />
+            private void UnregisterCallbacks(IPlacementActions instance)
+            {
+                @Confirm.started -= instance.OnConfirm;
+                @Confirm.performed -= instance.OnConfirm;
+                @Confirm.canceled -= instance.OnConfirm;
+                @ConfirmAndContinue.started -= instance.OnConfirmAndContinue;
+                @ConfirmAndContinue.performed -= instance.OnConfirmAndContinue;
+                @ConfirmAndContinue.canceled -= instance.OnConfirmAndContinue;
+                @Cancel.started -= instance.OnCancel;
+                @Cancel.performed -= instance.OnCancel;
+                @Cancel.canceled -= instance.OnCancel;
+                @PointerPosition.started -= instance.OnPointerPosition;
+                @PointerPosition.performed -= instance.OnPointerPosition;
+                @PointerPosition.canceled -= instance.OnPointerPosition;
+            }
+
+            /// <summary>
+            /// Unregisters <param cref="instance" /> and unregisters all input action callbacks via <see cref="PlacementActions.UnregisterCallbacks(IPlacementActions)" />.
+            /// </summary>
+            /// <seealso cref="PlacementActions.UnregisterCallbacks(IPlacementActions)" />
+            public void RemoveCallbacks(IPlacementActions instance)
+            {
+                if (m_Wrapper.m_PlacementActionsCallbackInterfaces.Remove(instance))
+                    UnregisterCallbacks(instance);
+            }
+
+            /// <summary>
+            /// Replaces all existing callback instances and previously registered input action callbacks associated with them with callbacks provided via <param cref="instance" />.
+            /// </summary>
+            /// <remarks>
+            /// If <paramref name="instance" /> is <c>null</c>, calling this method will only unregister all existing callbacks but not register any new callbacks.
+            /// </remarks>
+            /// <seealso cref="PlacementActions.AddCallbacks(IPlacementActions)" />
+            /// <seealso cref="PlacementActions.RemoveCallbacks(IPlacementActions)" />
+            /// <seealso cref="PlacementActions.UnregisterCallbacks(IPlacementActions)" />
+            public void SetCallbacks(IPlacementActions instance)
+            {
+                foreach (var item in m_Wrapper.m_PlacementActionsCallbackInterfaces)
+                    UnregisterCallbacks(item);
+                m_Wrapper.m_PlacementActionsCallbackInterfaces.Clear();
+                AddCallbacks(instance);
+            }
+        }
+        /// <summary>
+        /// Provides a new <see cref="PlacementActions" /> instance referencing this action map.
+        /// </summary>
+        public PlacementActions @Placement => new PlacementActions(this);
         private int m_KeyboardMouseSchemeIndex = -1;
         /// <summary>
         /// Provides access to the input control scheme.
@@ -588,6 +823,42 @@ namespace BarracksAndBolts.Gameplay.Input
             /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
             void OnPointerDelta(InputAction.CallbackContext context);
+            /// <summary>
+            /// Method invoked when associated input action "PointerPosition" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+            /// </summary>
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+            void OnPointerPosition(InputAction.CallbackContext context);
+        }
+        /// <summary>
+        /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "Placement" which allows adding and removing callbacks.
+        /// </summary>
+        /// <seealso cref="PlacementActions.AddCallbacks(IPlacementActions)" />
+        /// <seealso cref="PlacementActions.RemoveCallbacks(IPlacementActions)" />
+        public interface IPlacementActions
+        {
+            /// <summary>
+            /// Method invoked when associated input action "Confirm" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+            /// </summary>
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+            void OnConfirm(InputAction.CallbackContext context);
+            /// <summary>
+            /// Method invoked when associated input action "ConfirmAndContinue" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+            /// </summary>
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+            void OnConfirmAndContinue(InputAction.CallbackContext context);
+            /// <summary>
+            /// Method invoked when associated input action "Cancel" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+            /// </summary>
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+            void OnCancel(InputAction.CallbackContext context);
             /// <summary>
             /// Method invoked when associated input action "PointerPosition" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
             /// </summary>

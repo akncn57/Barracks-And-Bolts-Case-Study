@@ -80,18 +80,19 @@ Scripts/
 ```
 UI ──► Gameplay ──► Core ──► Utils
  └──► Popup ──────► Core
-Tests.EditMode ──► Gameplay, Core, Utils
+Tests.EditMode ──► Gameplay, UI, Core, Utils
 ```
 
 ### Gameplay alt yapısı (namespace = klasör)
 ```
 Gameplay/
 ├── Bootstrap/      GameplayLifetimeScope, GameplayEntryPoint
-├── Data/           BuildingDefinition, UnitDefinition, TeamColorDefinition ... (ScriptableObject)
+├── Data/           BuildingDefinition, UnitDefinition, TeamColorDefinition, GameDatabase (ScriptableObject)
+├── Entities/       GameEntityId, GameEntityIdGenerator
 ├── Grid/           GridMap, GridCell, GridCoordinates
 ├── Pathfinding/    AStarPathfinder, PathStatus, GridSearch
-├── Placement/      PlacementService, PlacementValidator, PlacementPreviewView
-├── Buildings/      BuildingService, BuildingModel, BuildingView, Production/
+├── Placement/      PlacementService, PlacementInputHandler, PlacementPreviewView (bölge kuralı gelince: PlacementValidator)
+├── Buildings/      BuildingService, BuildingModel, BuildingView, BuildingViewSpawner, Production/
 ├── Units/          UnitService, UnitModel, UnitView, States/
 ├── Combat/         CombatService, Damage, Targeting
 ├── Selection/      SelectionService, BoxSelectionView
@@ -195,9 +196,10 @@ public interface IEventBus
 ## 9. Veri Tanımları (ScriptableObject)
 | Tip | Önemli Alanlar |
 |---|---|
-| `BuildingDefinition` | `Id`, `DisplayName`, `Icon`, `Size (Vector2Int)`, `MaxHp`, `Producibles (UnitDefinition[])`, `SpawnOffset`, `Cost` |
+| `BuildingDefinition` | `Id`, `DisplayName`, `Size (Vector2Int)`, `MaxHp`, `Producibles (UnitDefinition[])`, `SpawnOffset`. `Cost` P1'de eklenecek. Sprite yok, renge bağlı olduğu için `TeamColorDefinition`'da. |
 | `UnitDefinition` | `Id`, `DisplayName`, `Portrait`, `MaxHp`, `Damage`, `AttackRange`, `AttackCooldown`, `MoveSpeed`, `PopulationCost` |
-| `TeamColorDefinition` | `Color`, bina sprite'ları ve her birim tipi için `AnimatorOverrideController` |
+| `TeamColorDefinition` | `Color`, bina → sprite listesi. Birimler gelince her birim tipi için `AnimatorOverrideController` |
+| `GameDatabase` | `Buildings` (Production Menu sırası), `Units`, `TeamColors` |
 | `GameConfig` ve diğer config'ler | Takvim, harita, zorluk değerleri |
 
 - PDF değerleri bu asset'lerde tutulur: Barracks 100 HP, House 50 HP, askerler 10 HP ve 10 / 5 / 2 hasar.
@@ -221,8 +223,11 @@ public interface IEventBus
 ## 11. Object Pooling ve Sonsuz Scroll
 - `PoolService`, Unity'nin `UnityEngine.Pool.ObjectPool<T>` sınıfını prefab bazında sarar. Birimler, mermiler, efektler ve hasar sayıları pool'dan gelir. Pool'a geri dönen nesne `IPoolable.OnDespawn` ile durumunu sıfırlar.
 - **Production Menu (sonsuz scroll):** `RecyclingScrollView`
-  - Sadece görünen hücre sayısı + 2 kadar hücre oluşturulur.
-  - Kaydırma sırasında görünümden çıkan hücre diğer uca taşınır ve veri indeksi `index % dataCount` ile döngüye girer.
+  - ScrollRect kullanılmaz; sürükleme, fırlatma ve tekerlek bileşenin kendisindedir. Kaydırma tek bir offset değeridir.
+  - Sadece görünen satır sayısı + 1 kadar satır oluşturulur (kaydırırken üstte ve altta aynı anda yarım satır görünebilir).
+  - Kaydırma sırasında görünümden çıkan satır diğer uca taşınır. Veri indeksi negatif olmayan mod ile bulunur: `(row * columns + column) mod dataCount`.
+  - Hücre sadece gösterdiği öğe değişince yeniden bağlanır; liste dururken RectTransform'lar değişmez (canvas rebuild yok).
+  - Offset, öğelerin tekrar aynı yerlere geldiği döngü uzunluğuna sarılır; float hassasiyeti bozulmaz.
   - Liste görünür alandan kısaysa (veri sayısı < görünen hücre sayısı), boşluk kalmaması için öğeler tekrarlanarak doldurulur.
 
 ---
@@ -291,7 +296,8 @@ GameplayLifetimeScope
         Tilemap_Ground
         Tilemap_Water
 ----- WORLD -----
-    Buildings          (runtime'da üretilenlerin parent'ı)
+    Buildings          (runtime'da üretilenlerin parent'ı, BuildingViewSpawner)
+    PlacementPreview   (yerleştirme önizlemesi)
     Units
     Resources
     Effects
@@ -299,7 +305,8 @@ GameplayLifetimeScope
     (sadece MonoBehaviour gerektiren köprüler, ör. PoolRoot)
 ----- UI -----
     EventSystem
-    Canvas_HUD / Canvas_Panels / Canvas_Popups
+    Prefab_UI_Canvas_Gameplay_Variant (GameplayUiLifetimeScope, parent = GameplayLifetimeScope)
+        StaticCanvas / DynamicCanvas (Production Menu burada, kaydırırken sürekli değişir)
 ----- LIGHTS -----
     Global Light 2D
 ```

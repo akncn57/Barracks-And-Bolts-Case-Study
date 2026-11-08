@@ -159,5 +159,40 @@ namespace BarracksAndBolts.Tests.EditMode.Gameplay
             Assert.DoesNotThrow(() => _map.Release(new RectInt(8, 6, 5, 5), Barracks));
             Assert.IsTrue(_map.IsAreaFree(new RectInt(8, 6, 2, 2)));
         }
+
+        [Test]
+        public void GetAreaCenteredAt_OddSize_CentersOnCellUnderPoint()
+        {
+            var area = _map.GetAreaCenteredAt(new Vector2(5.3f, 4.8f), new Vector2Int(3, 3));
+
+            Assert.AreEqual(new RectInt(4, 3, 3, 3), area);
+        }
+
+        [Test]
+        public void GetAreaCenteredAt_EvenSize_CentersOnNearestGridLine()
+        {
+            var area = _map.GetAreaCenteredAt(new Vector2(5.3f, 4.8f), new Vector2Int(2, 2));
+
+            Assert.AreEqual(new RectInt(4, 4, 2, 2), area);
+        }
+
+        [Test]
+        public void GetAreaCenteredAt_UsesOrigin()
+        {
+            var map = new GridMap(10, 10, new Vector2(-5f, -5f));
+
+            var area = map.GetAreaCenteredAt(new Vector2(0.5f, 0.5f), new Vector2Int(1, 1));
+
+            Assert.AreEqual(new RectInt(5, 5, 1, 1), area);
+        }
+
+        [Test]
+        public void GetAreaCenteredAt_NearEdge_CanStickOutOfMap()
+        {
+            var area = _map.GetAreaCenteredAt(new Vector2(0.2f, 0.2f), new Vector2Int(3, 3));
+
+            Assert.AreEqual(new RectInt(-1, -1, 3, 3), area);
+            Assert.IsFalse(_map.IsAreaFree(area));
+        }
     }
 }

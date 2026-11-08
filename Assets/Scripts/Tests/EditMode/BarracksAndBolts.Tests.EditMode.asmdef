@@ -6,6 +6,7 @@
         "UnityEditor.TestRunner",
         "BarracksAndBolts.Core",
         "BarracksAndBolts.Gameplay",
+        "BarracksAndBolts.UI",
         "BarracksAndBolts.Utils"
     ],
     "includePlatforms": [

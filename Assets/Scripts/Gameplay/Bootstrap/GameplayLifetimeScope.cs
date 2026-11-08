@@ -1,9 +1,16 @@
+using System;
 using BarracksAndBolts.Core.Events;
 using BarracksAndBolts.Core.Simulation;
+using BarracksAndBolts.Gameplay.Buildings;
 using BarracksAndBolts.Gameplay.CameraControl;
+using BarracksAndBolts.Gameplay.Data;
+using BarracksAndBolts.Gameplay.Entities;
 using BarracksAndBolts.Gameplay.Grid;
 using BarracksAndBolts.Gameplay.Input;
 using BarracksAndBolts.Gameplay.Pathfinding;
+using BarracksAndBolts.Gameplay.Placement;
+using BarracksAndBolts.Gameplay.Teams;
+using UnityEngine;
 using VContainer;
 using VContainer.Unity;
 
@@ -14,8 +21,13 @@ namespace BarracksAndBolts.Gameplay.Bootstrap
     /// </summary>
     public sealed class GameplayLifetimeScope : LifetimeScope
     {
+        [SerializeField] private GameDatabase gameDatabase;
+
         protected override void Configure(IContainerBuilder builder)
         {
+            if (gameDatabase == null)
+                throw new InvalidOperationException($"{name}: game database is not assigned.");
+
             // Scene scoped, so no subscription can outlive the gameplay scene.
             builder.Register<EventBus>(Lifetime.Singleton).As<IEventBus>();
 
@@ -24,8 +36,14 @@ namespace BarracksAndBolts.Gameplay.Bootstrap
 
             // One shared instance; VContainer disposes it with the scope.
             builder.Register<GameInputActions>(Lifetime.Singleton);
+            builder.RegisterEntryPoint<InputModeController>();
+
+            builder.RegisterInstance(gameDatabase);
+            builder.Register<GameEntityIdGenerator>(Lifetime.Singleton);
+            builder.Register<TeamService>(Lifetime.Singleton);
 
             RegisterGrid(builder);
+            RegisterBuildings(builder);
             builder.RegisterComponentInHierarchy<CameraController>();
         }
 
@@ -39,6 +57,16 @@ namespace BarracksAndBolts.Gameplay.Bootstrap
 
             builder.Register<AStarPathfinder>(Lifetime.Singleton);
             builder.Register<GridSearch>(Lifetime.Singleton);
+        }
+
+        private static void RegisterBuildings(IContainerBuilder builder)
+        {
+            builder.Register<BuildingService>(Lifetime.Singleton);
+            builder.RegisterComponentInHierarchy<BuildingViewSpawner>();
+
+            builder.Register<PlacementService>(Lifetime.Singleton);
+            builder.RegisterEntryPoint<PlacementInputHandler>();
+            builder.RegisterComponentInHierarchy<PlacementPreviewView>();
         }
     }
 }
