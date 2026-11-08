@@ -223,6 +223,15 @@
                     "initialStateCheck": false
                 },
                 {
+                    "name": "Command",
+                    "type": "Button",
+                    "id": "bc610496-f559-466b-949b-5d98cd5e707a",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
                     "name": "PointerPosition",
                     "type": "Value",
                     "id": "e2a951ab-2c9e-4466-a9c0-b06967119511",
@@ -241,6 +250,17 @@
                     "processors": "",
                     "groups": "Keyboard&Mouse",
                     "action": "Select",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "3a05590f-22b4-4bbe-8046-0fc9dfb1692f",
+                    "path": "<Mouse>/rightButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard&Mouse",
+                    "action": "Command",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },

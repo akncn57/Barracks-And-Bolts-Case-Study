@@ -4,6 +4,7 @@ using BarracksAndBolts.Core.Simulation;
 using BarracksAndBolts.Gameplay.Buildings;
 using BarracksAndBolts.Gameplay.Buildings.Production;
 using BarracksAndBolts.Gameplay.CameraControl;
+using BarracksAndBolts.Gameplay.Commands;
 using BarracksAndBolts.Gameplay.Data;
 using BarracksAndBolts.Gameplay.Entities;
 using BarracksAndBolts.Gameplay.Grid;
@@ -54,7 +55,12 @@ namespace BarracksAndBolts.Gameplay.Bootstrap
         private static void RegisterUnits(IContainerBuilder builder)
         {
             builder.Register<UnitService>(Lifetime.Singleton);
+            builder.RegisterSimulationSystem<UnitMovementSystem>();
             builder.RegisterComponentInHierarchy<UnitViewSpawner>();
+
+            builder.Register<UnitCommandService>(Lifetime.Singleton);
+            builder.RegisterEntryPoint<CommandInputHandler>();
+            builder.RegisterComponentInHierarchy<MoveMarkerView>();
         }
 
         private static void RegisterGrid(IContainerBuilder builder)
@@ -81,6 +87,7 @@ namespace BarracksAndBolts.Gameplay.Bootstrap
 
             builder.Register<SelectionService>(Lifetime.Singleton);
             builder.RegisterEntryPoint<SelectionInputHandler>();
+            builder.RegisterComponentInHierarchy<BoxSelectionView>();
         }
     }
 }

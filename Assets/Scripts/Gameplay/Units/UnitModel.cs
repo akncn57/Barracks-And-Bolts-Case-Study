@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using BarracksAndBolts.Gameplay.Data;
 using BarracksAndBolts.Gameplay.Entities;
 using BarracksAndBolts.Gameplay.Teams;
@@ -8,6 +10,17 @@ namespace BarracksAndBolts.Gameplay.Units
     /// <summary>Runtime state of one unit.</summary>
     public sealed class UnitModel
     {
+        // The clickable body around the feet, in world units. Roughly the visible character.
+        private const float BodyWidth = 0.9f;
+        private const float BodyHeight = 1.25f;
+        private const float BodyBelowFeet = 0.1f;
+
+        // Below this sideways distance the unit keeps its facing, so walking straight up doesn't make it flicker.
+        private const float MinFacingChange = 0.001f;
+
+        private readonly List<Vector2> _waypoints = new();
+        private int _nextWaypoint;
+
         public UnitModel(GameEntityId id, UnitDefinition definition, Faction faction, Vector2 position)
         {
             Id = id;
@@ -24,6 +37,68 @@ namespace BarracksAndBolts.Gameplay.Units
         /// <summary>World position of the unit's feet. A world position, not a cell, because units move smoothly.</summary>
         public Vector2 Position { get; private set; }
 
+        /// <summary>The area that counts as the unit for clicks and box selection.</summary>
+        public Rect Body => new(Position.x - BodyWidth * 0.5f, Position.y - BodyBelowFeet, BodyWidth, BodyHeight);
+
         public int CurrentHp { get; private set; }
+
+        public bool IsMoving => _nextWaypoint < _waypoints.Count;
+        public bool IsFacingLeft { get; private set; }
+
+        /// <summary>Where the unit ends up: the end of its path, or where it stands.</summary>
+        public Vector2 Destination => IsMoving ? _waypoints[_waypoints.Count - 1] : Position;
+
+        /// <summary>Replaces the path. The list is copied, so the caller can reuse it.</summary>
+        public void SetPath(IReadOnlyList<Vector2> waypoints)
+        {
+            _waypoints.Clear();
+            _nextWaypoint = 0;
+            for (var i = 0; i < waypoints.Count; i++)
+                _waypoints.Add(waypoints[i]);
+        }
+
+        public void Stop()
+        {
+            _waypoints.Clear();
+            _nextWaypoint = 0;
+        }
+
+        /// <summary>Walks the given distance along the path. Leftover distance carries over to the next waypoint.</summary>
+        public void MoveAlongPath(float distance)
+        {
+            while (IsMoving && distance > 0f)
+            {
+                var toWaypoint = _waypoints[_nextWaypoint] - Position;
+                var remaining = toWaypoint.magnitude;
+
+                if (Mathf.Abs(toWaypoint.x) > MinFacingChange)
+                    IsFacingLeft = toWaypoint.x < 0f;
+
+                if (remaining > distance)
+                {
+                    Position += toWaypoint / remaining * distance;
+                    return;
+                }
+
+                Position = _waypoints[_nextWaypoint];
+                distance -= remaining;
+                _nextWaypoint++;
+            }
+
+            if (!IsMoving)
+                Stop();
+        }
+
+        /// <summary>True if a waypoint still ahead lies inside the area of cells.</summary>
+        public bool IsPathThrough(RectInt area, Func<Vector2, Vector2Int> worldToCell)
+        {
+            for (var i = _nextWaypoint; i < _waypoints.Count; i++)
+            {
+                if (area.Contains(worldToCell(_waypoints[i])))
+                    return true;
+            }
+
+            return false;
+        }
     }
 }

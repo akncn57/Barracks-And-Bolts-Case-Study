@@ -2,23 +2,28 @@ using System.Collections.Generic;
 using BarracksAndBolts.Core.Events;
 using BarracksAndBolts.Gameplay.Entities;
 using BarracksAndBolts.Gameplay.Grid;
+using BarracksAndBolts.Gameplay.Teams;
+using BarracksAndBolts.Gameplay.Units;
 using UnityEngine;
 
 namespace BarracksAndBolts.Gameplay.Selection
 {
     /// <summary>
-    /// What the player has selected. Holds ids, not objects, so a destroyed entity never stays referenced.
-    /// Kept as a list so box selection of units can be added without changing the readers.
+    /// What the player has selected, and the selection box while it is being dragged.
+    /// Holds ids, not objects, so a destroyed entity never stays referenced.
     /// </summary>
     public sealed class SelectionService
     {
         private readonly GridMap _gridMap;
+        private readonly UnitService _units;
         private readonly IEventBus _eventBus;
         private readonly List<GameEntityId> _selected = new();
+        private readonly List<GameEntityId> _candidates = new();
 
-        public SelectionService(GridMap gridMap, IEventBus eventBus)
+        public SelectionService(GridMap gridMap, UnitService units, IEventBus eventBus)
         {
             _gridMap = gridMap;
+            _units = units;
             _eventBus = eventBus;
         }
 
@@ -28,39 +33,85 @@ namespace BarracksAndBolts.Gameplay.Selection
         /// <summary>The entity the information panel shows. None when nothing is selected.</summary>
         public GameEntityId Primary => HasSelection ? _selected[0] : GameEntityId.None;
 
+        public bool HasBox { get; private set; }
+
+        /// <summary>The selection box in world space. Only meaningful while <see cref="HasBox"/> is true.</summary>
+        public Rect Box { get; private set; }
+
         public bool IsSelected(GameEntityId id) => _selected.Contains(id);
 
-        /// <summary>Selects whatever stands on the clicked cell, or clears the selection on an empty cell.</summary>
+        /// <summary>Selects the unit or building under the click, or clears the selection if there is none.</summary>
         public void SelectAt(Vector2 worldPosition)
         {
-            Select(_gridMap.GetOccupant(_gridMap.WorldToCell(worldPosition)));
+            // Units stand in front of buildings, so they are checked first.
+            var unit = _units.GetUnitAt(worldPosition);
+            Select(unit.IsValid ? unit : _gridMap.GetOccupant(_gridMap.WorldToCell(worldPosition)));
         }
 
         /// <summary>Replaces the selection with this entity. An invalid id clears it.</summary>
         public void Select(GameEntityId id)
         {
-            if (!id.IsValid)
-            {
-                Clear();
-                return;
-            }
+            _candidates.Clear();
+            if (id.IsValid)
+                _candidates.Add(id);
 
-            // Clicking the selected entity again changes nothing, so listeners don't redraw for no reason.
-            if (_selected.Count == 1 && _selected[0] == id)
-                return;
-
-            _selected.Clear();
-            _selected.Add(id);
-            _eventBus.Publish(new SelectionChangedEvent());
+            ApplyCandidates();
         }
 
         public void Clear()
         {
-            if (_selected.Count == 0)
+            _candidates.Clear();
+            ApplyCandidates();
+        }
+
+        /// <summary>Shows the box between the two world corners, in any order.</summary>
+        public void UpdateBox(Vector2 cornerA, Vector2 cornerB)
+        {
+            Box = Rect.MinMaxRect(
+                Mathf.Min(cornerA.x, cornerB.x), Mathf.Min(cornerA.y, cornerB.y),
+                Mathf.Max(cornerA.x, cornerB.x), Mathf.Max(cornerA.y, cornerB.y));
+            HasBox = true;
+        }
+
+        /// <summary>Selects the player's units inside the box and hides it. An empty box clears the selection.</summary>
+        public void ConfirmBox()
+        {
+            if (!HasBox)
+                return;
+
+            HasBox = false;
+            _units.CollectUnitsIn(Box, Faction.Player, _candidates);
+            ApplyCandidates();
+        }
+
+        public void CancelBox()
+        {
+            HasBox = false;
+        }
+
+        private void ApplyCandidates()
+        {
+            // The same selection again changes nothing, so listeners don't redraw for no reason.
+            if (IsSameAsSelected(_candidates))
                 return;
 
             _selected.Clear();
+            _selected.AddRange(_candidates);
             _eventBus.Publish(new SelectionChangedEvent());
+        }
+
+        private bool IsSameAsSelected(List<GameEntityId> ids)
+        {
+            if (ids.Count != _selected.Count)
+                return false;
+
+            for (var i = 0; i < ids.Count; i++)
+            {
+                if (ids[i] != _selected[i])
+                    return false;
+            }
+
+            return true;
         }
     }
 }

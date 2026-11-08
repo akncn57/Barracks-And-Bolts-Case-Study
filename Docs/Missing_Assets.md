@@ -28,9 +28,9 @@
 | 2 | ~~İkinci renk binalar~~ | ✅ Sarı set eklendi (Castle, Barracks, House, Monastery, Tower, Archery) | – |
 | 2a | ~~Sarı `Pawn_Interact_Axe`~~ | ✅ Eklendi | – |
 | 3 | Yerleştirme önizlemesi (yeşil/kırmızı hücre) | PDF: geçersiz alan kırmızı | 💻 Beyaz kare sprite + renk |
-| 4 | Seçim göstergesi (birimin altında halka/elips) | Neyin seçili olduğunu göstermek | 💻 Basit elips sprite. Alternatif: `Texture_Cursors_Selection` köşeleri |
-| 5 | Kutu seçimi dikdörtgeni | Sürükleyerek seçim | 💻 UI Image (9-slice) |
-| 6 | Hareket/saldırı emri işareti (tıklanan yerde kısa efekt) | Sağ tık geri bildirimi | 💻 / 🔍 |
+| 4 | ~~Seçim göstergesi (birimin altında halka/elips)~~ | ✅ Üretildi: `Texture_Markers_SelectionRing` | – |
+| 5 | ~~Kutu seçimi dikdörtgeni~~ | ✅ Üretildi: `Texture_Markers_SelectionBox` (dünyada Sliced SpriteRenderer) | – |
+| 6 | Hareket/saldırı emri işareti (tıklanan yerde kısa efekt) | Sağ tık geri bildirimi | 💻 Hareket için `Texture_Markers_SelectionRing` kullanılıyor; saldırı işareti kaldı |
 | 7 | ~~Ölüm ve yıkılma efekti~~ | ✅ Paketin Particle FX klasöründen alındı: `Texture_VFX_Dust_01/02`, `_Explosion_01/02`, `_Fire_01/02/03`, `_Water_Splash` (kare kare kesildi) | – |
 
 ## P1 – Oyun döngüsü

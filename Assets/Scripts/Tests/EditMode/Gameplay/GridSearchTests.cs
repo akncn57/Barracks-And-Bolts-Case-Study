@@ -86,6 +86,18 @@ namespace BarracksAndBolts.Tests.EditMode.Gameplay
         }
 
         [Test]
+        public void CollectDestinations_WithCondition_SkipsCellsButSearchesThroughThem()
+        {
+            var search = new GridSearch(new GridMap(10, 10, Vector2.zero));
+            var target = new Vector2Int(5, 5);
+
+            search.CollectDestinations(target, 3, cell => cell != target, _results);
+
+            Assert.AreEqual(3, _results.Count);
+            CollectionAssert.DoesNotContain(_results, target);
+        }
+
+        [Test]
         public void CollectDestinations_TargetUnderBuilding_OnlyReturnsFreeCells()
         {
             var map = new GridMap(10, 10, Vector2.zero);

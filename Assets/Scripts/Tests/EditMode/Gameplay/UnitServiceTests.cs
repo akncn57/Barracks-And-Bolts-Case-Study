@@ -145,6 +145,57 @@ namespace BarracksAndBolts.Tests.EditMode.Gameplay
         }
 
         [Test]
+        public void GetUnitAt_InsideBody_ReturnsTheUnit()
+        {
+            var unit = Spawn(new Vector2Int(3, 4));
+
+            Assert.AreEqual(unit.Id, _units.GetUnitAt(unit.Position + new Vector2(0.2f, 1f)));
+        }
+
+        [Test]
+        public void GetUnitAt_OutsideBody_ReturnsNone()
+        {
+            var unit = Spawn(new Vector2Int(3, 4));
+
+            Assert.AreEqual(GameEntityId.None, _units.GetUnitAt(unit.Position + new Vector2(1f, 0f)));
+            Assert.AreEqual(GameEntityId.None, _units.GetUnitAt(unit.Position + new Vector2(0f, 2f)));
+        }
+
+        [Test]
+        public void GetUnitAt_Overlapping_ReturnsTheOneInFront()
+        {
+            var behind = Spawn(new Vector2Int(3, 5));
+            var front = Spawn(new Vector2Int(3, 4));
+            var point = new Vector2(front.Position.x, behind.Position.y);
+
+            Assert.AreEqual(front.Id, _units.GetUnitAt(point));
+        }
+
+        [Test]
+        public void CollectUnitsIn_TouchingTheBody_Counts()
+        {
+            var unit = Spawn(new Vector2Int(3, 4));
+            var results = new System.Collections.Generic.List<GameEntityId> { new(99) };
+
+            // The box only reaches the unit's head, not its feet.
+            var area = Rect.MinMaxRect(unit.Position.x - 0.1f, unit.Position.y + 1f, unit.Position.x + 0.1f, unit.Position.y + 3f);
+            _units.CollectUnitsIn(area, Faction.Player, results);
+
+            CollectionAssert.AreEqual(new[] { unit.Id }, results);
+        }
+
+        [Test]
+        public void CollectUnitsIn_OtherFaction_IsSkipped()
+        {
+            Spawn(new Vector2Int(3, 4));
+            var results = new System.Collections.Generic.List<GameEntityId>();
+
+            _units.CollectUnitsIn(new Rect(0f, 0f, 10f, 10f), Faction.Enemy, results);
+
+            Assert.AreEqual(0, results.Count);
+        }
+
+        [Test]
         public void TryGet_UnknownId_ReturnsFalse()
         {
             Assert.IsFalse(_units.TryGet(new GameEntityId(5), out _));

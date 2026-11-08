@@ -76,6 +76,15 @@ namespace BarracksAndBolts.Gameplay.Pathfinding
         /// </summary>
         public void CollectDestinations(Vector2Int target, int count, List<Vector2Int> results)
         {
+            CollectDestinations(target, count, null, results);
+        }
+
+        /// <param name="isAllowed">
+        /// Extra condition a destination must meet, e.g. no other unit going there. Null means none.
+        /// A refused cell still lets the search pass through it, so the group spreads around it.
+        /// </param>
+        public void CollectDestinations(Vector2Int target, int count, Predicate<Vector2Int> isAllowed, List<Vector2Int> results)
+        {
             if (results == null)
                 throw new ArgumentNullException(nameof(results));
 
@@ -90,7 +99,8 @@ namespace BarracksAndBolts.Gameplay.Pathfinding
             while (_frontier.Count > 0 && results.Count < count)
             {
                 var cell = _frontier.Dequeue();
-                results.Add(cell);
+                if (isAllowed == null || isAllowed(cell))
+                    results.Add(cell);
 
                 foreach (var offset in Neighbours)
                 {

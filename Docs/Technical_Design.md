@@ -93,10 +93,10 @@ Gameplay/
 ├── Pathfinding/    AStarPathfinder, PathStatus, GridSearch
 ├── Placement/      PlacementService, PlacementInputHandler, PlacementPreviewView (bölge kuralı gelince: PlacementValidator)
 ├── Buildings/      BuildingService, BuildingModel, BuildingView, BuildingViewSpawner, Production/ (UnitProductionService)
-├── Units/          UnitService, UnitModel, UnitView, UnitViewSpawner, States/
+├── Units/          UnitService, UnitModel, UnitMovementSystem, UnitView, UnitViewSpawner, States/
 ├── Combat/         CombatService, Damage, Targeting
-├── Selection/      SelectionService, SelectionInputHandler (birimler gelince: BoxSelectionView)
-├── Commands/       CommandService, IUnitCommand, MoveCommand, AttackCommand ...
+├── Selection/      SelectionService, SelectionInputHandler, BoxSelectionView
+├── Commands/       UnitCommandService, CommandInputHandler, MoveMarkerView (AttackMove vb. gelince: IUnitCommand)
 ├── Teams/          Faction, TeamService (TeamColor, menüden taşındığı için Core.Session içinde)
 ├── Economy/        ResourceService, PopulationService, StorageService     (P1)
 ├── Calendar/       CalendarService, DayNightView                          (P1)
@@ -181,7 +181,7 @@ public interface IEventBus
 ## 8. Grid ve Pathfinding
 - **1 hücre = 1 Unity birimi = 64px** (oyun içi sprite'larda PPU 64). Görsel taraf Unity `Grid` + `Tilemap`, mantık tarafı `GridMap` ile çalışır.
 - `GridMap`, her hücre için şu bilgileri tutar: yürünebilir mi, üzerinde hangi bina veya kaynak var (`GameEntityId`), bölge içinde mi (P2).
-- **Birimler hücre işgal etmez.** Sadece binalar ve kaynaklar engeldir. Bu sayede birimler birbirini kilitleyemez. Üst üste binmeyi `GridSearch.CollectDestinations` ve hafif bir ayırma (separation) kuvveti önler. Üzerinde birim duran hücreye bina konamaz; yoksa birim binanın içinde kalır.
+- **Birimler hücre işgal etmez.** Sadece binalar ve kaynaklar engeldir. Bu sayede birimler birbirini kilitleyemez. Üst üste binmeyi `GridSearch.CollectDestinations` önler; hafif bir ayırma (separation) kuvveti henüz yok, birimler yürürken birbirinin içinden geçebilir. Üzerinde birim duran hücreye bina konamaz; yoksa birim binanın içinde kalır.
 - **A\***:
   - 8 yönlü hareket. Köşe kesmeye izin verilmez (iki yanı dolu çaprazdan geçilmez).
   - Octile mesafe sezgiseli kullanılır.
@@ -299,6 +299,8 @@ GameplayLifetimeScope
     Buildings          (runtime'da üretilenlerin parent'ı, BuildingViewSpawner)
     PlacementPreview   (yerleştirme önizlemesi)
     Units              (runtime'da üretilenlerin parent'ı, UnitViewSpawner)
+    SelectionBox       (kutu seçimi çerçevesi, BoxSelectionView)
+    MoveMarker         (sağ tık geri bildirimi, MoveMarkerView)
     Resources
     Effects
 ----- MANAGERS -----

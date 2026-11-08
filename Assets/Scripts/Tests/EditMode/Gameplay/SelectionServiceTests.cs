@@ -3,8 +3,10 @@ using BarracksAndBolts.Gameplay.Buildings;
 using BarracksAndBolts.Gameplay.Data;
 using BarracksAndBolts.Gameplay.Entities;
 using BarracksAndBolts.Gameplay.Grid;
+using BarracksAndBolts.Gameplay.Pathfinding;
 using BarracksAndBolts.Gameplay.Selection;
 using BarracksAndBolts.Gameplay.Teams;
+using BarracksAndBolts.Gameplay.Units;
 using NUnit.Framework;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -16,8 +18,10 @@ namespace BarracksAndBolts.Tests.EditMode.Gameplay
         private GridMap _map;
         private EventBus _eventBus;
         private BuildingService _buildings;
+        private UnitService _units;
         private SelectionService _selection;
         private BuildingDefinition _house;
+        private UnitDefinition _knight;
         private int _changedCount;
 
         [SetUp]
@@ -25,9 +29,12 @@ namespace BarracksAndBolts.Tests.EditMode.Gameplay
         {
             _map = new GridMap(10, 10, Vector2.zero);
             _eventBus = new EventBus();
-            _buildings = new BuildingService(_map, new GameEntityIdGenerator(), _eventBus);
-            _selection = new SelectionService(_map, _eventBus);
+            var ids = new GameEntityIdGenerator();
+            _buildings = new BuildingService(_map, ids, _eventBus);
+            _units = new UnitService(_map, new GridSearch(_map), ids, _eventBus);
+            _selection = new SelectionService(_map, _units, _eventBus);
             _house = TestDefinitions.CreateBuilding("house", new Vector2Int(2, 2));
+            _knight = TestDefinitions.CreateUnit("knight");
             _changedCount = 0;
             _eventBus.Subscribe<SelectionChangedEvent>(_ => _changedCount++);
         }
@@ -36,6 +43,7 @@ namespace BarracksAndBolts.Tests.EditMode.Gameplay
         public void TearDown()
         {
             Object.DestroyImmediate(_house);
+            Object.DestroyImmediate(_knight);
         }
 
         private BuildingModel Place(Vector2Int origin)
@@ -44,11 +52,18 @@ namespace BarracksAndBolts.Tests.EditMode.Gameplay
             return building;
         }
 
+        private UnitModel Spawn(Vector2Int cell, Faction faction = Faction.Player)
+        {
+            Assert.IsTrue(_units.TrySpawn(_knight, cell, faction, out var unit));
+            return unit;
+        }
+
         [Test]
         public void StartsEmpty()
         {
             Assert.IsFalse(_selection.HasSelection);
             Assert.AreEqual(GameEntityId.None, _selection.Primary);
+            Assert.IsFalse(_selection.HasBox);
         }
 
         [Test]
@@ -85,6 +100,38 @@ namespace BarracksAndBolts.Tests.EditMode.Gameplay
             _selection.SelectAt(new Vector2(-3f, 20f));
 
             Assert.IsFalse(_selection.HasSelection);
+        }
+
+        [Test]
+        public void SelectAt_OnUnit_SelectsTheUnit()
+        {
+            var unit = Spawn(new Vector2Int(5, 5));
+
+            _selection.SelectAt(unit.Position + Vector2.up * 0.5f);
+
+            Assert.AreEqual(unit.Id, _selection.Primary);
+        }
+
+        [Test]
+        public void SelectAt_UnitInFrontOfBuilding_PrefersTheUnit()
+        {
+            Place(new Vector2Int(5, 6));
+            var unit = Spawn(new Vector2Int(5, 5));
+
+            // The unit's head reaches into the building's bottom cell.
+            _selection.SelectAt(new Vector2(unit.Position.x, 6.2f));
+
+            Assert.AreEqual(unit.Id, _selection.Primary);
+        }
+
+        [Test]
+        public void SelectAt_EnemyUnit_CanBeSelected()
+        {
+            var enemy = Spawn(new Vector2Int(5, 5), Faction.Enemy);
+
+            _selection.SelectAt(enemy.Position);
+
+            Assert.AreEqual(enemy.Id, _selection.Primary);
         }
 
         [Test]
@@ -131,6 +178,107 @@ namespace BarracksAndBolts.Tests.EditMode.Gameplay
             _selection.SelectAt(new Vector2(5.5f, 5.5f));
 
             Assert.AreEqual(0, _changedCount);
+        }
+
+        [Test]
+        public void UpdateBox_AnyCornerOrder_GivesTheSameRect()
+        {
+            _selection.UpdateBox(new Vector2(4f, 1f), new Vector2(2f, 3f));
+
+            Assert.IsTrue(_selection.HasBox);
+            Assert.AreEqual(Rect.MinMaxRect(2f, 1f, 4f, 3f), _selection.Box);
+        }
+
+        [Test]
+        public void UpdateBox_DoesNotChangeSelectionUntilConfirmed()
+        {
+            Spawn(new Vector2Int(3, 3));
+
+            _selection.UpdateBox(Vector2.zero, new Vector2(6f, 6f));
+
+            Assert.IsFalse(_selection.HasSelection);
+            Assert.AreEqual(0, _changedCount);
+        }
+
+        [Test]
+        public void ConfirmBox_SelectsPlayerUnitsInside()
+        {
+            var inside = Spawn(new Vector2Int(2, 2));
+            var alsoInside = Spawn(new Vector2Int(3, 3));
+            var outside = Spawn(new Vector2Int(8, 8));
+
+            _selection.UpdateBox(Vector2.zero, new Vector2(5f, 5f));
+            _selection.ConfirmBox();
+
+            Assert.IsFalse(_selection.HasBox);
+            Assert.AreEqual(2, _selection.Selected.Count);
+            Assert.IsTrue(_selection.IsSelected(inside.Id));
+            Assert.IsTrue(_selection.IsSelected(alsoInside.Id));
+            Assert.IsFalse(_selection.IsSelected(outside.Id));
+            Assert.AreEqual(1, _changedCount);
+        }
+
+        [Test]
+        public void ConfirmBox_SkipsEnemyUnitsAndBuildings()
+        {
+            var enemy = Spawn(new Vector2Int(2, 2), Faction.Enemy);
+            var building = Place(new Vector2Int(3, 3));
+
+            _selection.UpdateBox(Vector2.zero, new Vector2(6f, 6f));
+            _selection.ConfirmBox();
+
+            Assert.IsFalse(_selection.IsSelected(enemy.Id));
+            Assert.IsFalse(_selection.IsSelected(building.Id));
+            Assert.IsFalse(_selection.HasSelection);
+        }
+
+        [Test]
+        public void ConfirmBox_Empty_ClearsSelection()
+        {
+            _selection.Select(Spawn(new Vector2Int(8, 8)).Id);
+
+            _selection.UpdateBox(Vector2.zero, new Vector2(2f, 2f));
+            _selection.ConfirmBox();
+
+            Assert.IsFalse(_selection.HasSelection);
+            Assert.AreEqual(2, _changedCount);
+        }
+
+        [Test]
+        public void ConfirmBox_SameUnitsAgain_DoesNotPublish()
+        {
+            Spawn(new Vector2Int(2, 2));
+            _selection.UpdateBox(Vector2.zero, new Vector2(5f, 5f));
+            _selection.ConfirmBox();
+
+            _selection.UpdateBox(Vector2.zero, new Vector2(5f, 5f));
+            _selection.ConfirmBox();
+
+            Assert.AreEqual(1, _changedCount);
+        }
+
+        [Test]
+        public void ConfirmBox_WithoutBox_DoesNothing()
+        {
+            var unit = Spawn(new Vector2Int(2, 2));
+            _selection.Select(unit.Id);
+
+            _selection.ConfirmBox();
+
+            Assert.AreEqual(unit.Id, _selection.Primary);
+        }
+
+        [Test]
+        public void CancelBox_HidesBoxAndKeepsSelection()
+        {
+            var unit = Spawn(new Vector2Int(8, 8));
+            _selection.Select(unit.Id);
+
+            _selection.UpdateBox(Vector2.zero, new Vector2(2f, 2f));
+            _selection.CancelBox();
+
+            Assert.IsFalse(_selection.HasBox);
+            Assert.AreEqual(unit.Id, _selection.Primary);
         }
     }
 }
