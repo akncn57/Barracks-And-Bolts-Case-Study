@@ -8,7 +8,7 @@ namespace BarracksAndBolts.Gameplay.CameraControl
         [Header("Pan")]
         [Tooltip("Screen heights per second. Scaling with the view keeps panning equally fast at every zoom level.")]
         [SerializeField, Min(0f)] private float panSpeed = 1.2f;
-        [SerializeField] private bool isEdgePanEnabled = true;
+        [SerializeField] private bool isEdgePanEnabled;
         [Tooltip("Distance from the screen edge, in pixels, that starts edge panning.")]
         [SerializeField, Min(1f)] private float edgeThickness = 12f;
 

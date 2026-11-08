@@ -265,7 +265,7 @@ Tuşlar Age of Empires, StarCraft ve Warcraft III gibi RTS oyunlarının alış�
 | Action | Tuş | Tür | Not |
 |---|---|---|---|
 | `Pan` | WASD / Ok tuşları | Value (Vector2) | |
-| `EdgePan` | Mouse ekran kenarında | Value (Vector2) | Ayarlardan kapatılabilir |
+| `EdgePan` | Mouse ekran kenarında | Value (Vector2) | Varsayılan kapalı; ayarlardan açılabilir |
 | `DragPan` | Orta tuş basılı + sürükle | Button + Delta | |
 | `Zoom` | Mouse tekerleği | Value (float) | Min/max zoom sınırı olur |
 | `FocusSelection` | Space | Button | Kamerayı seçili birime ortalar |
