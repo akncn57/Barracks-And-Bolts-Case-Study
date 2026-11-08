@@ -9,6 +9,7 @@ using BarracksAndBolts.Gameplay.Grid;
 using BarracksAndBolts.Gameplay.Input;
 using BarracksAndBolts.Gameplay.Pathfinding;
 using BarracksAndBolts.Gameplay.Placement;
+using BarracksAndBolts.Gameplay.Selection;
 using BarracksAndBolts.Gameplay.Teams;
 using UnityEngine;
 using VContainer;
@@ -67,6 +68,9 @@ namespace BarracksAndBolts.Gameplay.Bootstrap
             builder.Register<PlacementService>(Lifetime.Singleton);
             builder.RegisterEntryPoint<PlacementInputHandler>();
             builder.RegisterComponentInHierarchy<PlacementPreviewView>();
+
+            builder.Register<SelectionService>(Lifetime.Singleton);
+            builder.RegisterEntryPoint<SelectionInputHandler>();
         }
     }
 }

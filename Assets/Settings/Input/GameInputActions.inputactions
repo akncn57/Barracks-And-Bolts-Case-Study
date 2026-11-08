@@ -210,6 +210,54 @@
             ]
         },
         {
+            "name": "Gameplay",
+            "id": "84c5faae-d8f7-40ac-84ec-66d0dd3336c6",
+            "actions": [
+                {
+                    "name": "Select",
+                    "type": "Button",
+                    "id": "c74c4bee-73c2-4084-95aa-65939a44be8d",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "PointerPosition",
+                    "type": "Value",
+                    "id": "e2a951ab-2c9e-4466-a9c0-b06967119511",
+                    "expectedControlType": "Vector2",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "092eb6bf-89eb-458d-9dfb-9800fadb3bf8",
+                    "path": "<Mouse>/leftButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard&Mouse",
+                    "action": "Select",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "0b78f0c2-336d-477a-b104-f4560db4a4af",
+                    "path": "<Pointer>/position",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard&Mouse",
+                    "action": "PointerPosition",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        },
+        {
             "name": "Placement",
             "id": "9843f8e7-1813-4b97-898c-7ac4c0a1724a",
             "actions": [

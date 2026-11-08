@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: BarracksAndBolts.Gameplay::BarracksAndBolts.Gameplay.Data.UnitDefinition
   id: knight
   displayName: Knight
-  portrait: {fileID: 0}
+  portrait: {fileID: -4216416322996058909, guid: d7216114c8492ab40963825ff267108f, type: 3}
   maxHp: 10
   damage: 10
   attackRange: 1

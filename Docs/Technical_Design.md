@@ -95,7 +95,7 @@ Gameplay/
 ├── Buildings/      BuildingService, BuildingModel, BuildingView, BuildingViewSpawner, Production/
 ├── Units/          UnitService, UnitModel, UnitView, States/
 ├── Combat/         CombatService, Damage, Targeting
-├── Selection/      SelectionService, BoxSelectionView
+├── Selection/      SelectionService, SelectionInputHandler (birimler gelince: BoxSelectionView)
 ├── Commands/       CommandService, IUnitCommand, MoveCommand, AttackCommand ...
 ├── Teams/          Faction, TeamService (TeamColor, menüden taşındığı için Core.Session içinde)
 ├── Economy/        ResourceService, PopulationService, StorageService     (P1)

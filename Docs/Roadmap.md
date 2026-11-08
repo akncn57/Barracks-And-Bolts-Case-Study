@@ -1,6 +1,6 @@
 # Barracks & Bolts – Öncelik ve Takvim
 
-> **Durum (7 Kasım gece):** Altyapı, grid, kamera, A* (algoritma), tüm P0/P1 assetleri, veri tanımları, bina yerleştirme ve Production Menu kodu hazır. 148 EditMode testi. **Sıradaki adım:** yerleştirme ve menünün sahne/prefab kurulumu ve editörde test → Information Panel → seçim.
+> **Durum (8 Kasım):** Altyapı, grid, kamera, A* (algoritma), tüm P0/P1 assetleri, veri tanımları, bina yerleştirme, Production Menu, binaya sol tıkla seçim ve Information Panel hazır ve oyunda denendi. **Sıradaki adım:** birimler, Barracks'tan asker üretimi ve spawn point → birim seçimi (kutu seçimi dahil) → sağ tıkla hareket.
 
 > **Teslim tarihi:** 13 Kasım 2026, Cuma
 > **Ana kural:** Her öncelik seviyesi bitmeden bir sonrakine geçilmez. `main` branch'i her zaman çalışan ve build alınabilen bir halde tutulur.
@@ -15,12 +15,12 @@ Bu seviye bittiğinde PDF'teki her madde karşılanmış olur. **Hedef: 10 Kası
 - [x] Grid sistemi (A* ve bina yerleştirme aynı grid'i kullanır). Bu aşamada sabit veya basit bir harita
 - [x] Kamera: kaydırma ve zoom, harita sınırlarına göre kısıtlı, farklı ekran oranlarında çalışır (Cinemachine)
 - [x] Veri odaklı bina ve birim tanımları (ScriptableObject: ad, görsel, boyut, HP, hasar). Görseller renk setlerinde (`TeamColorDefinition`)
-- [ ] **Production Menu:** sonsuz scroll view + object pooling *(kod ve testler hazır; prefab ve canvas kurulumu kaldı)*
-- [ ] **Bina yerleştirme:** önizleme, geçerli alan yeşil, geçersiz alan kırmızı *(kod ve testler hazır; sahne kurulumu kaldı)*
-- [ ] Barracks (100 HP) ve House (Power Plant karşılığı, 50 HP). Ek olarak en az 1–2 bina daha (Castle, Kule; işlevleri P2'de gelir) *(4 bina asset'i hazır; oyunda görülmesi kaldı)*
-- [ ] **Information Panel:** seçilen binanın görseli. Üretim yapan binada üretilebilir birimlerin listesi
+- [x] **Production Menu:** sonsuz scroll view + object pooling
+- [x] **Bina yerleştirme:** önizleme, geçerli alan yeşil, geçersiz alan kırmızı
+- [x] Barracks (100 HP) ve House (Power Plant karşılığı, 50 HP). Ek olarak en az 1–2 bina daha (Castle, Kule; işlevleri P2'de gelir)
+- [x] **Information Panel:** seçilen binanın görseli. Üretim yapan binada üretilebilir birimlerin listesi
 - [ ] Barracks'tan 3 asker üretimi (10 HP; 10 / 5 / 2 hasar), süre yok, sınırsız. Spawn point (doluysa en yakın boş hücre)
-- [ ] Seçim: sol tık ve kutu seçimi
+- [ ] Seçim: sol tık ve kutu seçimi *(binaya sol tıkla seçim hazır; kutu seçimi birimlerle gelecek)*
 - [ ] **A\* pathfinding:** sağ tıkla hareket, binaların etrafından dolaşma, grup halinde gidince hedefin etrafına dağılma *(algoritma ve GridSearch hazır + testli; birim hareketine bağlanması kaldı)*
 - [ ] **Saldırı:** sağ tıkla birime ya da binaya saldırma
 - [ ] HP 0 olunca yok olma: seçim ve panel temizlenir, grid hücreleri boşalır, saldıranlar hedefini bırakır
