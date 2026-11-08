@@ -12,12 +12,12 @@
 | `Texture_UI_Icons_Arrow_Green`, `_Arrow_Orange` | İleri / geri butonları |
 | `Texture_UI_Icons_Cancel` | İptal, kapat, geçersiz |
 | `Texture_UI_Icons_Settings`, `_Info`, `_Music` | Ayarlar, bilgi, ses ayarı |
-| `Texture_UI_Avatars_01–05` | Birim portreleri: Şövalye, Mızrakçı, Okçu, Rahip, Köylü (eşleşme Unity'de kontrol edilecek) |
+| `Texture_UI_Avatars_01–05` | Birim portreleri: Şövalye, Mızrakçı, Okçu, Rahip, Köylü (ilk üçü `Data_Unit_*` asset'lerine atandı) |
 | `Texture_Cursors_Default`, `_Pointer`, `_Forbidden` | Varsayılan imleç, tıklanabilir (el), yasak |
 | `Texture_Cursors_Selection` (köşe çerçevesi) | Seçim / hedef göstergesi |
 | `Texture_UI_Tools_Hammer`, `_Axe`, `_Sword`, `_Pickaxe` | İmleç durumları: inşa/tamir, odun, saldırı, maden |
 | `Texture_UI_Bars_Big_*`, `_Small_*` | Can barı, ilerleme barı |
-| `Texture_UI_Ribbons_Small`, `_Banners_*`, `_Papers_*`, `_WoodTable_*` | Panel arka planları, başlıklar, slotlar |
+| `Texture_UI_Ribbons_Small_<Renk>_<Fork/Point>`, `_Banners_*`, `_Papers_*`, `_WoodTable_*` | Panel arka planları, başlıklar, slotlar |
 
 ---
 

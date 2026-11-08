@@ -306,7 +306,7 @@ GameplayLifetimeScope
 ----- UI -----
     EventSystem
     Prefab_UI_Canvas_Gameplay_Variant (GameplayUiLifetimeScope, parent = GameplayLifetimeScope)
-        StaticCanvas / DynamicCanvas (Production Menu burada, kaydırırken sürekli değişir)
+        StaticCanvas / DynamicCanvas (Production Menu ve Information Panel burada; içerikleri oyun sırasında değişir)
 ----- LIGHTS -----
     Global Light 2D
 ```

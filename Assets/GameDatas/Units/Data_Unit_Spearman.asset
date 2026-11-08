@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: BarracksAndBolts.Gameplay::BarracksAndBolts.Gameplay.Data.UnitDefinition
   id: spearman
   displayName: Spearman
-  portrait: {fileID: -1955488095112409121, guid: 6424b7b582b0c014f91c4cf7b8d289aa, type: 3}
+  portrait: {fileID: -1558449054324165317, guid: 753c63139ddbb0248824b9bf2c323ed8, type: 3}
   maxHp: 10
   damage: 5
   attackRange: 1.5
