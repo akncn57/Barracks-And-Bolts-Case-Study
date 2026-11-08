@@ -19,6 +19,7 @@ namespace BarracksAndBolts.UI
         {
             builder.RegisterComponentInHierarchy<ProductionMenuView>();
             builder.RegisterComponentInHierarchy<InformationPanelView>();
+            builder.RegisterComponentInHierarchy<UnitSelectionCardView>();
             builder.RegisterComponentInHierarchy<SandboxFactionToggleView>();
             builder.RegisterComponentInHierarchy<FloatingTextSpawner>();
             builder.RegisterComponentInHierarchy<HoverLabelView>();

@@ -7,7 +7,6 @@ using BarracksAndBolts.Gameplay.Data;
 using BarracksAndBolts.Gameplay.Sandbox;
 using BarracksAndBolts.Gameplay.Selection;
 using BarracksAndBolts.Gameplay.Teams;
-using BarracksAndBolts.Gameplay.Units;
 using BarracksAndBolts.UI.Common;
 using BarracksAndBolts.UI.Tooltips;
 using BarracksAndBolts.Utils.Disposables;
@@ -20,12 +19,11 @@ namespace BarracksAndBolts.UI.Information
 {
     /// <summary>
     /// Shows the selected building: picture, name, HP and, for the player's production buildings, the units it can make.
-    /// For selected units it shows the first one's picture and the health of the whole group.
-    /// Hidden while nothing is selected. Redraws only when the selection changes.
+    /// Hidden unless a building is selected; units have their own small card. Redraws only when the selection changes.
     /// </summary>
     public sealed class InformationPanelView : MonoBehaviour
     {
-        [Tooltip("Child that holds the visible panel. Hidden while nothing is selected; this object stays active.")]
+        [Tooltip("Child that holds the visible panel. Hidden unless a building is selected; this object stays active.")]
         [SerializeField] private GameObject content;
         [SerializeField] private ContentFitPanel panelFit;
         [SerializeField] private ScrollRect scrollRect;
@@ -49,20 +47,18 @@ namespace BarracksAndBolts.UI.Information
         private BuildingService _buildings;
         private TeamService _teams;
         private UnitProductionService _production;
-        private UnitService _units;
         private SandboxService _sandbox;
         private TooltipView _tooltip;
         private IEventBus _eventBus;
 
         [Inject]
         private void Construct(SelectionService selection, BuildingService buildings, TeamService teams,
-            UnitProductionService production, UnitService units, SandboxService sandbox, TooltipView tooltip, IEventBus eventBus)
+            UnitProductionService production, SandboxService sandbox, TooltipView tooltip, IEventBus eventBus)
         {
             _selection = selection;
             _buildings = buildings;
             _teams = teams;
             _production = production;
-            _units = units;
             _sandbox = sandbox;
             _tooltip = tooltip;
             _eventBus = eventBus;
@@ -97,53 +93,13 @@ namespace BarracksAndBolts.UI.Information
 
         private void Refresh()
         {
-            var primary = _selection.Primary;
-            if (_buildings.TryGet(primary, out var building))
-            {
-                content.SetActive(true);
-                ShowBuilding(building);
-            }
-            else if (_units.TryGet(primary, out var unit))
-            {
-                content.SetActive(true);
-                ShowUnits(unit);
-            }
-            else
-            {
-                content.SetActive(false);
+            var hasBuilding = _buildings.TryGet(_selection.Primary, out var building);
+            content.SetActive(hasBuilding);
+            if (!hasBuilding)
                 return;
-            }
 
+            ShowBuilding(building);
             panelFit.Refit();
-        }
-
-        private void ShowUnits(UnitModel primary)
-        {
-            productionSection.SetActive(false);
-            picture.sprite = primary.Definition.Portrait;
-
-            var count = _selection.Selected.Count;
-            nameLabel.text = count == 1 ? primary.Definition.DisplayName : $"{count} Units";
-
-            // A group shows the health of all its units together.
-            var currentHp = 0;
-            var maxHp = 0;
-            foreach (var id in _selection.Selected)
-            {
-                if (!_units.TryGet(id, out var unit))
-                    continue;
-
-                currentHp += unit.CurrentHp;
-                maxHp += unit.Definition.MaxHp;
-            }
-
-            ShowHp(currentHp, maxHp);
-        }
-
-        private void ShowHp(int currentHp, int maxHp)
-        {
-            hpLabel.text = $"{currentHp} / {maxHp}";
-            hpFill.fillAmount = (float)currentHp / maxHp;
         }
 
         private void ShowBuilding(BuildingModel building)
@@ -151,7 +107,8 @@ namespace BarracksAndBolts.UI.Information
             var definition = building.Definition;
             picture.sprite = _teams.GetColorSet(building.Faction).GetBuildingSprite(definition);
             nameLabel.text = definition.DisplayName;
-            ShowHp(building.CurrentHp, definition.MaxHp);
+            hpLabel.text = $"{building.CurrentHp} / {definition.MaxHp}";
+            hpFill.fillAmount = (float)building.CurrentHp / definition.MaxHp;
 
             // Only the side being built for lists its units. Outside sandbox mode that is always the player.
             var showProduction = definition.CanProduce && building.Faction == _sandbox.ActiveFaction;

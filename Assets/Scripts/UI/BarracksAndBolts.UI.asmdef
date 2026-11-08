@@ -8,6 +8,7 @@
         "BarracksAndBolts.Utils",
         "VContainer",
         "UniTask",
+        "DOTween.Modules",
         "UnityEngine.UI",
         "Unity.TextMeshPro"
     ],

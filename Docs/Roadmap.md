@@ -1,6 +1,6 @@
 # Barracks & Bolts – Öncelik ve Takvim
 
-> **Durum (8 Kasım):** Altyapı, grid, kamera, A* (algoritma), tüm P0/P1 assetleri, veri tanımları, bina yerleştirme, Production Menu, binaya sol tıkla seçim, Information Panel, birimler, Barracks'tan asker üretimi, birim seçimi (sol tık ve kutu) ve sağ tıkla hareket hazır ve oyunda denendi. Saldırı, yok olma ve minimal Sandbox da hazır ve oyunda denendi. P0+ istekleri de bitti. **Sıradaki adım:** SetPass, build, README. Efekt turunda yapılacak: vuruş zamanlaması ve ölüm efekti.
+> **Durum (8 Kasım):** Altyapı, grid, kamera, A* (algoritma), tüm P0/P1 assetleri, veri tanımları, bina yerleştirme, Production Menu, binaya sol tıkla seçim, Information Panel, birimler, Barracks'tan asker üretimi, birim seçimi (sol tık ve kutu) ve sağ tıkla hareket hazır ve oyunda denendi. Saldırı, yok olma ve minimal Sandbox da hazır ve oyunda denendi. P0+ istekleri de bitti. SetPass 10, Windows build denendi. **Sıradaki adım:** kullanıcının yeni istekleri, sonra README. Efekt turunda yapılacak: vuruş zamanlaması ve ölüm efekti.
 
 > **Teslim tarihi:** 13 Kasım 2026, Cuma
 > **Ana kural:** Her öncelik seviyesi bitmeden bir sonrakine geçilmez. `main` branch'i her zaman çalışan ve build alınabilen bir halde tutulur.
@@ -26,8 +26,8 @@ Bu seviye bittiğinde PDF'teki her madde karşılanmış olur. **Hedef: 10 Kası
 - [x] HP 0 olunca yok olma: seçim ve panel temizlenir, grid hücreleri boşalır, saldıranlar hedefini bırakır
 - [x] **Minimal Sandbox:** düşman birimi ve binası yerleştirme. Dost ateşi olmadığı için saldırı maddesinin test edilebilmesi buna bağlı
 - [x] Ana menü (Sandbox ile başlama ve çıkış yeterli)
-- [ ] SetPass < 20 kontrolü (Sprite Atlas, Frame Debugger ile ölçüm)
-- [ ] Resizable Windows build
+- [x] SetPass < 20 kontrolü: savaş sırasında Stats'ta 10
+- [x] Resizable Windows build
 - [ ] README: nasıl oynanır, kontroller, mimari özeti, PDF maddelerinin nasıl karşılandığı
 
 ## P0+ – Oyun İçi Test İstekleri (8 Kasım)
@@ -37,6 +37,8 @@ Oyunu deneyince çıkan kullanılabilirlik istekleri. Sandbox'ta da olmalı, bui
 - [x] **Üzerine gelince bina adı:** Mouse binanın üstündeyken ekranda adı yazar, binada hover efekti olur
 - [x] **Information Panel boyutu:** Min-max arasında içeriğe göre boyutlanır. İçerik sığmazsa scroll olur, sağda sürüklenebilir scrollbar görünür. Üste anchor'landığı için geniş ekran taşması da çözüldü
 - [x] **Production Menu tooltip:** Hücrenin üstünde durunca bina bilgisi açılır (boyut, HP, ürettikleri). Maliyet satırı P1'de maliyetler gelince eklenir
+- [x] **Production Menu açılır kapanır:** Kapalı başlar, butona basınca soldan DOTween ile kayarak gelir. Haritayı kapatmasın diye
+- [x] **Birim kartı:** Asker seçilince alt ortada küçük kart çıkar, mouse'u yakalamaz. Büyük panel sadece binada açılır
 
 ## P1 – Oyun Döngüsü (bu seviyeyle bir "oyun" ortaya çıkar)
 **Hedef: 11 Kasım Çarşamba akşamı.**
