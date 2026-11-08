@@ -46,7 +46,8 @@ Oyunu deneyince çıkan kullanılabilirlik istekleri. Sandbox'ta da olmalı, bui
 ## P1 – Oyun Döngüsü (bu seviyeyle bir "oyun" ortaya çıkar)
 **Hedef: 11 Kasım Çarşamba akşamı.**
 
-- [ ] Kaynaklar (odun, taş, yemek, altın) ve haritadaki kaynak noktaları (tükenme, koyunların çoğalması)
+- [x] **Haritada rastgele kaynak dağılımı:** seed'li; orman, taş ocağı, altın madeni, koyun sürüsü
+- [ ] Kaynak miktarı, tükenme ve koyunların çoğalması
 - [ ] Köylü: Castle'dan üretim, kaynak toplama, Castle'a taşıma
 - [ ] Bina ve birim maliyetleri (Production Menu hücresinde ve tooltip'te gösterilir)
 - [ ] Üstteki kaynak barının gerçek miktarlara bağlanması (bar P0+'ta geldi; Normal modda şimdilik 0 yazıyor)

@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: bfe93b27a50c113418ebe44534cde076
+guid: 7b735540799b96c479a3c43f7d360d51
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -5114542402921555521
-    second: Rock4_0
+      213: -7380142637463262645
+    second: Gold Stone 6_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -113,23 +113,23 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Rock4_0
+      name: Gold Stone 6_0
       rect:
         serializedVersion: 2
-        x: 1
-        y: 7
-        width: 61
-        height: 44
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 16
+        y: 29
+        width: 94
+        height: 83
+      alignment: 9
+      pivot: {x: 0.5, y: 0.01205}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: fb9103558ce7509b0800000000000000
-      internalID: -5114542402921555521
+      spriteID: b4aa9467f57749990800000000000000
+      internalID: -7380142637463262645
       vertices: []
       indices: 
       edges: []
@@ -148,7 +148,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Rock4_0: -5114542402921555521
+      Gold Stone 6_0: -7380142637463262645
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

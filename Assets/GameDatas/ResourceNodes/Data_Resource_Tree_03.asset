@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8026d4a890e1ad743855890e42b317e3, type: 3}
+  m_Name: Data_Resource_Tree_03
+  m_EditorClassIdentifier: BarracksAndBolts.Gameplay::BarracksAndBolts.Gameplay.Data.ResourceNodeDefinition
+  id: tree
+  displayName: Tree
+  kind: 0
+  size: {x: 1, y: 1}
+  frames:
+  - {fileID: 5490517706564299302, guid: e9b10b5b19dcd6740956c5c4c6592306, type: 3}
+  - {fileID: 6298380449833275366, guid: e9b10b5b19dcd6740956c5c4c6592306, type: 3}
+  - {fileID: 2824195752816409085, guid: e9b10b5b19dcd6740956c5c4c6592306, type: 3}
+  - {fileID: 1194283620096228996, guid: e9b10b5b19dcd6740956c5c4c6592306, type: 3}
+  - {fileID: 1588640195615601357, guid: e9b10b5b19dcd6740956c5c4c6592306, type: 3}
+  - {fileID: 5002216177705252053, guid: e9b10b5b19dcd6740956c5c4c6592306, type: 3}
+  - {fileID: -5242237701343363396, guid: e9b10b5b19dcd6740956c5c4c6592306, type: 3}
+  - {fileID: -1336393745153393164, guid: e9b10b5b19dcd6740956c5c4c6592306, type: 3}

@@ -13,6 +13,7 @@ using BarracksAndBolts.Gameplay.Hover;
 using BarracksAndBolts.Gameplay.Input;
 using BarracksAndBolts.Gameplay.Pathfinding;
 using BarracksAndBolts.Gameplay.Placement;
+using BarracksAndBolts.Gameplay.ResourceNodes;
 using BarracksAndBolts.Gameplay.Sandbox;
 using BarracksAndBolts.Gameplay.Selection;
 using BarracksAndBolts.Gameplay.Teams;
@@ -53,7 +54,20 @@ namespace BarracksAndBolts.Gameplay.Bootstrap
             RegisterGrid(builder);
             RegisterUnits(builder);
             RegisterBuildings(builder);
+            RegisterResourceNodes(builder);
             builder.RegisterComponentInHierarchy<CameraController>();
+        }
+
+        private void RegisterResourceNodes(IContainerBuilder builder)
+        {
+            if (gameDatabase.ResourceDistribution == null)
+                throw new InvalidOperationException($"{gameDatabase.name}: resource distribution is not assigned.");
+
+            builder.RegisterInstance(gameDatabase.ResourceDistribution);
+            builder.Register<ResourceNodeService>(Lifetime.Singleton);
+            builder.Register<ResourceDistributor>(Lifetime.Singleton);
+            builder.RegisterEntryPoint<ResourceMapInitializer>();
+            builder.RegisterComponentInHierarchy<ResourceNodeViewSpawner>();
         }
 
         private static void RegisterUnits(IContainerBuilder builder)

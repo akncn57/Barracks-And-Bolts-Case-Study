@@ -24,3 +24,4 @@ MonoBehaviour:
   teamColors:
   - {fileID: 11400000, guid: f94dc58a74734471bc142acb1505acb8, type: 2}
   - {fileID: 11400000, guid: 20473e0c6a124e238c80631725cf4d11, type: 2}
+  resourceDistribution: {fileID: 11400000, guid: 56baf061acdf5d740a737e44469f60f8, type: 2}

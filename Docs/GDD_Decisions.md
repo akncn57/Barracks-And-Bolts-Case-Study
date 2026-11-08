@@ -120,7 +120,7 @@ Bu değerler ScriptableObject üzerinden ayarlanabilir olacak, ileride değişti
 | Rahip | `Monk` (+ Heal VFX) | 192 kare | 1x1 |
 | Koyun | `Sheep` | 128 kare | 1x1 |
 | Odun | `Tree1–4` (animasyonlu) → biter, `Stump` kalır | 192x256 kare | 1x1 |
-| Altın | `Gold Stone 1–6` (+ Highlight) | 128x128 | 2x2 |
+| Altın | `Gold Stone 5–6` (+ Highlight) | 128x128 | 2x1 |
 | Taş | `Rock1–4`. Birkaç kaya bir araya gelip bir taş ocağı kümesi oluşturur | 64x64 | 1x1 (her kaya) |
 | Zemin | `Tilemap_color1–5`, `Water Background`, `Water Foam`, `Water Rocks` | 64 tile | – |
 
@@ -167,7 +167,7 @@ Bu değerler ScriptableObject üzerinden ayarlanabilir olacak, ileride değişti
 - Harita grid tabanlıdır ve A* ile bina yerleştirme sistemi aynı grid'i kullanır. Varsayılan boyut: 64x64 hücre (ayarlanabilir).
 - Zemin Unity **Tilemap** ile çizilir. Tilemap tek materyal ve tek atlas kullanarak SetPass sayısını düşük tutar.
 
-> **Şu anki hali:** Sahnede sabit bir harita var: 64x64 alanda ada, iki su birikintisi, üç düzensiz şekilli plato (biri denize bakan uçurumlu). Gölge kullanılmadı. Rastgele üretim P2'de.
+> **Şu anki hali:** Sahnede sabit bir harita var: 64x64 alanda ada, iki su birikintisi, üç düzensiz şekilli plato (biri denize bakan uçurumlu). Gölge kullanılmadı. Zemin sabit, rastgele zemin üretimi P2'de. **Kaynaklar ise her oyunda seed ile rastgele dağılıyor:** ortada Castle için boş alan, yakınında her kaynaktan birer tane var; merdiven önleri açık kalıyor, hiçbir kaynak haritayı ikiye bölemiyor.
 
 ### Üretim Adımları
 1. **Zemin:** Perlin noise ile çimen, toprak ve (varsa) su/uçurum bölgeleri oluşturulur. Su ve uçurum yürünemez.

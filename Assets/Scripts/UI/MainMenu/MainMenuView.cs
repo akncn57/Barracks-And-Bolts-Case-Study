@@ -1,3 +1,4 @@
+using System;
 using BarracksAndBolts.Core.Scenes;
 using BarracksAndBolts.Core.Session;
 using Cysharp.Threading.Tasks;
@@ -37,6 +38,7 @@ namespace BarracksAndBolts.UI.MainMenu
         private void OnSandboxClicked()
         {
             _sessionSettings.Mode = GameMode.Sandbox;
+            _sessionSettings.Seed = Environment.TickCount;
             SetButtonsInteractable(false);
             _sceneLoader.LoadAsync(SceneNames.Gameplay).Forget();
         }

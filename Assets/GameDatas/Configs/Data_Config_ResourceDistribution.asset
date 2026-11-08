@@ -1,0 +1,63 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5f6515773963f4048a1c62fc51af3325, type: 3}
+  m_Name: Data_Config_ResourceDistribution
+  m_EditorClassIdentifier: BarracksAndBolts.Gameplay::BarracksAndBolts.Gameplay.Data.ResourceDistributionSettings
+  startClearRadius: 8
+  startDepositRadius: 17
+  rampClearance: 2
+  groups:
+  - definitions:
+    - {fileID: 11400000, guid: 60f9b0676c0ba554d96b3d2a0a77aac3, type: 2}
+    - {fileID: 11400000, guid: 51495112caec29f4cabfb853b1c46fb7, type: 2}
+    depositCount: 4
+    minNodesPerDeposit: 1
+    maxNodesPerDeposit: 1
+    minSpacing: 14
+    hasStartDeposit: 1
+  - definitions:
+    - {fileID: 11400000, guid: e8e424fd45d7ae445ba50935d64c62b2, type: 2}
+    - {fileID: 11400000, guid: e93a17b8bacfc8344b50960d9f1d0de6, type: 2}
+    - {fileID: 11400000, guid: e676910c8c7aec74797be72b35cc544f, type: 2}
+    - {fileID: 11400000, guid: 7d56a14e4461d7444a72918827c0b55c, type: 2}
+    depositCount: 6
+    minNodesPerDeposit: 3
+    maxNodesPerDeposit: 5
+    minSpacing: 10
+    hasStartDeposit: 1
+  - definitions:
+    - {fileID: 11400000, guid: fe42034a86ca9354fb16807231f61a97, type: 2}
+    depositCount: 6
+    minNodesPerDeposit: 3
+    maxNodesPerDeposit: 5
+    minSpacing: 10
+    hasStartDeposit: 1
+  - definitions:
+    - {fileID: 11400000, guid: c8301d0dba391fd47a0d9ed7dfb2a5b3, type: 2}
+    - {fileID: 11400000, guid: 526e7bce16f034d44abe76e5ad09f776, type: 2}
+    - {fileID: 11400000, guid: ac51adc2fd54f314ab5ddfb1dbb9cb89, type: 2}
+    - {fileID: 11400000, guid: 2cc37b87e26165447b25df5a693159ce, type: 2}
+    depositCount: 9
+    minNodesPerDeposit: 14
+    maxNodesPerDeposit: 26
+    minSpacing: 11
+    hasStartDeposit: 1
+  - definitions:
+    - {fileID: 11400000, guid: c8301d0dba391fd47a0d9ed7dfb2a5b3, type: 2}
+    - {fileID: 11400000, guid: 526e7bce16f034d44abe76e5ad09f776, type: 2}
+    - {fileID: 11400000, guid: ac51adc2fd54f314ab5ddfb1dbb9cb89, type: 2}
+    - {fileID: 11400000, guid: 2cc37b87e26165447b25df5a693159ce, type: 2}
+    depositCount: 16
+    minNodesPerDeposit: 1
+    maxNodesPerDeposit: 2
+    minSpacing: 3
+    hasStartDeposit: 0

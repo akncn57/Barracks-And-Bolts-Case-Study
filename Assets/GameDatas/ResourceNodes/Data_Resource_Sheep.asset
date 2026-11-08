@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8026d4a890e1ad743855890e42b317e3, type: 3}
+  m_Name: Data_Resource_Sheep
+  m_EditorClassIdentifier: BarracksAndBolts.Gameplay::BarracksAndBolts.Gameplay.Data.ResourceNodeDefinition
+  id: sheep
+  displayName: Sheep
+  kind: 2
+  size: {x: 1, y: 1}
+  frames:
+  - {fileID: -6879290243380990860, guid: 3456eff5277dbd64c9f3e12e1acbd7ec, type: 3}
+  - {fileID: 6416055995298698269, guid: 3456eff5277dbd64c9f3e12e1acbd7ec, type: 3}
+  - {fileID: -1385137418063276101, guid: 3456eff5277dbd64c9f3e12e1acbd7ec, type: 3}
+  - {fileID: -6629803274111058658, guid: 3456eff5277dbd64c9f3e12e1acbd7ec, type: 3}
+  - {fileID: -8493763510348472219, guid: 3456eff5277dbd64c9f3e12e1acbd7ec, type: 3}
+  - {fileID: 6094259631630437551, guid: 3456eff5277dbd64c9f3e12e1acbd7ec, type: 3}

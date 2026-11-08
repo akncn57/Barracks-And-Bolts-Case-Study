@@ -16,9 +16,11 @@ namespace BarracksAndBolts.Gameplay.Data
         [SerializeField] private BuildingDefinition[] buildings = Array.Empty<BuildingDefinition>();
         [SerializeField] private UnitDefinition[] units = Array.Empty<UnitDefinition>();
         [SerializeField] private TeamColorDefinition[] teamColors = Array.Empty<TeamColorDefinition>();
+        [SerializeField] private ResourceDistributionSettings resourceDistribution;
 
         public IReadOnlyList<BuildingDefinition> Buildings => buildings;
         public IReadOnlyList<UnitDefinition> Units => units;
+        public ResourceDistributionSettings ResourceDistribution => resourceDistribution;
 
         public TeamColorDefinition GetTeamColor(TeamColor color)
         {

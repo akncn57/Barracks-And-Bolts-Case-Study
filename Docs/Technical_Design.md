@@ -35,7 +35,7 @@ Assets/
 ├── GameDatas/                  ScriptableObject verileri
 │   ├── Buildings/              Data_Building_<İsim>.asset
 │   ├── Units/                  Data_Unit_<İsim>.asset
-│   ├── Resources/              Data_Resource_<İsim>.asset
+│   ├── ResourceNodes/          Data_Resource_<İsim>.asset
 │   ├── TeamColors/             Data_TeamColor_<Renk>.asset
 │   └── Configs/                Data_Config_<İsim>.asset (harita, takvim, zorluk...)
 ├── Materials/
@@ -44,9 +44,9 @@ Assets/
 │   ├── Gameplay/               Prefab_Gameplay_<İsim>
 │   │   ├── Buildings/
 │   │   ├── Units/
-│   │   └── Resources/
+│   │   └── ResourceNodes/
 │   └── UI/                     Prefab_UI_<Kategori>_<İsim>
-├── Resources/                  Sadece kütüphanelerin zorunlu tuttuğu dosyalar (ör. DOTweenSettings)
+├── Resources/                  Sadece kütüphanelerin zorunlu tuttuğu dosyalar (ör. DOTweenSettings). Bu isimdeki klasör build'e komple girer, başka yerde kullanılmaz
 ├── Scenes/                     Bootstrap, MainMenu, Gameplay
 ├── Scripts/                    (bkz. Bölüm 3)
 ├── Settings/                   URP, Renderer2D, Input Actions
@@ -101,6 +101,7 @@ Gameplay/
 ├── Commands/       UnitCommandService, CommandInputHandler, MoveMarkerView (AttackMove vb. gelince: IUnitCommand)
 ├── Sandbox/        SandboxService (minimal: taraf seçimi; tam palet P2)
 ├── Teams/          Faction, TeamService (TeamColor, menüden taşındığı için Core.Session içinde)
+├── ResourceNodes/  ResourceNodeService, ResourceDistributor, ResourceMapInitializer, ResourceNodeView, ResourceNodeViewSpawner
 ├── Economy/        ResourceService, PopulationService, StorageService     (P1)
 ├── Calendar/       CalendarService, DayNightView                          (P1)
 ├── Waves/          WaveService, EnemyAI                                    (P1)
