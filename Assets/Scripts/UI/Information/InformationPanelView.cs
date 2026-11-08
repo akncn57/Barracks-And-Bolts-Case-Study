@@ -8,6 +8,7 @@ using BarracksAndBolts.Gameplay.Sandbox;
 using BarracksAndBolts.Gameplay.Selection;
 using BarracksAndBolts.Gameplay.Teams;
 using BarracksAndBolts.Gameplay.Units;
+using BarracksAndBolts.UI.Common;
 using BarracksAndBolts.Utils.Disposables;
 using TMPro;
 using UnityEngine;
@@ -25,6 +26,8 @@ namespace BarracksAndBolts.UI.Information
     {
         [Tooltip("Child that holds the visible panel. Hidden while nothing is selected; this object stays active.")]
         [SerializeField] private GameObject content;
+        [SerializeField] private ContentFitPanel panelFit;
+        [SerializeField] private ScrollRect scrollRect;
 
         [Header("Building")]
         [SerializeField] private Image picture;
@@ -64,7 +67,7 @@ namespace BarracksAndBolts.UI.Information
 
         private void Start()
         {
-            _eventBus.Subscribe<SelectionChangedEvent>(_ => Refresh()).AddTo(_subscriptions);
+            _eventBus.Subscribe<SelectionChangedEvent>(_ => OnSelectionChanged()).AddTo(_subscriptions);
             _eventBus.Subscribe<SandboxFactionChangedEvent>(_ => Refresh()).AddTo(_subscriptions);
             _eventBus.Subscribe<EntityDamagedEvent>(OnEntityDamaged).AddTo(_subscriptions);
             Refresh();
@@ -73,6 +76,14 @@ namespace BarracksAndBolts.UI.Information
         private void OnDestroy()
         {
             _subscriptions.Dispose();
+        }
+
+        private void OnSelectionChanged()
+        {
+            Refresh();
+
+            // Something new is shown, so it starts from the top. A health update keeps the scroll position.
+            scrollRect.verticalNormalizedPosition = 1f;
         }
 
         private void OnEntityDamaged(EntityDamagedEvent damagedEvent)
@@ -97,7 +108,10 @@ namespace BarracksAndBolts.UI.Information
             else
             {
                 content.SetActive(false);
+                return;
             }
+
+            panelFit.Refit();
         }
 
         private void ShowUnits(UnitModel primary)
