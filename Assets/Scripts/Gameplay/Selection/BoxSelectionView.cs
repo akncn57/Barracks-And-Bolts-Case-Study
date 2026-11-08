@@ -17,6 +17,12 @@ namespace BarracksAndBolts.Gameplay.Selection
             _selection = selection;
         }
 
+        private void Awake()
+        {
+            // Setting the size has no effect in Simple mode; the box would stay at the sprite's small size.
+            boxRenderer.drawMode = SpriteDrawMode.Sliced;
+        }
+
         private void LateUpdate()
         {
             boxRenderer.enabled = _selection.HasBox;

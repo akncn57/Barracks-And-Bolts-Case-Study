@@ -75,8 +75,8 @@ namespace BarracksAndBolts.Gameplay.Combat
             if (_units.TryGet(unitId, out var unit) && unit.Faction != faction)
                 return unitId;
 
-            var occupant = _gridMap.GetOccupant(_gridMap.WorldToCell(worldPosition));
-            return _buildings.TryGet(occupant, out var building) && building.Faction != faction ? occupant : GameEntityId.None;
+            var buildingId = _buildings.GetBuildingAt(worldPosition);
+            return _buildings.TryGet(buildingId, out var building) && building.Faction != faction ? buildingId : GameEntityId.None;
         }
 
         /// <summary>

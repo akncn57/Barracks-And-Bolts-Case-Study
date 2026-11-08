@@ -30,12 +30,21 @@ Bu seviye bittiğinde PDF'teki her madde karşılanmış olur. **Hedef: 10 Kası
 - [ ] Resizable Windows build
 - [ ] README: nasıl oynanır, kontroller, mimari özeti, PDF maddelerinin nasıl karşılandığı
 
+## P0+ – Oyun İçi Test İstekleri (8 Kasım)
+Oyunu deneyince çıkan kullanılabilirlik istekleri. Sandbox'ta da olmalı, build'den önce yapılacak.
+
+- [x] **Uçan yazı (generic):** Dünyada beliren, yukarı süzülüp solan yazı. İlk kullanım: geçersiz alana bina koymaya çalışınca uyarı
+- [x] **Üzerine gelince bina adı:** Mouse binanın üstündeyken ekranda adı yazar, binada hover efekti olur
+- [ ] **Information Panel boyutu:** Min-max arasında içeriğe göre boyutlanır. İçerik sığmazsa scroll olur, sağda sürüklenebilir scrollbar görünür. Üste anchor'lanacağı için geniş ekran taşması da burada çözülür
+- [ ] **Production Menu tooltip:** Hücrenin üstünde durunca bina bilgisi açılır (boyut, HP, ürettikleri). Maliyet satırı P1'de maliyetler gelince eklenir
+
 ## P1 – Oyun Döngüsü (bu seviyeyle bir "oyun" ortaya çıkar)
 **Hedef: 11 Kasım Çarşamba akşamı.**
 
 - [ ] Kaynaklar (odun, taş, yemek, altın) ve haritadaki kaynak noktaları (tükenme, koyunların çoğalması)
 - [ ] Köylü: Castle'dan üretim, kaynak toplama, Castle'a taşıma
-- [ ] Bina ve birim maliyetleri
+- [ ] Bina ve birim maliyetleri (Production Menu hücresinde ve tooltip'te gösterilir)
+- [ ] Ekranda mevcut kaynakların ve nüfusun görünmesi (HUD)
 - [ ] Nüfus sistemi (House ile kapasite artışı)
 - [ ] Takvim: gündüz/gece döngüsü, saldırı günleri, baskın sırasında zamanın durması
 - [ ] Düşman AI: Castle'a yürür, yolundakine saldırır, kapalı yolda engel yıkar

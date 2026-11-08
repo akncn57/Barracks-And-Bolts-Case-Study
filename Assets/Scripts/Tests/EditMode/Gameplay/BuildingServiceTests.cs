@@ -108,6 +108,40 @@ namespace BarracksAndBolts.Tests.EditMode.Gameplay
         }
 
         [Test]
+        public void GetBuildingAt_FootprintAndRoof_FindTheBuilding()
+        {
+            var tall = TestDefinitions.CreateBuilding("tall", new Vector2Int(2, 2), visualHeight: 3f);
+            Assert.IsTrue(_service.TryPlace(tall, new Vector2Int(2, 2), Faction.Player, out var building));
+
+            Assert.AreEqual(building.Id, _service.GetBuildingAt(new Vector2(2.5f, 2.5f)));
+            Assert.AreEqual(building.Id, _service.GetBuildingAt(new Vector2(3.5f, 4.5f)), "The roof above the footprint counts.");
+            Assert.AreEqual(GameEntityId.None, _service.GetBuildingAt(new Vector2(3.5f, 5.5f)), "Above the roof.");
+            Assert.AreEqual(GameEntityId.None, _service.GetBuildingAt(new Vector2(4.5f, 2.5f)), "Beside it.");
+            Object.DestroyImmediate(tall);
+        }
+
+        [Test]
+        public void GetBuildingAt_RoofInFrontOfAnotherBuilding_ReturnsTheFrontOne()
+        {
+            var tall = TestDefinitions.CreateBuilding("tall", new Vector2Int(2, 2), visualHeight: 3f);
+            Assert.IsTrue(_service.TryPlace(tall, new Vector2Int(2, 4), Faction.Player, out var behind));
+            Assert.IsTrue(_service.TryPlace(tall, new Vector2Int(2, 2), Faction.Player, out var front));
+
+            Assert.AreEqual(front.Id, _service.GetBuildingAt(new Vector2(3f, 4.5f)), "The lower building is drawn in front.");
+            Assert.AreEqual(behind.Id, _service.GetBuildingAt(new Vector2(3f, 5.5f)));
+            Object.DestroyImmediate(tall);
+        }
+
+        [Test]
+        public void VisualHeight_NeverLessThanTheFootprint()
+        {
+            var flat = TestDefinitions.CreateBuilding("flat", new Vector2Int(2, 3), visualHeight: 1f);
+
+            Assert.AreEqual(3f, flat.VisualHeight);
+            Object.DestroyImmediate(flat);
+        }
+
+        [Test]
         public void TryGet_UnknownId_ReturnsFalse()
         {
             Assert.IsFalse(_service.TryGet(new GameEntityId(99), out _));

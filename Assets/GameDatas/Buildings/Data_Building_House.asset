@@ -15,6 +15,7 @@ MonoBehaviour:
   id: house
   displayName: House
   size: {x: 2, y: 2}
+  visualHeight: 2.5
   maxHp: 50
   producibles: []
   spawnOffset: {x: 0, y: -1}

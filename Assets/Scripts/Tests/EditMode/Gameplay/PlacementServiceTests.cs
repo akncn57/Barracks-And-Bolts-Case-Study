@@ -211,5 +211,26 @@ namespace BarracksAndBolts.Tests.EditMode.Gameplay
             Assert.IsFalse(_placement.IsCellFree(new Vector2Int(-1, 0)));
             Assert.IsTrue(_placement.IsCellFree(new Vector2Int(7, 7)));
         }
+
+        [Test]
+        public void Block_TellsWhyTheAreaIsInvalid()
+        {
+            _placement.Begin(_house, Faction.Player);
+            Assert.AreEqual(PlacementBlock.NoArea, _placement.Block);
+
+            _placement.MoveTo(new Vector2(5f, 5f));
+            Assert.AreEqual(PlacementBlock.None, _placement.Block);
+
+            _placement.MoveTo(new Vector2(0f, 0f));
+            Assert.AreEqual(PlacementBlock.OutsideMap, _placement.Block);
+
+            _map.TryOccupy(new RectInt(5, 5, 1, 1), new GameEntityId(99));
+            _placement.MoveTo(new Vector2(5f, 5f));
+            Assert.AreEqual(PlacementBlock.Occupied, _placement.Block);
+
+            _units.TrySpawn(_knight, new Vector2Int(8, 8), Faction.Player, out _);
+            _placement.MoveTo(new Vector2(8f, 8f));
+            Assert.AreEqual(PlacementBlock.UnitInTheWay, _placement.Block);
+        }
     }
 }

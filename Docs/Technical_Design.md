@@ -95,6 +95,8 @@ Gameplay/
 ├── Buildings/      BuildingService, BuildingModel, BuildingView, BuildingViewSpawner, Production/ (UnitProductionService)
 ├── Units/          UnitService, UnitModel, UnitMovementSystem, UnitView, UnitViewSpawner, States/
 ├── Combat/         CombatService, CombatSystem, DeathCleanupSystem, DamageFlash, ProjectileSpawner, ProjectileView
+├── Hover/          HoverService, HoverInputHandler, HoverHighlightView
+├── Feedback/       FloatingTextRequestedEvent (çizen: UI/Feedback/FloatingTextSpawner)
 ├── Selection/      SelectionService, SelectionInputHandler, BoxSelectionView
 ├── Commands/       UnitCommandService, CommandInputHandler, MoveMarkerView (AttackMove vb. gelince: IUnitCommand)
 ├── Sandbox/        SandboxService (minimal: taraf seçimi; tam palet P2)
@@ -303,6 +305,8 @@ GameplayLifetimeScope
     SelectionBox       (kutu seçimi çerçevesi, BoxSelectionView)
     MoveMarker         (sağ tık geri bildirimi, MoveMarkerView)
     Projectiles        (havuzdan gelen oklar, ProjectileSpawner)
+    HoverHighlight     (mouse'un altındakinin çerçevesi, HoverHighlightView)
+    FloatingTexts      (havuzdan gelen uçan yazılar, FloatingTextSpawner)
     Resources
     Effects
 ----- MANAGERS -----

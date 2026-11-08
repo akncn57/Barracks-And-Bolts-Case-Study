@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using BarracksAndBolts.Core.Events;
 using BarracksAndBolts.Gameplay.Buildings;
 using BarracksAndBolts.Gameplay.Entities;
-using BarracksAndBolts.Gameplay.Grid;
 using BarracksAndBolts.Gameplay.Teams;
 using BarracksAndBolts.Gameplay.Units;
 using BarracksAndBolts.Utils.Disposables;
@@ -17,17 +16,17 @@ namespace BarracksAndBolts.Gameplay.Selection
     /// </summary>
     public sealed class SelectionService : IDisposable
     {
-        private readonly GridMap _gridMap;
         private readonly UnitService _units;
+        private readonly BuildingService _buildings;
         private readonly IEventBus _eventBus;
         private readonly List<GameEntityId> _selected = new();
         private readonly List<GameEntityId> _candidates = new();
         private readonly CompositeDisposable _subscriptions = new();
 
-        public SelectionService(GridMap gridMap, UnitService units, IEventBus eventBus)
+        public SelectionService(UnitService units, BuildingService buildings, IEventBus eventBus)
         {
-            _gridMap = gridMap;
             _units = units;
+            _buildings = buildings;
             _eventBus = eventBus;
             eventBus.Subscribe<UnitDiedEvent>(e => Deselect(e.Unit.Id)).AddTo(_subscriptions);
             eventBus.Subscribe<BuildingDestroyedEvent>(e => Deselect(e.Building.Id)).AddTo(_subscriptions);
@@ -51,7 +50,7 @@ namespace BarracksAndBolts.Gameplay.Selection
         {
             // Units stand in front of buildings, so they are checked first.
             var unit = _units.GetUnitAt(worldPosition);
-            Select(unit.IsValid ? unit : _gridMap.GetOccupant(_gridMap.WorldToCell(worldPosition)));
+            Select(unit.IsValid ? unit : _buildings.GetBuildingAt(worldPosition));
         }
 
         /// <summary>Replaces the selection with this entity. An invalid id clears it.</summary>

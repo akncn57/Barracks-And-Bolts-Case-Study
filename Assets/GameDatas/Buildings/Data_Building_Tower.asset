@@ -15,6 +15,7 @@ MonoBehaviour:
   id: tower
   displayName: Tower
   size: {x: 2, y: 2}
+  visualHeight: 3
   maxHp: 150
   producibles: []
   spawnOffset: {x: 0, y: -1}

@@ -42,7 +42,7 @@ namespace BarracksAndBolts.Tests.EditMode.Gameplay
             _units = new UnitService(_map, new GridSearch(_map), ids, _eventBus);
             _movement = new UnitMovementSystem(_units, _map, new AStarPathfinder(_map), _eventBus);
             _combat = new CombatService(_units, _buildings, _map, _eventBus);
-            _selection = new SelectionService(_map, _units, _eventBus);
+            _selection = new SelectionService(_units, _buildings, _eventBus);
 
             _runner = new SimulationRunner(new GameClock());
             _runner.Add(_movement);

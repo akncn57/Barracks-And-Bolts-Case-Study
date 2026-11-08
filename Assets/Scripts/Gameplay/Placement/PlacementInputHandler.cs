@@ -1,4 +1,6 @@
+using BarracksAndBolts.Core.Events;
 using BarracksAndBolts.Gameplay.CameraControl;
+using BarracksAndBolts.Gameplay.Feedback;
 using BarracksAndBolts.Gameplay.Input;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -16,12 +18,14 @@ namespace BarracksAndBolts.Gameplay.Placement
         private readonly PlacementService _placement;
         private readonly CameraController _cameraController;
         private readonly GameInputActions.PlacementActions _actions;
+        private readonly IEventBus _eventBus;
 
-        public PlacementInputHandler(PlacementService placement, CameraController cameraController, GameInputActions inputActions)
+        public PlacementInputHandler(PlacementService placement, CameraController cameraController, GameInputActions inputActions, IEventBus eventBus)
         {
             _placement = placement;
             _cameraController = cameraController;
             _actions = inputActions.Placement;
+            _eventBus = eventBus;
         }
 
         public void PostTick()
@@ -42,11 +46,29 @@ namespace BarracksAndBolts.Gameplay.Placement
                 return;
             }
 
-            var pointer = _actions.PointerPosition.ReadValue<Vector2>();
-            _placement.MoveTo(_cameraController.ScreenToWorld(pointer));
+            var pointer = _cameraController.ScreenToWorld(_actions.PointerPosition.ReadValue<Vector2>());
+            _placement.MoveTo(pointer);
 
-            if (_actions.Confirm.WasPressedThisFrame())
-                _placement.TryConfirm(keepPlacing: _actions.ConfirmAndContinue.IsPressed());
+            if (!_actions.Confirm.WasPressedThisFrame())
+                return;
+
+            // Read before confirming: a successful placement ends the mode.
+            var block = _placement.Block;
+            if (!_placement.TryConfirm(keepPlacing: _actions.ConfirmAndContinue.IsPressed()))
+                _eventBus.Publish(new FloatingTextRequestedEvent(GetBlockMessage(block), pointer, FloatingTextKind.Warning));
+        }
+
+        private static string GetBlockMessage(PlacementBlock block)
+        {
+            switch (block)
+            {
+                case PlacementBlock.OutsideMap:
+                    return "Can't build outside the map";
+                case PlacementBlock.UnitInTheWay:
+                    return "Units are in the way";
+                default:
+                    return "Can't build here";
+            }
         }
     }
 }

@@ -32,7 +32,7 @@ namespace BarracksAndBolts.Tests.EditMode.Gameplay
             var ids = new GameEntityIdGenerator();
             _buildings = new BuildingService(_map, ids, _eventBus);
             _units = new UnitService(_map, new GridSearch(_map), ids, _eventBus);
-            _selection = new SelectionService(_map, _units, _eventBus);
+            _selection = new SelectionService(_units, _buildings, _eventBus);
             _house = TestDefinitions.CreateBuilding("house", new Vector2Int(2, 2));
             _knight = TestDefinitions.CreateUnit("knight");
             _changedCount = 0;
@@ -77,6 +77,18 @@ namespace BarracksAndBolts.Tests.EditMode.Gameplay
             Assert.AreEqual(building.Id, _selection.Primary);
             Assert.IsTrue(_selection.IsSelected(building.Id));
             Assert.AreEqual(1, _changedCount);
+        }
+
+        [Test]
+        public void SelectAt_OnTheRoofAboveTheFootprint_SelectsTheBuilding()
+        {
+            var tall = TestDefinitions.CreateBuilding("tall", new Vector2Int(2, 2), visualHeight: 3f);
+            Assert.IsTrue(_buildings.TryPlace(tall, new Vector2Int(2, 2), Faction.Player, out var building));
+
+            _selection.SelectAt(new Vector2(3f, 4.5f));
+
+            Assert.AreEqual(building.Id, _selection.Primary);
+            Object.DestroyImmediate(tall);
         }
 
         [Test]

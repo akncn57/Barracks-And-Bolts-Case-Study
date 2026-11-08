@@ -15,6 +15,7 @@ MonoBehaviour:
   id: castle
   displayName: Castle
   size: {x: 5, y: 3}
+  visualHeight: 3.25
   maxHp: 400
   producibles: []
   spawnOffset: {x: 2, y: -1}

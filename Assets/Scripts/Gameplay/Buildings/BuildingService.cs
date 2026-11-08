@@ -63,6 +63,31 @@ namespace BarracksAndBolts.Gameplay.Buildings
             return true;
         }
 
+        /// <summary>The building whose visible area covers the point. If several do, the one drawn in front: the lowest on screen.</summary>
+        public GameEntityId GetBuildingAt(Vector2 worldPosition)
+        {
+            var result = GameEntityId.None;
+            var lowestBase = int.MaxValue;
+            foreach (var building in _buildings.Values)
+            {
+                if (building.Area.yMin < lowestBase && GetVisibleArea(building).Contains(worldPosition))
+                {
+                    lowestBase = building.Area.yMin;
+                    result = building.Id;
+                }
+            }
+
+            return result;
+        }
+
+        /// <summary>The footprint plus the roof above it, in world space. Roofs are taller than the cells they stand on.</summary>
+        public Rect GetVisibleArea(BuildingModel building)
+        {
+            var area = building.Area;
+            var corner = _gridMap.Origin + area.min;
+            return new Rect(corner.x, corner.y, area.width, building.Definition.VisualHeight);
+        }
+
         public bool TryGet(GameEntityId id, out BuildingModel building)
         {
             return _buildings.TryGetValue(id, out building);

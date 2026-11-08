@@ -16,6 +16,8 @@ namespace BarracksAndBolts.Gameplay.Data
         [SerializeField] private string displayName;
         [Tooltip("Footprint in cells. The sprite can be taller; the roof covers the cells above.")]
         [SerializeField] private Vector2Int size = new(2, 2);
+        [Tooltip("How tall the building looks, in cells, counted from the bottom of the footprint. Clicks and hover use this. Never less than the footprint.")]
+        [SerializeField, Min(0f)] private float visualHeight;
         [SerializeField, Min(1)] private int maxHp = 100;
 
         [Header("Production")]
@@ -26,6 +28,7 @@ namespace BarracksAndBolts.Gameplay.Data
         public string Id => id;
         public string DisplayName => displayName;
         public Vector2Int Size => size;
+        public float VisualHeight => Mathf.Max(visualHeight, size.y);
         public int MaxHp => maxHp;
         public IReadOnlyList<UnitDefinition> Producibles => producibles;
         public bool CanProduce => producibles.Length > 0;

@@ -9,6 +9,21 @@ using UnityEngine;
 
 namespace BarracksAndBolts.Gameplay.Placement
 {
+    public enum PlacementBlock
+    {
+        None,
+
+        /// <summary>The pointer isn't over the map, or it is on a panel.</summary>
+        NoArea,
+
+        OutsideMap,
+
+        /// <summary>A building or unwalkable terrain is in the way.</summary>
+        Occupied,
+
+        UnitInTheWay
+    }
+
     /// <summary>
     /// State of the building placement mode: which building is being placed and where its footprint is.
     /// Input moves and confirms it; the preview only reads it.
@@ -37,8 +52,26 @@ namespace BarracksAndBolts.Gameplay.Placement
 
         public RectInt Area { get; private set; }
 
-        // Units don't block the grid, but a building placed on one would trap it.
-        public bool IsAreaValid => HasArea && _gridMap.IsAreaFree(Area) && !_units.HasUnitIn(Area);
+        public bool IsAreaValid => Block == PlacementBlock.None;
+
+        /// <summary>Why the building can't go where the footprint is now.</summary>
+        public PlacementBlock Block
+        {
+            get
+            {
+                if (!HasArea)
+                    return PlacementBlock.NoArea;
+
+                if (!_gridMap.IsInBounds(Area))
+                    return PlacementBlock.OutsideMap;
+
+                if (!_gridMap.IsAreaFree(Area))
+                    return PlacementBlock.Occupied;
+
+                // Units don't block the grid, but a building placed on one would trap it.
+                return _units.HasUnitIn(Area) ? PlacementBlock.UnitInTheWay : PlacementBlock.None;
+            }
+        }
 
         /// <summary>True if this cell of the footprint doesn't stop the building from being placed.</summary>
         public bool IsCellFree(Vector2Int cell) => _gridMap.IsWalkable(cell) && !_units.HasUnitAt(cell);

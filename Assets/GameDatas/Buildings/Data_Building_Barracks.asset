@@ -15,6 +15,7 @@ MonoBehaviour:
   id: barracks
   displayName: Barracks
   size: {x: 3, y: 3}
+  visualHeight: 3
   maxHp: 100
   producibles:
   - {fileID: 11400000, guid: 5ed1c31b43ef4510b9d5c8966a56d71a, type: 2}

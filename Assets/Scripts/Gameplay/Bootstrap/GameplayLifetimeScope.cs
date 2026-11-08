@@ -9,6 +9,7 @@ using BarracksAndBolts.Gameplay.Commands;
 using BarracksAndBolts.Gameplay.Data;
 using BarracksAndBolts.Gameplay.Entities;
 using BarracksAndBolts.Gameplay.Grid;
+using BarracksAndBolts.Gameplay.Hover;
 using BarracksAndBolts.Gameplay.Input;
 using BarracksAndBolts.Gameplay.Pathfinding;
 using BarracksAndBolts.Gameplay.Placement;
@@ -96,6 +97,10 @@ namespace BarracksAndBolts.Gameplay.Bootstrap
             builder.Register<SelectionService>(Lifetime.Singleton);
             builder.RegisterEntryPoint<SelectionInputHandler>();
             builder.RegisterComponentInHierarchy<BoxSelectionView>();
+
+            builder.Register<HoverService>(Lifetime.Singleton);
+            builder.RegisterEntryPoint<HoverInputHandler>();
+            builder.RegisterComponentInHierarchy<HoverHighlightView>();
         }
     }
 }

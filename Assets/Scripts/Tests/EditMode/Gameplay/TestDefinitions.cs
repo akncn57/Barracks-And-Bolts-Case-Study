@@ -7,7 +7,7 @@ namespace BarracksAndBolts.Tests.EditMode.Gameplay
     internal static class TestDefinitions
     {
         /// <summary>Destroy the result in TearDown; ScriptableObjects are not garbage collected.</summary>
-        public static BuildingDefinition CreateBuilding(string id, Vector2Int size, int maxHp = 100)
+        public static BuildingDefinition CreateBuilding(string id, Vector2Int size, int maxHp = 100, float visualHeight = 0f)
         {
             var definition = ScriptableObject.CreateInstance<BuildingDefinition>();
             definition.name = id;
@@ -18,6 +18,7 @@ namespace BarracksAndBolts.Tests.EditMode.Gameplay
             serialized.FindProperty("displayName").stringValue = id;
             serialized.FindProperty("size").vector2IntValue = size;
             serialized.FindProperty("maxHp").intValue = maxHp;
+            serialized.FindProperty("visualHeight").floatValue = visualHeight;
             serialized.ApplyModifiedPropertiesWithoutUndo();
 
             return definition;
