@@ -1,6 +1,6 @@
 # Barracks & Bolts – Öncelik ve Takvim
 
-> **Durum (8 Kasım):** Altyapı, grid, kamera, A* (algoritma), tüm P0/P1 assetleri, veri tanımları, bina yerleştirme, Production Menu, binaya sol tıkla seçim, Information Panel, birimler, Barracks'tan asker üretimi ve birim seçimi (sol tık ve kutu) hazır ve oyunda denendi. Sağ tıkla hareket kodu hazır. **Sıradaki adım:** hareketin sahne kurulumu → saldırı → yok olma → minimal Sandbox.
+> **Durum (8 Kasım):** Altyapı, grid, kamera, A* (algoritma), tüm P0/P1 assetleri, veri tanımları, bina yerleştirme, Production Menu, binaya sol tıkla seçim, Information Panel, birimler, Barracks'tan asker üretimi, birim seçimi (sol tık ve kutu) ve sağ tıkla hareket hazır ve oyunda denendi. **Sıradaki adım:** saldırı → yok olma → minimal Sandbox.
 
 > **Teslim tarihi:** 13 Kasım 2026, Cuma
 > **Ana kural:** Her öncelik seviyesi bitmeden bir sonrakine geçilmez. `main` branch'i her zaman çalışan ve build alınabilen bir halde tutulur.
@@ -21,7 +21,7 @@ Bu seviye bittiğinde PDF'teki her madde karşılanmış olur. **Hedef: 10 Kası
 - [x] **Information Panel:** seçilen binanın görseli. Üretim yapan binada üretilebilir birimlerin listesi
 - [x] Barracks'tan 3 asker üretimi (10 HP; 10 / 5 / 2 hasar), süre yok, sınırsız. Spawn point (doluysa en yakın boş hücre)
 - [x] Seçim: sol tık ve kutu seçimi
-- [ ] **A\* pathfinding:** sağ tıkla hareket, binaların etrafından dolaşma, grup halinde gidince hedefin etrafına dağılma *(kod ve testler hazır; sahne kurulumu kaldı)*
+- [x] **A\* pathfinding:** sağ tıkla hareket, binaların etrafından dolaşma, grup halinde gidince hedefin etrafına dağılma
 - [ ] **Saldırı:** sağ tıkla birime ya da binaya saldırma
 - [ ] HP 0 olunca yok olma: seçim ve panel temizlenir, grid hücreleri boşalır, saldıranlar hedefini bırakır
 - [ ] **Minimal Sandbox:** düşman birimi ve binası yerleştirme. Dost ateşi olmadığı için saldırı maddesinin test edilebilmesi buna bağlı
