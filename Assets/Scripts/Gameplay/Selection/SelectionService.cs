@@ -1,9 +1,12 @@
+using System;
 using System.Collections.Generic;
 using BarracksAndBolts.Core.Events;
+using BarracksAndBolts.Gameplay.Buildings;
 using BarracksAndBolts.Gameplay.Entities;
 using BarracksAndBolts.Gameplay.Grid;
 using BarracksAndBolts.Gameplay.Teams;
 using BarracksAndBolts.Gameplay.Units;
+using BarracksAndBolts.Utils.Disposables;
 using UnityEngine;
 
 namespace BarracksAndBolts.Gameplay.Selection
@@ -12,19 +15,22 @@ namespace BarracksAndBolts.Gameplay.Selection
     /// What the player has selected, and the selection box while it is being dragged.
     /// Holds ids, not objects, so a destroyed entity never stays referenced.
     /// </summary>
-    public sealed class SelectionService
+    public sealed class SelectionService : IDisposable
     {
         private readonly GridMap _gridMap;
         private readonly UnitService _units;
         private readonly IEventBus _eventBus;
         private readonly List<GameEntityId> _selected = new();
         private readonly List<GameEntityId> _candidates = new();
+        private readonly CompositeDisposable _subscriptions = new();
 
         public SelectionService(GridMap gridMap, UnitService units, IEventBus eventBus)
         {
             _gridMap = gridMap;
             _units = units;
             _eventBus = eventBus;
+            eventBus.Subscribe<UnitDiedEvent>(e => Deselect(e.Unit.Id)).AddTo(_subscriptions);
+            eventBus.Subscribe<BuildingDestroyedEvent>(e => Deselect(e.Building.Id)).AddTo(_subscriptions);
         }
 
         public IReadOnlyList<GameEntityId> Selected => _selected;
@@ -87,6 +93,17 @@ namespace BarracksAndBolts.Gameplay.Selection
         public void CancelBox()
         {
             HasBox = false;
+        }
+
+        public void Dispose()
+        {
+            _subscriptions.Dispose();
+        }
+
+        private void Deselect(GameEntityId id)
+        {
+            if (_selected.Remove(id))
+                _eventBus.Publish(new SelectionChangedEvent());
         }
 
         private void ApplyCandidates()

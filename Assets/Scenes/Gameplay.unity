@@ -1928,6 +1928,7 @@ Transform:
   - {fileID: 694399891}
   - {fileID: 530070110}
   - {fileID: 977154452}
+  - {fileID: 988778844}
   m_Father: {fileID: 254955788}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &254955787
@@ -7400,9 +7401,56 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: BarracksAndBolts.Gameplay::BarracksAndBolts.Gameplay.Commands.MoveMarkerView
   markerRenderer: {fileID: 977154453}
+  moveColor: {r: 0, g: 1, b: 0, a: 1}
+  attackColor: {r: 1, g: 0, b: 0, a: 1}
   duration: 0.4
   startScale: 1.2
   endScale: 0.3
+--- !u!1 &988778843
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 988778844}
+  - component: {fileID: 988778845}
+  m_Layer: 0
+  m_Name: ProjectileSpawner
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &988778844
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 988778843}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 149533827}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &988778845
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 988778843}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b4fb4b6800c67da438d1639572acf0c7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: BarracksAndBolts.Gameplay::BarracksAndBolts.Gameplay.Combat.ProjectileSpawner
+  projectilePrefab: {fileID: -9090347417468593448, guid: d92e48e11fa765f4fa4cd9f90fc4e152, type: 3}
 --- !u!1 &1024717898
 GameObject:
   m_ObjectHideFlags: 0

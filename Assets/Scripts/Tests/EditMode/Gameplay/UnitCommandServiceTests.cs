@@ -35,7 +35,7 @@ namespace BarracksAndBolts.Tests.EditMode.Gameplay
             _buildings = new BuildingService(_map, ids, _eventBus);
             _units = new UnitService(_map, search, ids, _eventBus);
             _movement = new UnitMovementSystem(_units, _map, new AStarPathfinder(_map), _eventBus);
-            _commands = new UnitCommandService(_units, _movement, search, _map, _eventBus);
+            _commands = new UnitCommandService(_units, _movement, new BarracksAndBolts.Gameplay.Combat.CombatService(_units, _buildings, _map, _eventBus), search, _map, _eventBus);
             _knight = TestDefinitions.CreateUnit("knight");
             _house = TestDefinitions.CreateBuilding("house", new Vector2Int(2, 2));
         }
@@ -72,6 +72,92 @@ namespace BarracksAndBolts.Tests.EditMode.Gameplay
             }
 
             return cells;
+        }
+
+        [Test]
+        public void CommandAt_OnEnemyUnit_OrdersAttack()
+        {
+            var unit = Spawn(new Vector2Int(1, 1));
+            var enemy = Spawn(new Vector2Int(6, 6), Faction.Enemy);
+            var attackEvents = 0;
+            var moveEvents = 0;
+            _eventBus.Subscribe<AttackCommandIssuedEvent>(_ => attackEvents++);
+            _eventBus.Subscribe<MoveCommandIssuedEvent>(_ => moveEvents++);
+
+            Assert.IsTrue(_commands.CommandAt(new[] { unit.Id }, enemy.Position));
+
+            Assert.AreEqual(enemy.Id, unit.AttackTarget);
+            Assert.AreEqual(1, attackEvents);
+            Assert.AreEqual(0, moveEvents);
+        }
+
+        [Test]
+        public void CommandAt_OnEnemyBuilding_OrdersAttack()
+        {
+            Assert.IsTrue(_buildings.TryPlace(_house, new Vector2Int(6, 6), Faction.Enemy, out var building));
+            var unit = Spawn(new Vector2Int(1, 1));
+
+            _commands.CommandAt(new[] { unit.Id }, new Vector2(7f, 7f));
+
+            Assert.AreEqual(building.Id, unit.AttackTarget);
+        }
+
+        [Test]
+        public void CommandAt_OnOwnBuilding_MovesNextToIt()
+        {
+            Assert.IsTrue(_buildings.TryPlace(_house, new Vector2Int(6, 6), Faction.Player, out _));
+            var unit = Spawn(new Vector2Int(1, 1));
+
+            _commands.CommandAt(new[] { unit.Id }, new Vector2(7f, 7f));
+
+            Assert.IsFalse(unit.HasAttackTarget, "No friendly fire.");
+            Assert.IsTrue(unit.IsMoving);
+        }
+
+        [Test]
+        public void CommandAt_OnOwnUnit_Moves()
+        {
+            var unit = Spawn(new Vector2Int(1, 1));
+            var friend = Spawn(new Vector2Int(6, 6));
+
+            _commands.CommandAt(new[] { unit.Id }, friend.Position);
+
+            Assert.IsFalse(unit.HasAttackTarget);
+            Assert.IsTrue(unit.IsMoving);
+        }
+
+        [Test]
+        public void Attack_FriendlyTarget_IsRefused()
+        {
+            var unit = Spawn(new Vector2Int(1, 1));
+            var friend = Spawn(new Vector2Int(6, 6));
+
+            Assert.IsFalse(_commands.Attack(new[] { unit.Id }, friend.Id, friend.Position));
+
+            Assert.IsFalse(unit.HasAttackTarget);
+        }
+
+        [Test]
+        public void Attack_EnemiesInTheSelection_GetNoOrder()
+        {
+            var enemy = Spawn(new Vector2Int(1, 1), Faction.Enemy);
+            var otherEnemy = Spawn(new Vector2Int(6, 6), Faction.Enemy);
+
+            Assert.IsFalse(_commands.CommandAt(new[] { enemy.Id }, otherEnemy.Position));
+
+            Assert.IsFalse(enemy.HasAttackTarget);
+        }
+
+        [Test]
+        public void MoveTo_ClearsTheAttackOrder()
+        {
+            var unit = Spawn(new Vector2Int(1, 1));
+            var enemy = Spawn(new Vector2Int(6, 6), Faction.Enemy);
+            _commands.CommandAt(new[] { unit.Id }, enemy.Position);
+
+            _commands.MoveTo(new[] { unit.Id }, new Vector2(1.5f, 8.5f));
+
+            Assert.IsFalse(unit.HasAttackTarget);
         }
 
         [Test]

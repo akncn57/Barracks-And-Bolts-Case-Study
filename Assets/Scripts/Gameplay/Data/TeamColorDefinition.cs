@@ -60,12 +60,14 @@ namespace BarracksAndBolts.Gameplay.Data
             [SerializeField] private UnitDefinition unit;
             [SerializeField] private Sprite[] idleFrames;
             [SerializeField] private Sprite[] runFrames;
+            [SerializeField] private Sprite[] attackFrames;
 
             public UnitDefinition Unit => unit;
 
             // The default set of a missing unit has null arrays; readers always get a list.
             public IReadOnlyList<Sprite> IdleFrames => idleFrames ?? Array.Empty<Sprite>();
             public IReadOnlyList<Sprite> RunFrames => runFrames ?? Array.Empty<Sprite>();
+            public IReadOnlyList<Sprite> AttackFrames => attackFrames ?? Array.Empty<Sprite>();
         }
     }
 }

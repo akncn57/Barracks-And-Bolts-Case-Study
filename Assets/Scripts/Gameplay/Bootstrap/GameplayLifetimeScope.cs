@@ -4,6 +4,7 @@ using BarracksAndBolts.Core.Simulation;
 using BarracksAndBolts.Gameplay.Buildings;
 using BarracksAndBolts.Gameplay.Buildings.Production;
 using BarracksAndBolts.Gameplay.CameraControl;
+using BarracksAndBolts.Gameplay.Combat;
 using BarracksAndBolts.Gameplay.Commands;
 using BarracksAndBolts.Gameplay.Data;
 using BarracksAndBolts.Gameplay.Entities;
@@ -11,6 +12,7 @@ using BarracksAndBolts.Gameplay.Grid;
 using BarracksAndBolts.Gameplay.Input;
 using BarracksAndBolts.Gameplay.Pathfinding;
 using BarracksAndBolts.Gameplay.Placement;
+using BarracksAndBolts.Gameplay.Sandbox;
 using BarracksAndBolts.Gameplay.Selection;
 using BarracksAndBolts.Gameplay.Teams;
 using BarracksAndBolts.Gameplay.Units;
@@ -45,6 +47,7 @@ namespace BarracksAndBolts.Gameplay.Bootstrap
             builder.RegisterInstance(gameDatabase);
             builder.Register<GameEntityIdGenerator>(Lifetime.Singleton);
             builder.Register<TeamService>(Lifetime.Singleton);
+            builder.Register<SandboxService>(Lifetime.Singleton);
 
             RegisterGrid(builder);
             RegisterUnits(builder);
@@ -57,6 +60,11 @@ namespace BarracksAndBolts.Gameplay.Bootstrap
             builder.Register<UnitService>(Lifetime.Singleton);
             builder.RegisterSimulationSystem<UnitMovementSystem>();
             builder.RegisterComponentInHierarchy<UnitViewSpawner>();
+
+            builder.Register<CombatService>(Lifetime.Singleton);
+            builder.RegisterSimulationSystem<CombatSystem>();
+            builder.RegisterSimulationSystem<DeathCleanupSystem>();
+            builder.RegisterComponentInHierarchy<ProjectileSpawner>();
 
             builder.Register<UnitCommandService>(Lifetime.Singleton);
             builder.RegisterEntryPoint<CommandInputHandler>();

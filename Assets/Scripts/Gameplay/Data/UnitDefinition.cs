@@ -5,6 +5,9 @@ namespace BarracksAndBolts.Gameplay.Data
     [CreateAssetMenu(fileName = "Data_Unit_New", menuName = "Barracks & Bolts/Data/Unit")]
     public sealed class UnitDefinition : ScriptableObject
     {
+        // The spearman reaches 1.5 cells and still fights up close.
+        private const float MeleeRangeLimit = 2f;
+
         [Tooltip("Stable key for save files. Don't change it once saves exist.")]
         [SerializeField] private string id;
         [SerializeField] private string displayName;
@@ -28,6 +31,10 @@ namespace BarracksAndBolts.Gameplay.Data
         public int Damage => damage;
         public float AttackRange => attackRange;
         public float AttackCooldown => attackCooldown;
+
+        /// <summary>Fires projectiles instead of striking up close.</summary>
+        public bool IsRanged => attackRange > MeleeRangeLimit;
+
         public float MoveSpeed => moveSpeed;
         public int PopulationCost => populationCost;
 

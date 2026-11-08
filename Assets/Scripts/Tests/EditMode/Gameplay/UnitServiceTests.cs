@@ -196,6 +196,26 @@ namespace BarracksAndBolts.Tests.EditMode.Gameplay
         }
 
         [Test]
+        public void Remove_TakesTheUnitOutAndTells()
+        {
+            var unit = Spawn(new Vector2Int(3, 4));
+            UnitModel died = null;
+            _eventBus.Subscribe<UnitDiedEvent>(e => died = e.Unit);
+
+            Assert.IsTrue(_units.Remove(unit.Id));
+
+            Assert.AreSame(unit, died);
+            Assert.AreEqual(0, _units.Count);
+            Assert.IsFalse(_units.HasUnitAt(new Vector2Int(3, 4)));
+        }
+
+        [Test]
+        public void Remove_UnknownId_ReturnsFalse()
+        {
+            Assert.IsFalse(_units.Remove(new GameEntityId(5)));
+        }
+
+        [Test]
         public void TryGet_UnknownId_ReturnsFalse()
         {
             Assert.IsFalse(_units.TryGet(new GameEntityId(5), out _));

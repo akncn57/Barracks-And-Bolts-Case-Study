@@ -1,5 +1,6 @@
 using BarracksAndBolts.UI.Information;
 using BarracksAndBolts.UI.Production;
+using BarracksAndBolts.UI.Sandbox;
 using VContainer;
 using VContainer.Unity;
 
@@ -16,6 +17,7 @@ namespace BarracksAndBolts.UI
         {
             builder.RegisterComponentInHierarchy<ProductionMenuView>();
             builder.RegisterComponentInHierarchy<InformationPanelView>();
+            builder.RegisterComponentInHierarchy<SandboxFactionToggleView>();
         }
     }
 }

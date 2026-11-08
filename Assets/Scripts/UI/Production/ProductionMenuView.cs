@@ -1,7 +1,10 @@
+using BarracksAndBolts.Core.Events;
 using BarracksAndBolts.Gameplay.Data;
 using BarracksAndBolts.Gameplay.Placement;
+using BarracksAndBolts.Gameplay.Sandbox;
 using BarracksAndBolts.Gameplay.Teams;
 using BarracksAndBolts.UI.Scroll;
+using BarracksAndBolts.Utils.Disposables;
 using UnityEngine;
 using VContainer;
 
@@ -15,19 +18,36 @@ namespace BarracksAndBolts.UI.Production
         private GameDatabase _database;
         private TeamService _teams;
         private PlacementService _placement;
-        private TeamColorDefinition _playerColors;
+        private SandboxService _sandbox;
+        private IEventBus _eventBus;
+        private TeamColorDefinition _colors;
+        private readonly CompositeDisposable _subscriptions = new();
 
         [Inject]
-        private void Construct(GameDatabase database, TeamService teams, PlacementService placement)
+        private void Construct(GameDatabase database, TeamService teams, PlacementService placement, SandboxService sandbox, IEventBus eventBus)
         {
             _database = database;
             _teams = teams;
             _placement = placement;
+            _sandbox = sandbox;
+            _eventBus = eventBus;
         }
 
         private void Start()
         {
-            _playerColors = _teams.GetColorSet(Faction.Player);
+            _eventBus.Subscribe<SandboxFactionChangedEvent>(_ => ShowBuildings()).AddTo(_subscriptions);
+            ShowBuildings();
+        }
+
+        private void OnDestroy()
+        {
+            _subscriptions.Dispose();
+        }
+
+        private void ShowBuildings()
+        {
+            // The menu shows the buildings in the color of the side being built for.
+            _colors = _teams.GetColorSet(_sandbox.ActiveFaction);
             scrollView.Initialize<ProductionMenuCell>(_database.Buildings.Count, OnCellCreated, BindCell);
         }
 
@@ -40,12 +60,12 @@ namespace BarracksAndBolts.UI.Production
         private void BindCell(ProductionMenuCell cell, int index)
         {
             var building = _database.Buildings[index];
-            cell.Bind(building, _playerColors.GetBuildingSprite(building));
+            cell.Bind(building, _colors.GetBuildingSprite(building));
         }
 
         private void OnBuildingClicked(BuildingDefinition building)
         {
-            _placement.Begin(building, Faction.Player);
+            _placement.Begin(building, _sandbox.ActiveFaction);
         }
     }
 }

@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using BarracksAndBolts.Core.Events;
 using BarracksAndBolts.Core.Simulation;
+using BarracksAndBolts.Gameplay.Combat;
 using BarracksAndBolts.Gameplay.Entities;
 using BarracksAndBolts.Gameplay.Selection;
 using BarracksAndBolts.Gameplay.Teams;
@@ -32,6 +33,9 @@ namespace BarracksAndBolts.Gameplay.Units
             _clock = clock;
             _selection = selection;
             eventBus.Subscribe<UnitSpawnedEvent>(OnUnitSpawned).AddTo(_subscriptions);
+            eventBus.Subscribe<UnitDiedEvent>(OnUnitDied).AddTo(_subscriptions);
+            eventBus.Subscribe<UnitAttackedEvent>(OnUnitAttacked).AddTo(_subscriptions);
+            eventBus.Subscribe<EntityDamagedEvent>(OnEntityDamaged).AddTo(_subscriptions);
             eventBus.Subscribe<SelectionChangedEvent>(_ => RefreshSelectionMarkers()).AddTo(_subscriptions);
         }
 
@@ -48,6 +52,27 @@ namespace BarracksAndBolts.Gameplay.Units
             var view = Instantiate(unitPrefab, unit.Position, Quaternion.identity, transform);
             view.Bind(unit, sprites, _clock);
             _views.Add(unit.Id, view);
+        }
+
+        private void OnUnitDied(UnitDiedEvent diedEvent)
+        {
+            if (!_views.Remove(diedEvent.Unit.Id, out var view))
+                return;
+
+            _selectedViews.Remove(view);
+            Destroy(view.gameObject);
+        }
+
+        private void OnUnitAttacked(UnitAttackedEvent attackedEvent)
+        {
+            if (_views.TryGetValue(attackedEvent.Attacker.Id, out var view))
+                view.PlayAttack();
+        }
+
+        private void OnEntityDamaged(EntityDamagedEvent damagedEvent)
+        {
+            if (_views.TryGetValue(damagedEvent.Id, out var view))
+                view.ShowDamage();
         }
 
         private void RefreshSelectionMarkers()

@@ -36,7 +36,7 @@ namespace BarracksAndBolts.Gameplay.Commands
                 return;
 
             var pointer = _actions.PointerPosition.ReadValue<Vector2>();
-            _commands.MoveTo(_selection.Selected, _cameraController.ScreenToWorld(pointer));
+            _commands.CommandAt(_selection.Selected, _cameraController.ScreenToWorld(pointer));
         }
     }
 }

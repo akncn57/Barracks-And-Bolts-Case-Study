@@ -5,10 +5,12 @@ using VContainer;
 
 namespace BarracksAndBolts.Gameplay.Commands
 {
-    /// <summary>Short shrinking ring on the ground where a move order was given.</summary>
+    /// <summary>Short shrinking ring on the ground where an order was given. Its color tells move from attack.</summary>
     public sealed class MoveMarkerView : MonoBehaviour
     {
         [SerializeField] private SpriteRenderer markerRenderer;
+        [SerializeField] private Color moveColor = Color.green;
+        [SerializeField] private Color attackColor = Color.red;
         [SerializeField, Min(0.01f)] private float duration = 0.4f;
         [SerializeField, Min(0f)] private float startScale = 1.2f;
         [SerializeField, Min(0f)] private float endScale = 0.3f;
@@ -20,12 +22,12 @@ namespace BarracksAndBolts.Gameplay.Commands
         [Inject]
         private void Construct(IEventBus eventBus)
         {
-            eventBus.Subscribe<MoveCommandIssuedEvent>(OnMoveCommandIssued).AddTo(_subscriptions);
+            eventBus.Subscribe<MoveCommandIssuedEvent>(e => Show(e.Position, moveColor)).AddTo(_subscriptions);
+            eventBus.Subscribe<AttackCommandIssuedEvent>(e => Show(e.Position, attackColor)).AddTo(_subscriptions);
         }
 
         private void Awake()
         {
-            _baseColor = markerRenderer.color;
             markerRenderer.enabled = false;
         }
 
@@ -34,9 +36,10 @@ namespace BarracksAndBolts.Gameplay.Commands
             _subscriptions.Dispose();
         }
 
-        private void OnMoveCommandIssued(MoveCommandIssuedEvent issuedEvent)
+        private void Show(Vector2 position, Color color)
         {
-            transform.position = issuedEvent.Position;
+            transform.position = position;
+            _baseColor = color;
             _elapsed = 0f;
             markerRenderer.enabled = true;
         }

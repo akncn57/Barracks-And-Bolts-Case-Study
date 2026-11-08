@@ -41,12 +41,63 @@ namespace BarracksAndBolts.Gameplay.Units
         public Rect Body => new(Position.x - BodyWidth * 0.5f, Position.y - BodyBelowFeet, BodyWidth, BodyHeight);
 
         public int CurrentHp { get; private set; }
+        public bool IsDead => CurrentHp <= 0;
+
+        /// <summary>The entity this unit is ordered to attack. None when it has no target.</summary>
+        public GameEntityId AttackTarget { get; private set; }
+        public bool HasAttackTarget => AttackTarget.IsValid;
+        public float AttackCooldownLeft { get; private set; }
+
+        /// <summary>The cell this unit last set out for while chasing its target.</summary>
+        public Vector2Int? ChasedCell { get; private set; }
+        public float RepathDelayLeft { get; private set; }
 
         public bool IsMoving => _nextWaypoint < _waypoints.Count;
         public bool IsFacingLeft { get; private set; }
 
         /// <summary>Where the unit ends up: the end of its path, or where it stands.</summary>
         public Vector2 Destination => IsMoving ? _waypoints[_waypoints.Count - 1] : Position;
+
+        public void TakeDamage(int amount)
+        {
+            CurrentHp = Mathf.Max(CurrentHp - amount, 0);
+        }
+
+        public void SetAttackTarget(GameEntityId target)
+        {
+            AttackTarget = target;
+            ChasedCell = null;
+            RepathDelayLeft = 0f;
+        }
+
+        public void ClearAttackTarget()
+        {
+            SetAttackTarget(GameEntityId.None);
+        }
+
+        public void TickCombatTimers(float deltaTime)
+        {
+            AttackCooldownLeft = Mathf.Max(AttackCooldownLeft - deltaTime, 0f);
+            RepathDelayLeft = Mathf.Max(RepathDelayLeft - deltaTime, 0f);
+        }
+
+        public void StartAttackCooldown()
+        {
+            AttackCooldownLeft = Definition.AttackCooldown;
+        }
+
+        public void MarkChase(Vector2Int cell, float repathDelay)
+        {
+            ChasedCell = cell;
+            RepathDelayLeft = repathDelay;
+        }
+
+        public void FaceTowards(Vector2 point)
+        {
+            var sideways = point.x - Position.x;
+            if (Mathf.Abs(sideways) > MinFacingChange)
+                IsFacingLeft = sideways < 0f;
+        }
 
         /// <summary>Replaces the path. The list is copied, so the caller can reuse it.</summary>
         public void SetPath(IReadOnlyList<Vector2> waypoints)

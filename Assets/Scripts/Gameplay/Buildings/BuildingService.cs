@@ -50,6 +50,19 @@ namespace BarracksAndBolts.Gameplay.Buildings
             return true;
         }
 
+        /// <summary>Takes the building off the map and frees its cells.</summary>
+        /// <returns>False if there is no such building.</returns>
+        public bool Remove(GameEntityId id)
+        {
+            if (!_buildings.Remove(id, out var building))
+                return false;
+
+            _gridMap.Release(building.Area, id);
+            _eventBus.Publish(new BuildingDestroyedEvent(building));
+            _eventBus.Publish(new GridChangedEvent(building.Area));
+            return true;
+        }
+
         public bool TryGet(GameEntityId id, out BuildingModel building)
         {
             return _buildings.TryGetValue(id, out building);

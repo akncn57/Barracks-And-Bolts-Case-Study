@@ -18,6 +18,7 @@
   - Takvim ve baskınlar açılıp kapatılabilir. Baskın manuel olarak da başlatılabilir.
   - Silme aracı ve zaman kontrolü (durdur, hızlandır) var.
   - Oyuncu kendi savaşlarını kurabilir: kendi ordusu ile düşman birim ve binalarını karşı karşıya koyabilir.
+  - **Şu anki hali (minimal):** Side düğmesi yeni bina ve birimlerin tarafını değiştirir. Düşman binası konur, düşman Barracks'ından düşman asker üretilir. Tam palet P2'de.
 - **Zorluk Seviyesi (Normal Mod):** Kolay, Normal, Zor. Düşman sayısını, düşman gücünü ve başlangıç kaynaklarını etkiler. Değerler bir `DifficultySettings` ScriptableObject'inde tutulur.
 
 ### Nüfus (Power Plant karşılığı = House)
@@ -190,6 +191,7 @@ Bu değerler ScriptableObject üzerinden ayarlanabilir olacak, ileride değişti
 - Oyunda baltayla koşma animasyonu kullanılmayacak. Köylü her durumda normal `Run` animasyonuyla koşar.
 - Renk setleri arasında küçük bir fark var: Sarıda `Warrior_Guard` var, Kırmızıda yok. Kod, bir animasyon eksikse varsayılan animasyona (Idle / Run) düşmelidir.
 - **Dost ateşi yok:** Oyuncu kendi birimlerine ve binalarına saldırma emri veremez.
+- **Karşılık verme:** Boşta duran birim, kendisine vurana saldırır. Yürüyen ya da hedefi olan birim işine devam eder.
 - **Düşman yerleşkeleri (ileride konuşulacak):** Haritada rastgele küçük düşman yerleşkeleri olabilir. Böylece PDF'teki "binaya saldırma" maddesi düşman binaları üzerinden de karşılanır.
 
 ### Birlikte Hareket

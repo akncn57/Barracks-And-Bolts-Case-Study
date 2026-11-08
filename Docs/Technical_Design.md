@@ -94,9 +94,10 @@ Gameplay/
 ├── Placement/      PlacementService, PlacementInputHandler, PlacementPreviewView (bölge kuralı gelince: PlacementValidator)
 ├── Buildings/      BuildingService, BuildingModel, BuildingView, BuildingViewSpawner, Production/ (UnitProductionService)
 ├── Units/          UnitService, UnitModel, UnitMovementSystem, UnitView, UnitViewSpawner, States/
-├── Combat/         CombatService, Damage, Targeting
+├── Combat/         CombatService, CombatSystem, DeathCleanupSystem, DamageFlash, ProjectileSpawner, ProjectileView
 ├── Selection/      SelectionService, SelectionInputHandler, BoxSelectionView
 ├── Commands/       UnitCommandService, CommandInputHandler, MoveMarkerView (AttackMove vb. gelince: IUnitCommand)
+├── Sandbox/        SandboxService (minimal: taraf seçimi; tam palet P2)
 ├── Teams/          Faction, TeamService (TeamColor, menüden taşındığı için Core.Session içinde)
 ├── Economy/        ResourceService, PopulationService, StorageService     (P1)
 ├── Calendar/       CalendarService, DayNightView                          (P1)
@@ -301,6 +302,7 @@ GameplayLifetimeScope
     Units              (runtime'da üretilenlerin parent'ı, UnitViewSpawner)
     SelectionBox       (kutu seçimi çerçevesi, BoxSelectionView)
     MoveMarker         (sağ tık geri bildirimi, MoveMarkerView)
+    Projectiles        (havuzdan gelen oklar, ProjectileSpawner)
     Resources
     Effects
 ----- MANAGERS -----

@@ -30,7 +30,7 @@
 | 3 | Yerleştirme önizlemesi (yeşil/kırmızı hücre) | PDF: geçersiz alan kırmızı | 💻 Beyaz kare sprite + renk |
 | 4 | ~~Seçim göstergesi (birimin altında halka/elips)~~ | ✅ Üretildi: `Texture_Markers_SelectionRing` | – |
 | 5 | ~~Kutu seçimi dikdörtgeni~~ | ✅ Üretildi: `Texture_Markers_SelectionBox` (dünyada Sliced SpriteRenderer) | – |
-| 6 | Hareket/saldırı emri işareti (tıklanan yerde kısa efekt) | Sağ tık geri bildirimi | 💻 Hareket için `Texture_Markers_SelectionRing` kullanılıyor; saldırı işareti kaldı |
+| 6 | ~~Hareket/saldırı emri işareti~~ | ✅ `Texture_Markers_SelectionRing`: hareket yeşil, saldırı kırmızı | – |
 | 7 | ~~Ölüm ve yıkılma efekti~~ | ✅ Paketin Particle FX klasöründen alındı: `Texture_VFX_Dust_01/02`, `_Explosion_01/02`, `_Fire_01/02/03`, `_Water_Splash` (kare kare kesildi) | – |
 
 ## P1 – Oyun döngüsü

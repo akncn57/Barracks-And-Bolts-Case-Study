@@ -9,9 +9,6 @@ TextureImporter:
       213: 7232042838751349278
     second: Lancer_Right_Attack_1
   - first:
-      213: -4157329051755591257
-    second: Lancer_Right_Attack_2
-  - first:
       213: -4391963831756658790
     second: Lancer_Right_Attack_3
   externalObjects: {}
@@ -129,8 +126,8 @@ TextureImporter:
         y: 121
         width: 165
         height: 75
-      alignment: 0
-      pivot: {x: 0, y: 0}
+      alignment: 9
+      pivot: {x: 0.10303, y: 0.01333}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -149,10 +146,10 @@ TextureImporter:
         serializedVersion: 2
         x: 463
         y: 121
-        width: 157
+        width: 165
         height: 75
-      alignment: 0
-      pivot: {x: 0, y: 0}
+      alignment: 9
+      pivot: {x: 0.10303, y: 0.01333}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -166,28 +163,6 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Lancer_Right_Attack_2
-      rect:
-        serializedVersion: 2
-        x: 611
-        y: 141
-        width: 17
-        height: 13
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 7a942bff0433e46c0800000000000000
-      internalID: -4157329051755591257
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
       name: Lancer_Right_Attack_3
       rect:
         serializedVersion: 2
@@ -195,8 +170,8 @@ TextureImporter:
         y: 121
         width: 152
         height: 77
-      alignment: 0
-      pivot: {x: 0, y: 0}
+      alignment: 9
+      pivot: {x: 0.26316, y: 0.01299}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -225,7 +200,6 @@ TextureImporter:
     nameFileIdTable:
       Lancer_Right_Attack_0: 6331980819534964110
       Lancer_Right_Attack_1: 7232042838751349278
-      Lancer_Right_Attack_2: -4157329051755591257
       Lancer_Right_Attack_3: -4391963831756658790
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0

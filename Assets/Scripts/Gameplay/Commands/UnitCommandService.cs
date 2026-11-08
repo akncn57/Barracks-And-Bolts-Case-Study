@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using BarracksAndBolts.Core.Events;
+using BarracksAndBolts.Gameplay.Combat;
 using BarracksAndBolts.Gameplay.Entities;
 using BarracksAndBolts.Gameplay.Grid;
 using BarracksAndBolts.Gameplay.Pathfinding;
@@ -10,11 +11,12 @@ using UnityEngine;
 
 namespace BarracksAndBolts.Gameplay.Commands
 {
-    /// <summary>Turns the player's orders into unit actions. Right now the only order is moving.</summary>
+    /// <summary>Turns the player's orders into unit actions: attack an enemy, or move.</summary>
     public sealed class UnitCommandService
     {
         private readonly UnitService _units;
         private readonly UnitMovementSystem _movement;
+        private readonly CombatService _combat;
         private readonly GridSearch _gridSearch;
         private readonly GridMap _gridMap;
         private readonly IEventBus _eventBus;
@@ -26,14 +28,41 @@ namespace BarracksAndBolts.Gameplay.Commands
         // Kept in a field so a command doesn't allocate a new delegate.
         private readonly Predicate<Vector2Int> _isDestinationFree;
 
-        public UnitCommandService(UnitService units, UnitMovementSystem movement, GridSearch gridSearch, GridMap gridMap, IEventBus eventBus)
+        public UnitCommandService(UnitService units, UnitMovementSystem movement, CombatService combat, GridSearch gridSearch, GridMap gridMap, IEventBus eventBus)
         {
             _units = units;
             _movement = movement;
+            _combat = combat;
             _gridSearch = gridSearch;
             _gridMap = gridMap;
             _eventBus = eventBus;
             _isDestinationFree = cell => !_units.IsDestinationTaken(cell, _groupIds);
+        }
+
+        /// <summary>The right click order: attack the enemy under the point, or move there if there is none.</summary>
+        /// <returns>False if the list holds no unit that can take the order.</returns>
+        public bool CommandAt(IReadOnlyList<GameEntityId> ids, Vector2 worldPosition)
+        {
+            var enemy = _combat.GetHostileAt(worldPosition, Faction.Player);
+            return enemy.IsValid ? Attack(ids, enemy, worldPosition) : MoveTo(ids, worldPosition);
+        }
+
+        /// <summary>Orders the player's units among the ids to attack the target. There is no friendly fire.</summary>
+        /// <returns>False if the target isn't an enemy or no unit can take the order.</returns>
+        public bool Attack(IReadOnlyList<GameEntityId> ids, GameEntityId targetId, Vector2 markerPosition)
+        {
+            if (!_combat.TryGetTarget(targetId, markerPosition, out var target) || target.Faction == Faction.Player)
+                return false;
+
+            CollectGroup(ids);
+            if (_group.Count == 0)
+                return false;
+
+            foreach (var unit in _group)
+                unit.SetAttackTarget(targetId);
+
+            _eventBus.Publish(new AttackCommandIssuedEvent(markerPosition));
+            return true;
         }
 
         /// <summary>
@@ -93,6 +122,7 @@ namespace BarracksAndBolts.Gameplay.Commands
                 index++;
 
                 var closest = FindClosestInGroup(_gridMap.CellToWorldCenter(destination));
+                _group[closest].ClearAttackTarget();
                 _movement.SendTo(_group[closest], destination);
 
                 _group[closest] = _group[_group.Count - 1];

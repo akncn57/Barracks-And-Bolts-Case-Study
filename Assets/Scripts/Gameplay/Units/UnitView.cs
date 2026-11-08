@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using BarracksAndBolts.Core.Simulation;
+using BarracksAndBolts.Gameplay.Combat;
 using BarracksAndBolts.Gameplay.Data;
 using BarracksAndBolts.Gameplay.Entities;
 using BarracksAndBolts.Gameplay.Teams;
@@ -8,7 +9,7 @@ using UnityEngine;
 namespace BarracksAndBolts.Gameplay.Units
 {
     /// <summary>
-    /// Shows one unit: follows its model and plays idle or run frames. The root sits on the unit's feet;
+    /// Shows one unit: follows its model and plays idle, run or attack frames. The root sits on the unit's feet;
     /// every frame's pivot is on the feet too, and a Sorting Group on the root makes the unit sort by that point.
     /// </summary>
     public sealed class UnitView : MonoBehaviour
@@ -25,12 +26,14 @@ namespace BarracksAndBolts.Gameplay.Units
         [SerializeField] private Color playerMarkerColor = Color.green;
         [SerializeField] private Color enemyMarkerColor = Color.red;
 
+        private readonly DamageFlash _damageFlash = new();
         private UnitModel _unit;
         private TeamColorDefinition.UnitSpriteSet _sprites;
         private GameClock _clock;
         private float _phase;
         private IReadOnlyList<Sprite> _shownFrames;
         private int _shownFrame = -1;
+        private float _attackStartedAt = -1f;
 
         public GameEntityId UnitId => _unit.Id;
 
@@ -51,6 +54,16 @@ namespace BarracksAndBolts.Gameplay.Units
             selectionMarker.enabled = isSelected;
         }
 
+        public void PlayAttack()
+        {
+            _attackStartedAt = _clock.ElapsedTime;
+        }
+
+        public void ShowDamage()
+        {
+            _damageFlash.Start();
+        }
+
         // LateUpdate, so the model has already moved this frame.
         private void LateUpdate()
         {
@@ -59,16 +72,40 @@ namespace BarracksAndBolts.Gameplay.Units
 
             transform.position = _unit.Position;
             spriteRenderer.flipX = _unit.IsFacingLeft;
-            ShowFrame(_unit.IsMoving ? _sprites.RunFrames : _sprites.IdleFrames);
+            _damageFlash.Update(spriteRenderer, Time.deltaTime);
+
+            if (!TryShowAttackFrame())
+                ShowLoopingFrame(_unit.IsMoving ? _sprites.RunFrames : _sprites.IdleFrames);
         }
 
-        private void ShowFrame(IReadOnlyList<Sprite> frames)
+        private bool TryShowAttackFrame()
+        {
+            if (_attackStartedAt < 0f)
+                return false;
+
+            var frames = _sprites.AttackFrames;
+            var frame = Mathf.FloorToInt((_clock.ElapsedTime - _attackStartedAt) * framesPerSecond);
+            if (frame >= frames.Count)
+            {
+                _attackStartedAt = -1f;
+                return false;
+            }
+
+            ShowFrame(frames, frame);
+            return true;
+        }
+
+        private void ShowLoopingFrame(IReadOnlyList<Sprite> frames)
         {
             if (frames.Count == 0)
                 return;
 
             // Follows the game clock, so units freeze on pause and speed up with the game.
-            var frame = Mathf.FloorToInt(_clock.ElapsedTime * framesPerSecond + _phase * frames.Count) % frames.Count;
+            ShowFrame(frames, Mathf.FloorToInt(_clock.ElapsedTime * framesPerSecond + _phase * frames.Count) % frames.Count);
+        }
+
+        private void ShowFrame(IReadOnlyList<Sprite> frames, int frame)
+        {
             if (frames == _shownFrames && frame == _shownFrame)
                 return;
 

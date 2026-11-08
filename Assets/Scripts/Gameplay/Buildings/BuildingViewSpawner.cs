@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using BarracksAndBolts.Core.Events;
+using BarracksAndBolts.Gameplay.Combat;
 using BarracksAndBolts.Gameplay.Entities;
 using BarracksAndBolts.Gameplay.Grid;
 using BarracksAndBolts.Gameplay.Teams;
@@ -28,6 +29,8 @@ namespace BarracksAndBolts.Gameplay.Buildings
             _gridMap = gridMap;
             _teams = teams;
             eventBus.Subscribe<BuildingPlacedEvent>(OnBuildingPlaced).AddTo(_subscriptions);
+            eventBus.Subscribe<BuildingDestroyedEvent>(OnBuildingDestroyed).AddTo(_subscriptions);
+            eventBus.Subscribe<EntityDamagedEvent>(OnEntityDamaged).AddTo(_subscriptions);
         }
 
         private void OnDestroy()
@@ -43,6 +46,18 @@ namespace BarracksAndBolts.Gameplay.Buildings
             var view = Instantiate(buildingPrefab, transform);
             view.Bind(building, sprite, _gridMap.AreaToWorldBottomCenter(building.Area));
             _views.Add(building.Id, view);
+        }
+
+        private void OnBuildingDestroyed(BuildingDestroyedEvent destroyedEvent)
+        {
+            if (_views.Remove(destroyedEvent.Building.Id, out var view))
+                Destroy(view.gameObject);
+        }
+
+        private void OnEntityDamaged(EntityDamagedEvent damagedEvent)
+        {
+            if (_views.TryGetValue(damagedEvent.Id, out var view))
+                view.ShowDamage();
         }
     }
 }

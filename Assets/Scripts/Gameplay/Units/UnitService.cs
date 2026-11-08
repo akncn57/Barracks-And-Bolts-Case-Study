@@ -44,6 +44,16 @@ namespace BarracksAndBolts.Gameplay.Units
             return _units.TryGetValue(id, out unit);
         }
 
+        /// <returns>False if there is no such unit.</returns>
+        public bool Remove(GameEntityId id)
+        {
+            if (!_units.Remove(id, out var unit))
+                return false;
+
+            _eventBus.Publish(new UnitDiedEvent(unit));
+            return true;
+        }
+
         public bool HasUnitAt(Vector2Int cell)
         {
             foreach (var unit in _units.Values)

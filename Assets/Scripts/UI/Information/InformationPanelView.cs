@@ -2,7 +2,9 @@ using System.Collections.Generic;
 using BarracksAndBolts.Core.Events;
 using BarracksAndBolts.Gameplay.Buildings;
 using BarracksAndBolts.Gameplay.Buildings.Production;
+using BarracksAndBolts.Gameplay.Combat;
 using BarracksAndBolts.Gameplay.Data;
+using BarracksAndBolts.Gameplay.Sandbox;
 using BarracksAndBolts.Gameplay.Selection;
 using BarracksAndBolts.Gameplay.Teams;
 using BarracksAndBolts.Gameplay.Units;
@@ -44,29 +46,39 @@ namespace BarracksAndBolts.UI.Information
         private TeamService _teams;
         private UnitProductionService _production;
         private UnitService _units;
+        private SandboxService _sandbox;
         private IEventBus _eventBus;
 
         [Inject]
         private void Construct(SelectionService selection, BuildingService buildings, TeamService teams,
-            UnitProductionService production, UnitService units, IEventBus eventBus)
+            UnitProductionService production, UnitService units, SandboxService sandbox, IEventBus eventBus)
         {
             _selection = selection;
             _buildings = buildings;
             _teams = teams;
             _production = production;
             _units = units;
+            _sandbox = sandbox;
             _eventBus = eventBus;
         }
 
         private void Start()
         {
             _eventBus.Subscribe<SelectionChangedEvent>(_ => Refresh()).AddTo(_subscriptions);
+            _eventBus.Subscribe<SandboxFactionChangedEvent>(_ => Refresh()).AddTo(_subscriptions);
+            _eventBus.Subscribe<EntityDamagedEvent>(OnEntityDamaged).AddTo(_subscriptions);
             Refresh();
         }
 
         private void OnDestroy()
         {
             _subscriptions.Dispose();
+        }
+
+        private void OnEntityDamaged(EntityDamagedEvent damagedEvent)
+        {
+            if (_selection.IsSelected(damagedEvent.Id))
+                Refresh();
         }
 
         private void Refresh()
@@ -124,8 +136,8 @@ namespace BarracksAndBolts.UI.Information
             nameLabel.text = definition.DisplayName;
             ShowHp(building.CurrentHp, definition.MaxHp);
 
-            // The enemy's production can't be controlled, so only the player's buildings list their units.
-            var showProduction = definition.CanProduce && building.Faction == Faction.Player;
+            // Only the side being built for lists its units. Outside sandbox mode that is always the player.
+            var showProduction = definition.CanProduce && building.Faction == _sandbox.ActiveFaction;
             productionSection.SetActive(showProduction);
             if (showProduction)
                 ShowProducibles(definition.Producibles);

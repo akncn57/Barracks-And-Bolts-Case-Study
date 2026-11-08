@@ -40,7 +40,7 @@ namespace BarracksAndBolts.Tests.EditMode.Gameplay
         }
 
         /// <summary>Destroy the result in TearDown; ScriptableObjects are not garbage collected.</summary>
-        public static UnitDefinition CreateUnit(string id, int maxHp = 10)
+        public static UnitDefinition CreateUnit(string id, int maxHp = 10, int damage = 1, float attackRange = 1f, float attackCooldown = 1f)
         {
             var definition = ScriptableObject.CreateInstance<UnitDefinition>();
             definition.name = id;
@@ -49,6 +49,9 @@ namespace BarracksAndBolts.Tests.EditMode.Gameplay
             serialized.FindProperty("id").stringValue = id;
             serialized.FindProperty("displayName").stringValue = id;
             serialized.FindProperty("maxHp").intValue = maxHp;
+            serialized.FindProperty("damage").intValue = damage;
+            serialized.FindProperty("attackRange").floatValue = attackRange;
+            serialized.FindProperty("attackCooldown").floatValue = attackCooldown;
             serialized.ApplyModifiedPropertiesWithoutUndo();
 
             return definition;

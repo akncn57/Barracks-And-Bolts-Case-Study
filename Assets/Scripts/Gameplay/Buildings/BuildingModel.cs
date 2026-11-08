@@ -25,5 +25,11 @@ namespace BarracksAndBolts.Gameplay.Buildings
         public RectInt Area { get; }
 
         public int CurrentHp { get; private set; }
+        public bool IsDead => CurrentHp <= 0;
+
+        public void TakeDamage(int amount)
+        {
+            CurrentHp = Mathf.Max(CurrentHp - amount, 0);
+        }
     }
 }

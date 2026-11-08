@@ -1,3 +1,4 @@
+using BarracksAndBolts.Gameplay.Combat;
 using BarracksAndBolts.Gameplay.Entities;
 using UnityEngine;
 
@@ -11,6 +12,8 @@ namespace BarracksAndBolts.Gameplay.Buildings
     {
         [SerializeField] private SpriteRenderer spriteRenderer;
 
+        private readonly DamageFlash _damageFlash = new();
+
         public GameEntityId BuildingId { get; private set; }
 
         public void Bind(BuildingModel building, Sprite sprite, Vector2 position)
@@ -19,6 +22,16 @@ namespace BarracksAndBolts.Gameplay.Buildings
             name = $"{building.Definition.DisplayName} ({building.Id})";
             transform.position = position;
             BuildingSpriteLayout.PlaceOnFootprint(spriteRenderer, sprite);
+        }
+
+        public void ShowDamage()
+        {
+            _damageFlash.Start();
+        }
+
+        private void Update()
+        {
+            _damageFlash.Update(spriteRenderer, Time.deltaTime);
         }
     }
 }
