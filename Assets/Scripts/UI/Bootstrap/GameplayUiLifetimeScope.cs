@@ -1,3 +1,4 @@
+using BarracksAndBolts.UI.Common;
 using BarracksAndBolts.UI.Feedback;
 using BarracksAndBolts.UI.Information;
 using BarracksAndBolts.UI.Production;
@@ -24,6 +25,8 @@ namespace BarracksAndBolts.UI
             builder.RegisterComponentInHierarchy<FloatingTextSpawner>();
             builder.RegisterComponentInHierarchy<HoverLabelView>();
             builder.RegisterComponentInHierarchy<TooltipView>();
+            builder.RegisterComponentInHierarchy<SlideOutPanel>().As<ICloseablePanel>();
+            builder.RegisterEntryPoint<EscapeInputHandler>();
         }
     }
 }

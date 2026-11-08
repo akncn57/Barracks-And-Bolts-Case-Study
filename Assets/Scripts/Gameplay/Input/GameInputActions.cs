@@ -320,6 +320,15 @@ namespace BarracksAndBolts.Gameplay.Input
                     ""initialStateCheck"": false
                 },
                 {
+                    ""name"": ""Cancel"",
+                    ""type"": ""Button"",
+                    ""id"": ""b28992bc-2992-419e-b5d0-814458c9a99f"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
                     ""name"": ""PointerPosition"",
                     ""type"": ""Value"",
                     ""id"": ""e2a951ab-2c9e-4466-a9c0-b06967119511"",
@@ -349,6 +358,17 @@ namespace BarracksAndBolts.Gameplay.Input
                     ""processors"": """",
                     ""groups"": ""Keyboard&Mouse"",
                     ""action"": ""Command"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""a5f31a0a-86e4-44d7-addb-853cabdd4cb7"",
+                    ""path"": ""<Keyboard>/escape"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""Cancel"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 },
@@ -495,6 +515,7 @@ namespace BarracksAndBolts.Gameplay.Input
             m_Gameplay = asset.FindActionMap("Gameplay", throwIfNotFound: true);
             m_Gameplay_Select = m_Gameplay.FindAction("Select", throwIfNotFound: true);
             m_Gameplay_Command = m_Gameplay.FindAction("Command", throwIfNotFound: true);
+            m_Gameplay_Cancel = m_Gameplay.FindAction("Cancel", throwIfNotFound: true);
             m_Gameplay_PointerPosition = m_Gameplay.FindAction("PointerPosition", throwIfNotFound: true);
             // Placement
             m_Placement = asset.FindActionMap("Placement", throwIfNotFound: true);
@@ -726,6 +747,7 @@ namespace BarracksAndBolts.Gameplay.Input
         private List<IGameplayActions> m_GameplayActionsCallbackInterfaces = new List<IGameplayActions>();
         private readonly InputAction m_Gameplay_Select;
         private readonly InputAction m_Gameplay_Command;
+        private readonly InputAction m_Gameplay_Cancel;
         private readonly InputAction m_Gameplay_PointerPosition;
         /// <summary>
         /// Provides access to input actions defined in input action map "Gameplay".
@@ -746,6 +768,10 @@ namespace BarracksAndBolts.Gameplay.Input
             /// Provides access to the underlying input action "Gameplay/Command".
             /// </summary>
             public InputAction @Command => m_Wrapper.m_Gameplay_Command;
+            /// <summary>
+            /// Provides access to the underlying input action "Gameplay/Cancel".
+            /// </summary>
+            public InputAction @Cancel => m_Wrapper.m_Gameplay_Cancel;
             /// <summary>
             /// Provides access to the underlying input action "Gameplay/PointerPosition".
             /// </summary>
@@ -782,6 +808,9 @@ namespace BarracksAndBolts.Gameplay.Input
                 @Command.started += instance.OnCommand;
                 @Command.performed += instance.OnCommand;
                 @Command.canceled += instance.OnCommand;
+                @Cancel.started += instance.OnCancel;
+                @Cancel.performed += instance.OnCancel;
+                @Cancel.canceled += instance.OnCancel;
                 @PointerPosition.started += instance.OnPointerPosition;
                 @PointerPosition.performed += instance.OnPointerPosition;
                 @PointerPosition.canceled += instance.OnPointerPosition;
@@ -802,6 +831,9 @@ namespace BarracksAndBolts.Gameplay.Input
                 @Command.started -= instance.OnCommand;
                 @Command.performed -= instance.OnCommand;
                 @Command.canceled -= instance.OnCommand;
+                @Cancel.started -= instance.OnCancel;
+                @Cancel.performed -= instance.OnCancel;
+                @Cancel.canceled -= instance.OnCancel;
                 @PointerPosition.started -= instance.OnPointerPosition;
                 @PointerPosition.performed -= instance.OnPointerPosition;
                 @PointerPosition.canceled -= instance.OnPointerPosition;
@@ -1044,6 +1076,13 @@ namespace BarracksAndBolts.Gameplay.Input
             /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
             void OnCommand(InputAction.CallbackContext context);
+            /// <summary>
+            /// Method invoked when associated input action "Cancel" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+            /// </summary>
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+            void OnCancel(InputAction.CallbackContext context);
             /// <summary>
             /// Method invoked when associated input action "PointerPosition" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
             /// </summary>

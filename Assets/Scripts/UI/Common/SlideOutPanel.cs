@@ -9,7 +9,7 @@ namespace BarracksAndBolts.UI.Common
     /// Drawer on the left edge of the screen. Starts closed; its button slides it in and out.
     /// The panel must be anchored to the left. Keep the button outside its right edge so it stays on screen when closed.
     /// </summary>
-    public sealed class SlideOutPanel : MonoBehaviour
+    public sealed class SlideOutPanel : MonoBehaviour, ICloseablePanel
     {
         [SerializeField] private Button toggleButton;
         [SerializeField] private TMP_Text toggleLabel;
@@ -21,7 +21,8 @@ namespace BarracksAndBolts.UI.Common
         private Vector2 _openPosition;
         private Vector2 _closedPosition;
         private Tween _slide;
-        private bool _isOpen;
+
+        public bool IsOpen { get; private set; }
 
         private void Awake()
         {
@@ -42,22 +43,28 @@ namespace BarracksAndBolts.UI.Common
             toggleButton.onClick.RemoveListener(Toggle);
         }
 
+        public void Close()
+        {
+            if (IsOpen)
+                Toggle();
+        }
+
         private void Toggle()
         {
-            _isOpen = !_isOpen;
+            IsOpen = !IsOpen;
             RefreshLabel();
 
             // A click during the slide turns it around from where it is.
             _slide?.Kill();
             _slide = _rect
-                .DOAnchorPos(_isOpen ? _openPosition : _closedPosition, duration)
-                .SetEase(_isOpen ? Ease.OutCubic : Ease.InCubic)
+                .DOAnchorPos(IsOpen ? _openPosition : _closedPosition, duration)
+                .SetEase(IsOpen ? Ease.OutCubic : Ease.InCubic)
                 .SetUpdate(true);
         }
 
         private void RefreshLabel()
         {
-            toggleLabel.text = _isOpen ? closeText : openText;
+            toggleLabel.text = IsOpen ? closeText : openText;
         }
     }
 }

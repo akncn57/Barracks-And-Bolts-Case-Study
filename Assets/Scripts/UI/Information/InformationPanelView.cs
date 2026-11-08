@@ -27,6 +27,8 @@ namespace BarracksAndBolts.UI.Information
         [SerializeField] private GameObject content;
         [SerializeField] private ContentFitPanel panelFit;
         [SerializeField] private ScrollRect scrollRect;
+        [Tooltip("Closing the panel clears the selection, because the panel only shows what is selected.")]
+        [SerializeField] private Button closeButton;
 
         [Header("Building")]
         [SerializeField] private Image picture;
@@ -66,6 +68,7 @@ namespace BarracksAndBolts.UI.Information
 
         private void Start()
         {
+            closeButton.onClick.AddListener(OnCloseClicked);
             _eventBus.Subscribe<SelectionChangedEvent>(_ => OnSelectionChanged()).AddTo(_subscriptions);
             _eventBus.Subscribe<SandboxFactionChangedEvent>(_ => Refresh()).AddTo(_subscriptions);
             _eventBus.Subscribe<EntityDamagedEvent>(OnEntityDamaged).AddTo(_subscriptions);
@@ -74,7 +77,13 @@ namespace BarracksAndBolts.UI.Information
 
         private void OnDestroy()
         {
+            closeButton.onClick.RemoveListener(OnCloseClicked);
             _subscriptions.Dispose();
+        }
+
+        private void OnCloseClicked()
+        {
+            _selection.Clear();
         }
 
         private void OnSelectionChanged()

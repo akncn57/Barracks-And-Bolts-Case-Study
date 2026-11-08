@@ -38,6 +38,7 @@ Oyunu deneyince çıkan kullanılabilirlik istekleri. Sandbox'ta da olmalı, bui
 - [x] **Information Panel boyutu:** Min-max arasında içeriğe göre boyutlanır. İçerik sığmazsa scroll olur, sağda sürüklenebilir scrollbar görünür. Üste anchor'landığı için geniş ekran taşması da çözüldü
 - [x] **Production Menu tooltip:** Hücrenin üstünde durunca bina bilgisi açılır (boyut, HP, ürettikleri). Maliyet satırı P1'de maliyetler gelince eklenir
 - [x] **Production Menu açılır kapanır:** Kapalı başlar, butona basınca soldan DOTween ile kayarak gelir. Haritayı kapatmasın diye
+- [x] **Esc ve panel kapatma:** Esc her basışta en üstteki katmanı kapatır: yerleştirme, seçim, Production Menu. Information Panel'in köşesinde kapatma butonu var
 - [x] **Birim kartı:** Asker seçilince alt ortada küçük kart çıkar, mouse'u yakalamaz. Büyük panel sadece binada açılır
 
 ## P1 – Oyun Döngüsü (bu seviyeyle bir "oyun" ortaya çıkar)
