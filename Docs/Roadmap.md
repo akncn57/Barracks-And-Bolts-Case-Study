@@ -40,6 +40,7 @@ Oyunu deneyince çıkan kullanılabilirlik istekleri. Sandbox'ta da olmalı, bui
 - [x] **Production Menu açılır kapanır:** Kapalı başlar, butona basınca soldan DOTween ile kayarak gelir. Haritayı kapatmasın diye
 - [x] **Esc ve panel kapatma:** Esc her basışta en üstteki katmanı kapatır: yerleştirme, seçim, Production Menu. Information Panel'in köşesinde kapatma butonu var
 - [x] **Kaynak barı:** Ekranın üstünde odun, taş, yemek, altın ve nüfus. Sandbox'ta hepsi ∞. Üstteki UI barın altına indi
+- [x] **Harita:** 64x64 ada: su, köpük, düz zemin, üç plato, merdivenler. Askerler platoya sadece merdivenden çıkar; plato kenarına kadar bina konur. Ağaç ve kaynaklar P1'de
 - [x] **Birim kartı:** Asker seçilince alt ortada küçük kart çıkar, mouse'u yakalamaz. Büyük panel sadece binada açılır
 
 ## P1 – Oyun Döngüsü (bu seviyeyle bir "oyun" ortaya çıkar)

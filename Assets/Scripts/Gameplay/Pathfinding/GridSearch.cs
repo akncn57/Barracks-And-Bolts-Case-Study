@@ -72,7 +72,7 @@ namespace BarracksAndBolts.Gameplay.Pathfinding
         /// <summary>
         /// Picks up to <paramref name="count"/> different walkable cells around the target, nearest first.
         /// Cells are collected by flooding outward through walkable cells only, so a group never gets split
-        /// across a lake or a wall. Returns fewer cells if the reachable area is smaller than the group.
+        /// across a lake, a wall or a cliff. Returns fewer cells if the reachable area is smaller than the group.
         /// </summary>
         public void CollectDestinations(Vector2Int target, int count, List<Vector2Int> results)
         {
@@ -105,7 +105,7 @@ namespace BarracksAndBolts.Gameplay.Pathfinding
                 foreach (var offset in Neighbours)
                 {
                     var next = cell + offset;
-                    if (!_grid.IsWalkable(next) || _visitedStamp[ToIndex(next)] == _searchId)
+                    if (!_grid.IsWalkable(next) || !_grid.CanStepBetween(cell, next) || _visitedStamp[ToIndex(next)] == _searchId)
                         continue;
 
                     _visitedStamp[ToIndex(next)] = _searchId;

@@ -74,7 +74,13 @@ namespace BarracksAndBolts.Gameplay.Placement
         }
 
         /// <summary>True if this cell of the footprint doesn't stop the building from being placed.</summary>
-        public bool IsCellFree(Vector2Int cell) => _gridMap.IsWalkable(cell) && !_units.HasUnitAt(cell);
+        public bool IsCellFree(Vector2Int cell)
+        {
+            // On uneven ground the footprint's center decides which level is the right one.
+            var center = new Vector2Int(Area.x + Area.width / 2, Area.y + Area.height / 2);
+            return _gridMap.IsWalkable(cell) && !_gridMap.IsRamp(cell) &&
+                   _gridMap.GetLevel(cell) == _gridMap.GetLevel(center) && !_units.HasUnitAt(cell);
+        }
 
         /// <summary>Starts placing the building. Calling it while active swaps the building, no cancel needed.</summary>
         public void Begin(BuildingDefinition definition, Faction faction)

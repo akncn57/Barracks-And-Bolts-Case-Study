@@ -11,6 +11,8 @@ namespace BarracksAndBolts.Gameplay.Grid
     public sealed class GridMap
     {
         private readonly bool[] _isTerrainWalkable;
+        private readonly byte[] _levels;
+        private readonly bool[] _isRamp;
         private readonly GameEntityId[] _occupants;
 
         public GridMap(int width, int height, Vector2 origin)
@@ -22,6 +24,8 @@ namespace BarracksAndBolts.Gameplay.Grid
             Height = height;
             Origin = origin;
             _isTerrainWalkable = new bool[width * height];
+            _levels = new byte[width * height];
+            _isRamp = new bool[width * height];
             _occupants = new GameEntityId[width * height];
 
             Array.Fill(_isTerrainWalkable, true);
@@ -82,6 +86,36 @@ namespace BarracksAndBolts.Gameplay.Grid
             _isTerrainWalkable[ToIndex(cell)] = isWalkable;
         }
 
+        /// <summary>Height of the ground: 0 is the lowest. Out of bounds counts as 0.</summary>
+        public int GetLevel(Vector2Int cell)
+        {
+            return IsInBounds(cell) ? _levels[ToIndex(cell)] : 0;
+        }
+
+        public void SetLevel(Vector2Int cell, int level)
+        {
+            EnsureInBounds(cell);
+            _levels[ToIndex(cell)] = (byte)level;
+        }
+
+        /// <summary>True for stairs: the only cells that join different levels. Nothing can be built on them.</summary>
+        public bool IsRamp(Vector2Int cell)
+        {
+            return IsInBounds(cell) && _isRamp[ToIndex(cell)];
+        }
+
+        public void SetRamp(Vector2Int cell, bool isRamp)
+        {
+            EnsureInBounds(cell);
+            _isRamp[ToIndex(cell)] = isRamp;
+        }
+
+        /// <summary>True if a unit can step directly between two neighbouring cells: same level, or one of them is a ramp.</summary>
+        public bool CanStepBetween(Vector2Int from, Vector2Int to)
+        {
+            return IsRamp(from) || IsRamp(to) || GetLevel(from) == GetLevel(to);
+        }
+
         public GameEntityId GetOccupant(Vector2Int cell)
         {
             return IsInBounds(cell) ? _occupants[ToIndex(cell)] : GameEntityId.None;
@@ -97,15 +131,16 @@ namespace BarracksAndBolts.Gameplay.Grid
             return _isTerrainWalkable[index] && !_occupants[index].IsValid;
         }
 
-        /// <summary>True if every cell of the area is inside the map, walkable and empty.</summary>
+        /// <summary>True if a building can use the area: inside the map, walkable, empty, on one level and with no ramps.</summary>
         public bool IsAreaFree(RectInt area)
         {
             if (!IsInBounds(area))
                 return false;
 
+            var level = GetLevel(area.position);
             foreach (var cell in area.allPositionsWithin)
             {
-                if (!IsWalkable(cell))
+                if (!IsWalkable(cell) || IsRamp(cell) || GetLevel(cell) != level)
                     return false;
             }
 

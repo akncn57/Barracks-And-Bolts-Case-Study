@@ -184,6 +184,7 @@ public interface IEventBus
 ## 8. Grid ve Pathfinding
 - **1 hücre = 1 Unity birimi = 64px** (oyun içi sprite'larda PPU 64). Görsel taraf Unity `Grid` + `Tilemap`, mantık tarafı `GridMap` ile çalışır.
 - `GridMap`, her hücre için şu bilgileri tutar: yürünebilir mi, üzerinde hangi bina veya kaynak var (`GameEntityId`), bölge içinde mi (P2).
+- **Yükseklik:** Her hücrenin bir seviyesi var (0 düz zemin, 1 plato). Komşu iki hücre arasında sadece aynı seviyede ya da rampa üzerinden geçilir. Bina tek seviyede durmalı, rampaya konamaz.
 - **Birimler hücre işgal etmez.** Sadece binalar ve kaynaklar engeldir. Bu sayede birimler birbirini kilitleyemez. Üst üste binmeyi `GridSearch.CollectDestinations` önler; hafif bir ayırma (separation) kuvveti henüz yok, birimler yürürken birbirinin içinden geçebilir. Üzerinde birim duran hücreye bina konamaz; yoksa birim binanın içinde kalır.
 - **A\***:
   - 8 yönlü hareket. Köşe kesmeye izin verilmez (iki yanı dolu çaprazdan geçilmez).
@@ -298,8 +299,12 @@ GameplayLifetimeScope
     Main Camera
 ----- GRIDS -----
     Grid
-        Tilemap_Ground
-        Tilemap_Water
+        Tilemap_Water      (order -5)
+        Tilemap_Foam       (order -4, animasyonlu köpük)
+        Tilemap_Ground     (order -3, düz zemin; dolu hücre yürünebilir)
+        Tilemap_Elevated   (order -2, plato ve uçurum; dolu hücre yüksek seviye)
+        Tilemap_Stairs     (order -2, merdiven; dolu hücre rampa)
+        Tilemap_Blocking   (çizilmez; dolu hücre yürünemez)
 ----- WORLD -----
     Buildings          (runtime'da üretilenlerin parent'ı, BuildingViewSpawner)
     PlacementPreview   (yerleştirme önizlemesi)

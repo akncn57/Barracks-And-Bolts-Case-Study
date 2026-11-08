@@ -126,6 +126,50 @@ namespace BarracksAndBolts.Tests.EditMode.Gameplay
         }
 
         [Test]
+        public void AreaAcrossTwoLevels_IsInvalidAndHasBlockedCell()
+        {
+            foreach (var cell in new RectInt(3, 0, _map.Width - 3, _map.Height).allPositionsWithin)
+                _map.SetLevel(cell, 1);
+
+            _placement.Begin(_house, Faction.Player);
+            _placement.MoveTo(new Vector2(3f, 3f));
+
+            Assert.IsFalse(_placement.IsAreaValid);
+            var hasBlockedCell = false;
+            foreach (var cell in _placement.Area.allPositionsWithin)
+                hasBlockedCell |= !_placement.IsCellFree(cell);
+
+            Assert.IsTrue(hasBlockedCell, "The preview must show why the footprint is refused.");
+        }
+
+        [Test]
+        public void AreaOnHighGround_IsValid()
+        {
+            foreach (var cell in _map.Bounds.allPositionsWithin)
+                _map.SetLevel(cell, 1);
+
+            _placement.Begin(_house, Faction.Player);
+            _placement.MoveTo(new Vector2(3f, 3f));
+
+            Assert.IsTrue(_placement.IsAreaValid);
+            foreach (var cell in _placement.Area.allPositionsWithin)
+                Assert.IsTrue(_placement.IsCellFree(cell));
+        }
+
+        [Test]
+        public void AreaOnRamp_IsInvalidAndRampCellIsBlocked()
+        {
+            var ramp = new Vector2Int(3, 3);
+            _map.SetRamp(ramp, true);
+
+            _placement.Begin(_house, Faction.Player);
+            _placement.MoveTo(new Vector2(3f, 3f));
+
+            Assert.IsFalse(_placement.IsAreaValid);
+            Assert.IsFalse(_placement.IsCellFree(ramp));
+        }
+
+        [Test]
         public void TryConfirm_AreaHiddenOverUi_Fails()
         {
             _placement.Begin(_house, Faction.Player);

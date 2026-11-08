@@ -8,7 +8,8 @@ namespace BarracksAndBolts.Tests.EditMode.Gameplay
     internal static class TestMaps
     {
         /// <summary>
-        /// Builds a map from rows written top to bottom, as they look on screen: '.' is walkable, '#' is blocked.
+        /// Builds a map from rows written top to bottom, as they look on screen:
+        /// '.' is walkable, '#' is blocked, '^' is high ground, '/' is a ramp.
         /// </summary>
         public static GridMap FromRows(params string[] rows)
         {
@@ -20,8 +21,13 @@ namespace BarracksAndBolts.Tests.EditMode.Gameplay
             {
                 for (var x = 0; x < width; x++)
                 {
+                    var cell = new Vector2Int(x, height - 1 - row);
                     if (rows[row][x] == '#')
-                        map.SetTerrainWalkable(new Vector2Int(x, height - 1 - row), false);
+                        map.SetTerrainWalkable(cell, false);
+                    else if (rows[row][x] == '^')
+                        map.SetLevel(cell, 1);
+                    else if (rows[row][x] == '/')
+                        map.SetRamp(cell, true);
                 }
             }
 

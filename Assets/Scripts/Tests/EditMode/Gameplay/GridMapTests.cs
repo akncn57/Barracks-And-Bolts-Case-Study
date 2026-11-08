@@ -78,6 +78,50 @@ namespace BarracksAndBolts.Tests.EditMode.Gameplay
         }
 
         [Test]
+        public void IsAreaFree_OnHighGround_ReturnsTrue()
+        {
+            var map = TestMaps.FromRows("^^", "^^");
+
+            Assert.IsTrue(map.IsAreaFree(new RectInt(0, 0, 2, 2)));
+        }
+
+        [Test]
+        public void IsAreaFree_AcrossTwoLevels_ReturnsFalse()
+        {
+            var map = TestMaps.FromRows(".^", ".^");
+
+            Assert.IsFalse(map.IsAreaFree(new RectInt(0, 0, 2, 2)));
+        }
+
+        [Test]
+        public void IsAreaFree_WithRamp_ReturnsFalse()
+        {
+            var map = TestMaps.FromRows("..", "/.");
+
+            Assert.IsFalse(map.IsAreaFree(new RectInt(0, 0, 2, 2)));
+            Assert.IsTrue(map.IsWalkable(Vector2Int.zero), "A ramp is still walkable.");
+        }
+
+        [Test]
+        public void TryOccupy_AcrossTwoLevels_Fails()
+        {
+            var map = TestMaps.FromRows(".^", ".^");
+
+            Assert.IsFalse(map.TryOccupy(new RectInt(0, 0, 2, 2), new GameEntityId(1)));
+        }
+
+        [Test]
+        public void CanStepBetween_OnlySameLevelOrThroughRamp()
+        {
+            var map = TestMaps.FromRows(".^", "/^");
+
+            Assert.IsFalse(map.CanStepBetween(new Vector2Int(0, 1), new Vector2Int(1, 1)), "Ground to high ground.");
+            Assert.IsTrue(map.CanStepBetween(new Vector2Int(1, 0), new Vector2Int(1, 1)), "Same level.");
+            Assert.IsTrue(map.CanStepBetween(new Vector2Int(0, 0), new Vector2Int(1, 0)), "Ramp to high ground.");
+            Assert.IsTrue(map.CanStepBetween(new Vector2Int(0, 0), new Vector2Int(0, 1)), "Ramp to ground.");
+        }
+
+        [Test]
         public void IsWalkable_OutOfBounds_ReturnsFalse()
         {
             Assert.IsFalse(_map.IsWalkable(new Vector2Int(-1, 0)));

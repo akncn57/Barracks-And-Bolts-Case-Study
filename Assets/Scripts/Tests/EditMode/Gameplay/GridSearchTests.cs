@@ -110,6 +110,19 @@ namespace BarracksAndBolts.Tests.EditMode.Gameplay
         }
 
         [Test]
+        public void CollectDestinations_DoesNotSpillDownPlateauEdge()
+        {
+            var map = TestMaps.FromRows(
+                "..^^",
+                "..^^");
+
+            new GridSearch(map).CollectDestinations(new Vector2Int(2, 0), 8, _results);
+
+            Assert.AreEqual(4, _results.Count);
+            Assert.IsTrue(_results.All(cell => cell.x >= 2));
+        }
+
+        [Test]
         public void CollectDestinations_DoesNotCrossWater()
         {
             var map = TestMaps.FromRows(

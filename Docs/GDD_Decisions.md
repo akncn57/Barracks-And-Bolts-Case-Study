@@ -167,7 +167,7 @@ Bu değerler ScriptableObject üzerinden ayarlanabilir olacak, ileride değişti
 - Harita grid tabanlıdır ve A* ile bina yerleştirme sistemi aynı grid'i kullanır. Varsayılan boyut: 64x64 hücre (ayarlanabilir).
 - Zemin Unity **Tilemap** ile çizilir. Tilemap tek materyal ve tek atlas kullanarak SetPass sayısını düşük tutar.
 
-> **Not:** Zemin tipleri (su, uçurum vb.), harita boyutu ve görsel detaylar terrain asseti incelendikten sonra netleştirilecek.
+> **Şu anki hali:** Sahnede sabit bir harita var: 64x64 alanda ada, iki su birikintisi, üç düzensiz şekilli plato (biri denize bakan uçurumlu). Gölge kullanılmadı. Rastgele üretim P2'de.
 
 ### Üretim Adımları
 1. **Zemin:** Perlin noise ile çimen, toprak ve (varsa) su/uçurum bölgeleri oluşturulur. Su ve uçurum yürünemez.

@@ -73,5 +73,8 @@
 ## En Önemli Eksikler (önce bunlar)
 P0 ve P1 için kritik asset eksiği kalmadı. Açık kalanlar: gün/gece ve baskın ikonları (P1, mevcut ikonlardan türetilecek), inşa görseli (P2, kodla), müzik ve ses efektleri (P3).
 
+## Projeye Kopyalanmamış Paket Dosyası
+- `Shadow.png` (Tiny Swords, Terrain/Tileset): Yüksek zeminin altındaki gölge. Haritada gölge kullanılmamasına karar verildi, gerekli değil.
+
 ## Lisans Notu
 Dışarıdan eklenen her asset için kaynak ve lisans bilgisi README'ye "Credits" bölümüne yazılacak.

@@ -108,15 +108,15 @@ namespace BarracksAndBolts.Gameplay.Pathfinding
             foreach (var direction in Directions)
             {
                 var next = current + direction;
-                if (!_grid.IsWalkable(next))
+                if (!CanStep(current, next))
                     continue;
 
                 var isDiagonal = direction.x != 0 && direction.y != 0;
 
                 // No corner cutting: a diagonal step needs both side cells free,
-                // otherwise units would clip through the corner of a building.
+                // otherwise units would clip through the corner of a building or a plateau.
                 if (isDiagonal &&
-                    (!_grid.IsWalkable(new Vector2Int(next.x, current.y)) || !_grid.IsWalkable(new Vector2Int(current.x, next.y))))
+                    (!CanStep(current, new Vector2Int(next.x, current.y)) || !CanStep(current, new Vector2Int(current.x, next.y))))
                     continue;
 
                 var nextIndex = ToIndex(next);
@@ -133,6 +133,11 @@ namespace BarracksAndBolts.Gameplay.Pathfinding
                 var heuristic = Heuristic(next, goal);
                 _open.Push(nextIndex, cost + heuristic, heuristic);
             }
+        }
+
+        private bool CanStep(Vector2Int from, Vector2Int to)
+        {
+            return _grid.IsWalkable(to) && _grid.CanStepBetween(from, to);
         }
 
         private void BeginSearch()

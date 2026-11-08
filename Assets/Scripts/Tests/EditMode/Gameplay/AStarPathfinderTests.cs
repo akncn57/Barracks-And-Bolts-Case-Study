@@ -19,6 +19,46 @@ namespace BarracksAndBolts.Tests.EditMode.Gameplay
         }
 
         [Test]
+        public void FindPath_HighGroundWithoutRamp_IsNotReachable()
+        {
+            var map = TestMaps.FromRows(
+                "..^^",
+                "..^^");
+
+            var status = new AStarPathfinder(map).FindPath(Vector2Int.zero, new Vector2Int(3, 0), _path);
+
+            Assert.AreEqual(PathStatus.Partial, status);
+            Assert.AreEqual(0, map.GetLevel(_path.Count > 0 ? _path[^1] : Vector2Int.zero), "Stops at the edge, on the ground.");
+        }
+
+        [Test]
+        public void FindPath_ToHighGround_GoesThroughRamp()
+        {
+            var map = TestMaps.FromRows(
+                "..^^",
+                "./^^",
+                "....");
+
+            var status = new AStarPathfinder(map).FindPath(new Vector2Int(3, 0), new Vector2Int(3, 2), _path);
+
+            Assert.AreEqual(PathStatus.Found, status);
+            CollectionAssert.Contains(_path, new Vector2Int(1, 1));
+            TestMaps.AssertWalkableAndContiguous(map, new Vector2Int(3, 0), _path);
+        }
+
+        [Test]
+        public void FindPath_DiagonalPastPlateauEdge_GoesAroundTheCorner()
+        {
+            var map = TestMaps.FromRows(
+                ".^",
+                "/^");
+
+            new AStarPathfinder(map).FindPath(new Vector2Int(1, 1), Vector2Int.zero, _path);
+
+            CollectionAssert.AreEqual(new[] { new Vector2Int(1, 0), Vector2Int.zero }, _path);
+        }
+
+        [Test]
         public void FindPath_StartEqualsGoal_FoundWithEmptyPath()
         {
             var pathfinder = OpenField(out _);

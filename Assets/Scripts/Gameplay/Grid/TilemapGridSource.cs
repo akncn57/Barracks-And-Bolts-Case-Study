@@ -7,6 +7,7 @@ namespace BarracksAndBolts.Gameplay.Grid
     /// <summary>
     /// Builds the logical <see cref="GridMap"/> from the painted tilemaps.
     /// A cell is walkable if it has a ground tile and no tile on any blocking tilemap.
+    /// Cells with an elevated tile are high ground; cells with a stairs tile join the two levels.
     /// </summary>
     public sealed class TilemapGridSource : MonoBehaviour
     {
@@ -15,8 +16,13 @@ namespace BarracksAndBolts.Gameplay.Grid
         [Tooltip("Tiles on these tilemaps block movement and building, e.g. rocks or cliffs.")]
         [SerializeField] private Tilemap[] blockingTilemaps = Array.Empty<Tilemap>();
 
+        [SerializeField] private Tilemap elevatedTilemap;
+        [SerializeField] private Tilemap stairsTilemap;
+
         [Header("Debug")]
         [SerializeField] private bool drawGizmos = true;
+
+        private const int ElevatedLevel = 1;
 
         private GridMap _gridMap;
 
@@ -44,6 +50,12 @@ namespace BarracksAndBolts.Gameplay.Grid
                 var cell = new Vector2Int(tilePosition.x - bounds.xMin, tilePosition.y - bounds.yMin);
                 var isWalkable = groundTilemap.HasTile(tilePosition) && !IsBlocked(tilePosition);
                 _gridMap.SetTerrainWalkable(cell, isWalkable);
+
+                if (elevatedTilemap != null && elevatedTilemap.HasTile(tilePosition))
+                    _gridMap.SetLevel(cell, ElevatedLevel);
+
+                if (stairsTilemap != null && stairsTilemap.HasTile(tilePosition))
+                    _gridMap.SetRamp(cell, true);
             }
 
             return _gridMap;
