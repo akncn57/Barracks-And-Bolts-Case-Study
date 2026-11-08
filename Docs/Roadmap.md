@@ -1,6 +1,6 @@
 # Barracks & Bolts – Öncelik ve Takvim
 
-> **Durum (8 Kasım):** Altyapı, grid, kamera, A* (algoritma), tüm P0/P1 assetleri, veri tanımları, bina yerleştirme, Production Menu, binaya sol tıkla seçim, Information Panel, birimler, Barracks'tan asker üretimi, birim seçimi (sol tık ve kutu) ve sağ tıkla hareket hazır ve oyunda denendi. Saldırı, yok olma ve minimal Sandbox da hazır ve oyunda denendi. **Sıradaki adım:** SetPass, panel anchor'ları, build, README. Efekt turunda yapılacak: vuruş zamanlaması ve ölüm efekti.
+> **Durum (8 Kasım):** Altyapı, grid, kamera, A* (algoritma), tüm P0/P1 assetleri, veri tanımları, bina yerleştirme, Production Menu, binaya sol tıkla seçim, Information Panel, birimler, Barracks'tan asker üretimi, birim seçimi (sol tık ve kutu) ve sağ tıkla hareket hazır ve oyunda denendi. Saldırı, yok olma ve minimal Sandbox da hazır ve oyunda denendi. P0+ istekleri de bitti. **Sıradaki adım:** SetPass, build, README. Efekt turunda yapılacak: vuruş zamanlaması ve ölüm efekti.
 
 > **Teslim tarihi:** 13 Kasım 2026, Cuma
 > **Ana kural:** Her öncelik seviyesi bitmeden bir sonrakine geçilmez. `main` branch'i her zaman çalışan ve build alınabilen bir halde tutulur.
@@ -36,7 +36,7 @@ Oyunu deneyince çıkan kullanılabilirlik istekleri. Sandbox'ta da olmalı, bui
 - [x] **Uçan yazı (generic):** Dünyada beliren, yukarı süzülüp solan yazı. İlk kullanım: geçersiz alana bina koymaya çalışınca uyarı
 - [x] **Üzerine gelince bina adı:** Mouse binanın üstündeyken ekranda adı yazar, binada hover efekti olur
 - [x] **Information Panel boyutu:** Min-max arasında içeriğe göre boyutlanır. İçerik sığmazsa scroll olur, sağda sürüklenebilir scrollbar görünür. Üste anchor'landığı için geniş ekran taşması da çözüldü
-- [ ] **Production Menu tooltip:** Hücrenin üstünde durunca bina bilgisi açılır (boyut, HP, ürettikleri). Maliyet satırı P1'de maliyetler gelince eklenir *(kod ve testler hazır; canvas kurulumu kaldı)*
+- [x] **Production Menu tooltip:** Hücrenin üstünde durunca bina bilgisi açılır (boyut, HP, ürettikleri). Maliyet satırı P1'de maliyetler gelince eklenir
 
 ## P1 – Oyun Döngüsü (bu seviyeyle bir "oyun" ortaya çıkar)
 **Hedef: 11 Kasım Çarşamba akşamı.**
