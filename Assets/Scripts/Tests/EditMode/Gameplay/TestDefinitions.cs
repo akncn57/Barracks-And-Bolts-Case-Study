@@ -58,6 +58,20 @@ namespace BarracksAndBolts.Tests.EditMode.Gameplay
             return definition;
         }
 
+        /// <summary>A building that shoots enemy units by itself. Destroy it in TearDown.</summary>
+        public static BuildingDefinition CreateTower(string id, float range, int damage, float cooldown = 1f)
+        {
+            var definition = CreateBuilding(id, new Vector2Int(2, 2));
+
+            var serialized = new SerializedObject(definition);
+            serialized.FindProperty("defenseRange").floatValue = range;
+            serialized.FindProperty("defenseDamage").intValue = damage;
+            serialized.FindProperty("defenseCooldown").floatValue = cooldown;
+            serialized.ApplyModifiedPropertiesWithoutUndo();
+
+            return definition;
+        }
+
         /// <summary>Destroy the result in TearDown; ScriptableObjects are not garbage collected.</summary>
         public static UnitDefinition CreateUnit(string id, int maxHp = 10, int damage = 1, float attackRange = 1f, float attackCooldown = 1f)
         {

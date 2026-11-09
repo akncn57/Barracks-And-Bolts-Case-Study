@@ -89,7 +89,7 @@ Bu değerler ScriptableObject üzerinden ayarlanabilir olacak, ileride değişti
 | Castle | Ana üs. Köylü üretir, kaynaklar buraya taşınır. Yıkılırsa oyun kaybedilir. |
 | Barracks | Şövalye, mızrakçı ve okçu üretir. Askerler barakanın spawn point'inde belirir. |
 | House | Nüfus kapasitesini artırır. Üretim menüsü yoktur (Power Plant karşılığı). |
-| Kule | Üzerindeki okçular belirli bir yarıçaptaki alanı korur ve menziline giren düşmana otomatik ateş eder. Kuledeki okçular binanın parçasıdır, nüfustan yer kaplamaz ve tek tek seçilemez. |
+| Kule | Üzerindeki okçular belirli bir yarıçaptaki alanı korur ve menziline giren düşmana otomatik ateş eder. Kuledeki okçular binanın parçasıdır, nüfustan yer kaplamaz ve tek tek seçilemez. **Şu anki hali:** tek okçu, 7 menzil, 3 hasar, 1 saniyede bir atış (geçici). Sadece birimleri vurur, binaları değil. Hedefi ölene ya da menzilden çıkana kadar bırakmaz. Her modda ve iki tarafta da çalışır. Okçu sayısı yükseltme sistemiyle artacak. |
 | Kilise | Monk yetiştirir. |
 | Oduncu Deposu (Lumber Storage) | Odun depolar. Köylüler buraya odun bırakır. |
 | Taş Deposu (Stone Storage) | Taş depolar. |
@@ -196,6 +196,7 @@ Bu değerler ScriptableObject üzerinden ayarlanabilir olacak, ileride değişti
 - Renk setleri arasında küçük bir fark var: Sarıda `Warrior_Guard` var, Kırmızıda yok. Kod, bir animasyon eksikse varsayılan animasyona (Idle / Run) düşmelidir.
 - **Dost ateşi yok:** Oyuncu kendi birimlerine ve binalarına saldırma emri veremez.
 - **Karşılık verme:** Boşta duran birim, kendisine vurana saldırır. Yürüyen ya da hedefi olan birim işine devam eder.
+- **Durum ikonları:** Boştaki köylünün başında "Zz" yazan krem baloncuk durur. Oyuncunun askeri düşmanı kendi fark edince ya da vurulup karşılık verince başında 1,5 saniye kırmızı "!" çıkar; oyuncunun verdiği saldırı emrinde çıkmaz. İkonlar ağaç ve binaların arkasında kalmaz.
 - **Düşman yerleşkeleri (ileride konuşulacak):** Haritada rastgele küçük düşman yerleşkeleri olabilir. Böylece PDF'teki "binaya saldırma" maddesi düşman binaları üzerinden de karşılanır.
 
 ### Birlikte Hareket

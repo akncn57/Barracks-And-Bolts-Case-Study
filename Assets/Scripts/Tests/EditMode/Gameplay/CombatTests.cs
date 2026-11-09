@@ -224,6 +224,21 @@ namespace BarracksAndBolts.Tests.EditMode.Gameplay
             _combat.ApplyDamage(victim.Id, 1, attacker.Id);
 
             Assert.AreEqual(attacker.Id, victim.AttackTarget);
+            Assert.IsTrue(victim.HasJustSpottedEnemy);
+        }
+
+        [Test]
+        public void OrderedTarget_IsNotASpottedEnemy()
+        {
+            var enemy = Spawn(_tank, new Vector2Int(6, 5), Faction.Enemy);
+            var soldier = Spawn(_knight, new Vector2Int(5, 5));
+
+            soldier.SetAttackTarget(enemy.Id);
+            Assert.IsFalse(soldier.HasJustSpottedEnemy);
+
+            soldier.SpotEnemy(enemy.Id);
+            soldier.ClearAttackTarget();
+            Assert.IsFalse(soldier.HasJustSpottedEnemy, "A new order or a lost target ends it.");
         }
 
         [Test]

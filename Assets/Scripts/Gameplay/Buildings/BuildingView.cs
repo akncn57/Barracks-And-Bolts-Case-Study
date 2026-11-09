@@ -1,4 +1,6 @@
+using BarracksAndBolts.Core.Simulation;
 using BarracksAndBolts.Gameplay.Combat;
+using BarracksAndBolts.Gameplay.Data;
 using BarracksAndBolts.Gameplay.Entities;
 using UnityEngine;
 
@@ -11,6 +13,7 @@ namespace BarracksAndBolts.Gameplay.Buildings
     public sealed class BuildingView : MonoBehaviour
     {
         [SerializeField] private SpriteRenderer spriteRenderer;
+        [SerializeField] private BuildingDefenderView defender;
 
         private readonly DamageFlash _damageFlash = new();
 
@@ -22,6 +25,16 @@ namespace BarracksAndBolts.Gameplay.Buildings
             name = $"{building.Definition.DisplayName} ({building.Id})";
             transform.position = position;
             BuildingSpriteLayout.PlaceOnFootprint(spriteRenderer, sprite);
+        }
+
+        public void ShowDefender(TeamColorDefinition.UnitSpriteSet sprites, Vector2 localPosition, GameClock clock)
+        {
+            defender.Show(sprites, localPosition, clock);
+        }
+
+        public void PlayDefenderShot(Vector2 aimPoint)
+        {
+            defender.PlayShot(aimPoint);
         }
 
         public void ShowDamage()

@@ -18,8 +18,12 @@ namespace BarracksAndBolts.Gameplay.Units
         // Below this sideways distance the unit keeps its facing, so walking straight up doesn't make it flicker.
         private const float MinFacingChange = 0.001f;
 
+        // How long a unit keeps telling that it noticed an enemy.
+        private const float EnemySpottedDuration = 1.5f;
+
         private readonly List<Vector2> _waypoints = new();
         private int _nextWaypoint;
+        private float _enemySpottedLeft;
 
         public UnitModel(GameEntityId id, UnitDefinition definition, Faction faction, Vector2 position)
         {
@@ -47,6 +51,9 @@ namespace BarracksAndBolts.Gameplay.Units
         public GameEntityId AttackTarget { get; private set; }
         public bool HasAttackTarget => AttackTarget.IsValid;
         public float AttackCooldownLeft { get; private set; }
+
+        /// <summary>The unit picked its target by itself a moment ago. Any change of target ends this.</summary>
+        public bool HasJustSpottedEnemy => _enemySpottedLeft > 0f;
 
         /// <summary>The cell this unit last set out for while chasing its target.</summary>
         public Vector2Int? ChasedCell { get; private set; }
@@ -77,6 +84,14 @@ namespace BarracksAndBolts.Gameplay.Units
             AttackTarget = target;
             ChasedCell = null;
             RepathDelayLeft = 0f;
+            _enemySpottedLeft = 0f;
+        }
+
+        /// <summary>Attacks a target the unit found by itself, not one the player ordered.</summary>
+        public void SpotEnemy(GameEntityId target)
+        {
+            SetAttackTarget(target);
+            _enemySpottedLeft = EnemySpottedDuration;
         }
 
         public void ClearAttackTarget()
@@ -105,6 +120,7 @@ namespace BarracksAndBolts.Gameplay.Units
         {
             AttackCooldownLeft = Mathf.Max(AttackCooldownLeft - deltaTime, 0f);
             RepathDelayLeft = Mathf.Max(RepathDelayLeft - deltaTime, 0f);
+            _enemySpottedLeft = Mathf.Max(_enemySpottedLeft - deltaTime, 0f);
         }
 
         public void StartAttackCooldown()

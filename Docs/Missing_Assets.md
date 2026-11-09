@@ -56,8 +56,9 @@
 | 21 | Rütbe / seviye simgesi (asker ve bina seviyesi) | Yükseltme sistemi | 🛠 / 💻 Küçük yıldız veya çizgiler |
 | 22 | Bölge sınırı görseli | Bölge sistemi | 💻 Tilemap overlay veya shader |
 | 23 | Mini harita çerçevesi | Mini harita | 🛠 `Papers_*` / `WoodTable_*` 9-slice |
-| 24 | Kuledeki okçu | Kule savunması | 🛠 `Archer` sprite'ı kulenin üstünde |
+| 24 | ~~Kuledeki okçu~~ | ✅ `Archer` kareleri kulenin platformunda, takım rengine göre | – |
 | 25 | ~~Toplanma noktası bayrağı~~ | ✅ Kurdeleden üretildi: `Textures/Markers/<Renk>/Texture_Markers_<Renk>_RallyFlag` (atlas'a eklendi) | – |
+| – | ~~Birim durum ikonları~~ | ✅ Birimlerin paletiyle çizildi: `Textures/Markers/Texture_Markers_Status_Idle`, `_EnemySpotted` (klasörle atlas'a giriyor) | – |
 
 ## P3 – Cila
 | # | Eksik | Neden Gerekli | Çözüm |

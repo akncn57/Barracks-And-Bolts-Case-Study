@@ -99,7 +99,7 @@ Gameplay/
 ├── Placement/      PlacementService, PlacementInputHandler, PlacementPreviewView (bölge kuralı gelince: PlacementValidator)
 ├── Buildings/      BuildingService, BuildingModel, BuildingView, BuildingViewSpawner, Production/ (UnitProductionService)
 ├── Units/          UnitService, UnitModel, UnitMovementSystem, UnitView, UnitViewSpawner, States/
-├── Combat/         CombatService, CombatSystem, DeathCleanupSystem, DamageFlash, ProjectileSpawner, ProjectileView
+├── Combat/         CombatService, CombatSystem, BuildingDefenseSystem, DeathCleanupSystem, DamageFlash, ProjectileSpawner, ProjectileView
 ├── Hover/          HoverService, HoverInputHandler, HoverHighlightView
 ├── Feedback/       FloatingTextRequestedEvent (çizen: UI/Feedback/FloatingTextSpawner)
 ├── Selection/      SelectionService, SelectionInputHandler, BoxSelectionView

@@ -21,6 +21,7 @@ namespace BarracksAndBolts.Gameplay.Combat
         private void Construct(IEventBus eventBus)
         {
             eventBus.Subscribe<UnitAttackedEvent>(OnUnitAttacked).AddTo(_subscriptions);
+            eventBus.Subscribe<BuildingFiredEvent>(OnBuildingFired).AddTo(_subscriptions);
         }
 
         private void Awake()
@@ -44,6 +45,11 @@ namespace BarracksAndBolts.Gameplay.Combat
                 return;
 
             _pool.Get().Launch(attackedEvent.Attacker.Position + MuzzleOffset, attackedEvent.AimPoint, _pool.Release);
+        }
+
+        private void OnBuildingFired(BuildingFiredEvent firedEvent)
+        {
+            _pool.Get().Launch(firedEvent.Muzzle, firedEvent.AimPoint, _pool.Release);
         }
     }
 }

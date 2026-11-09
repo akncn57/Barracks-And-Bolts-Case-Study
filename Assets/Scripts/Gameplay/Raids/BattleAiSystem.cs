@@ -87,7 +87,7 @@ namespace BarracksAndBolts.Gameplay.Raids
         {
             var near = _combat.FindNearestHostile(unit.Position, unit.Faction, _settings.AggroRange);
             if (near.IsValid)
-                unit.SetAttackTarget(near);
+                unit.SpotEnemy(near);
         }
 
         private GameEntityId FindCastle()

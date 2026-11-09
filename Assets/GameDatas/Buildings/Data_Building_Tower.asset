@@ -15,7 +15,7 @@ MonoBehaviour:
   id: tower
   displayName: Tower
   size: {x: 2, y: 2}
-  visualHeight: 3
+  visualHeight: 3.6
   maxHp: 150
   cost:
   - kind: 0
@@ -25,3 +25,8 @@ MonoBehaviour:
   isDropOff: 0
   producibles: []
   spawnOffset: {x: 0, y: -1}
+  defender: {fileID: 11400000, guid: 0126048d48304fddb8ac3633d7d7f700, type: 2}
+  defenderPosition: {x: 0, y: 2.36}
+  defenseRange: 7
+  defenseDamage: 3
+  defenseCooldown: 1

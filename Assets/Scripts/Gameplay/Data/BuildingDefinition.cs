@@ -33,6 +33,17 @@ namespace BarracksAndBolts.Gameplay.Data
         [Tooltip("Cell where new units appear, relative to the bottom-left cell of the footprint. (1, -1) is below the door of a 3 cell wide building.")]
         [SerializeField] private Vector2Int spawnOffset = new(0, -1);
 
+        [Header("Defense")]
+        [Tooltip("The unit that stands on the building. Only its look is used; the numbers are below.")]
+        [SerializeField] private UnitDefinition defender;
+        [Tooltip("Where the defender's feet are, in world units from the bottom-center of the footprint.")]
+        [SerializeField] private Vector2 defenderPosition;
+        [Tooltip("Enemy units this close get shot, in cells from the middle of the footprint. 0 for buildings that don't fight.")]
+        [SerializeField, Min(0f)] private float defenseRange;
+        [SerializeField, Min(0)] private int defenseDamage;
+        [Tooltip("Seconds between shots.")]
+        [SerializeField, Min(0.1f)] private float defenseCooldown = 1f;
+
         public string Id => id;
         public string DisplayName => displayName;
         public Vector2Int Size => size;
@@ -45,6 +56,12 @@ namespace BarracksAndBolts.Gameplay.Data
         public IReadOnlyList<UnitDefinition> Producibles => producibles;
         public bool CanProduce => producibles.Length > 0;
         public Vector2Int SpawnOffset => spawnOffset;
+        public UnitDefinition Defender => defender;
+        public Vector2 DefenderPosition => defenderPosition;
+        public bool HasDefense => defenseRange > 0f && defenseDamage > 0;
+        public float DefenseRange => defenseRange;
+        public int DefenseDamage => defenseDamage;
+        public float DefenseCooldown => defenseCooldown;
 
         private void OnValidate()
         {

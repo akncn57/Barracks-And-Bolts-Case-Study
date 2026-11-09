@@ -17,7 +17,7 @@ namespace BarracksAndBolts.Gameplay.Units
         // Spreads units over the animation by id, so a group doesn't breathe in perfect sync. A fraction of a loop per id.
         private const float PhasePerId = 0.37f;
 
-        // The idle icon bobs a little, so it catches the eye.
+        // The status icon bobs a little, so it catches the eye.
         private const float IconBobHeight = 0.05f;
         private const float IconBobSpeed = 4f;
 
@@ -30,9 +30,13 @@ namespace BarracksAndBolts.Gameplay.Units
         [SerializeField] private Color playerMarkerColor = Color.green;
         [SerializeField] private Color enemyMarkerColor = Color.red;
 
-        [Header("Idle")]
-        [Tooltip("Over the head of a player's villager with nothing to do.")]
-        [SerializeField] private SpriteRenderer idleIcon;
+        [Header("Status icon")]
+        [Tooltip("Over the head of the unit. Hidden when there is nothing to tell.")]
+        [SerializeField] private SpriteRenderer statusIcon;
+        [Tooltip("A player's villager with nothing to do.")]
+        [SerializeField] private Sprite idleSprite;
+        [Tooltip("A player's soldier that just noticed an enemy by itself.")]
+        [SerializeField] private Sprite enemySpottedSprite;
 
         private readonly DamageFlash _damageFlash = new();
         private UnitModel _unit;
@@ -42,7 +46,8 @@ namespace BarracksAndBolts.Gameplay.Units
         private IReadOnlyList<Sprite> _shownFrames;
         private int _shownFrame = -1;
         private float _attackStartedAt = -1f;
-        private bool _canBeIdle;
+        private bool _isPlayerVillager;
+        private bool _isPlayerSoldier;
         private Vector3 _iconRestPosition;
 
         public GameEntityId UnitId => _unit.Id;
@@ -58,9 +63,10 @@ namespace BarracksAndBolts.Gameplay.Units
             selectionMarker.color = unit.Faction == Faction.Player ? playerMarkerColor : enemyMarkerColor;
             SetSelected(false);
 
-            _canBeIdle = unit.Definition.CanGather && unit.Faction == Faction.Player;
-            _iconRestPosition = idleIcon.transform.localPosition;
-            idleIcon.enabled = false;
+            _isPlayerVillager = unit.Faction == Faction.Player && unit.Definition.CanGather;
+            _isPlayerSoldier = unit.Faction == Faction.Player && !unit.Definition.CanGather;
+            _iconRestPosition = statusIcon.transform.localPosition;
+            statusIcon.enabled = false;
         }
 
         public void SetSelected(bool isSelected)
@@ -87,7 +93,7 @@ namespace BarracksAndBolts.Gameplay.Units
             transform.position = _unit.Position;
             spriteRenderer.flipX = _unit.IsFacingLeft;
             _damageFlash.Update(spriteRenderer, Time.deltaTime);
-            UpdateIdleIcon();
+            UpdateStatusIcon();
 
             if (TryShowAttackFrame())
                 return;
@@ -98,12 +104,26 @@ namespace BarracksAndBolts.Gameplay.Units
                 ShowLoopingFrame(_unit.IsMoving ? _sprites.RunFrames : _sprites.IdleFrames);
         }
 
-        private void UpdateIdleIcon()
+        private void UpdateStatusIcon()
         {
-            var isShown = _canBeIdle && _unit.IsIdle;
-            idleIcon.enabled = isShown;
-            if (isShown)
-                idleIcon.transform.localPosition = _iconRestPosition + Vector3.up * (Mathf.Sin(_clock.ElapsedTime * IconBobSpeed) * IconBobHeight);
+            var sprite = PickStatusSprite();
+            statusIcon.enabled = sprite != null;
+            if (sprite == null)
+                return;
+
+            statusIcon.sprite = sprite;
+            statusIcon.transform.localPosition = _iconRestPosition + Vector3.up * (Mathf.Sin(_clock.ElapsedTime * IconBobSpeed) * IconBobHeight);
+        }
+
+        private Sprite PickStatusSprite()
+        {
+            if (_isPlayerVillager && _unit.IsIdle)
+                return idleSprite;
+
+            if (_isPlayerSoldier && _unit.HasJustSpottedEnemy)
+                return enemySpottedSprite;
+
+            return null;
         }
 
         private bool TryShowAttackFrame()

@@ -1,4 +1,5 @@
 using BarracksAndBolts.Core.Events;
+using BarracksAndBolts.Gameplay.Buildings;
 using BarracksAndBolts.Gameplay.Entities;
 using BarracksAndBolts.Gameplay.Units;
 using UnityEngine;
@@ -26,6 +27,21 @@ namespace BarracksAndBolts.Gameplay.Combat
         }
 
         public UnitModel Attacker { get; }
+        public Vector2 AimPoint { get; }
+    }
+
+    /// <summary>A building fired. Muzzle is where the arrow leaves, AimPoint where it lands, both in world space.</summary>
+    public readonly struct BuildingFiredEvent : IGameEvent
+    {
+        public BuildingFiredEvent(BuildingModel building, Vector2 muzzle, Vector2 aimPoint)
+        {
+            Building = building;
+            Muzzle = muzzle;
+            AimPoint = aimPoint;
+        }
+
+        public BuildingModel Building { get; }
+        public Vector2 Muzzle { get; }
         public Vector2 AimPoint { get; }
     }
 }

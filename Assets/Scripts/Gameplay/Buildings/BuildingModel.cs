@@ -27,9 +27,30 @@ namespace BarracksAndBolts.Gameplay.Buildings
         public int CurrentHp { get; private set; }
         public bool IsDead => CurrentHp <= 0;
 
+        /// <summary>The enemy this building is shooting at. None when it has no target.</summary>
+        public GameEntityId DefenseTarget { get; private set; }
+
+        /// <summary>Time until the building looks for a shot again.</summary>
+        public float ShotDelayLeft { get; private set; }
+
         public void TakeDamage(int amount)
         {
             CurrentHp = Mathf.Max(CurrentHp - amount, 0);
+        }
+
+        public void SetDefenseTarget(GameEntityId target)
+        {
+            DefenseTarget = target;
+        }
+
+        public void StartShotDelay(float seconds)
+        {
+            ShotDelayLeft = seconds;
+        }
+
+        public void TickShotDelay(float deltaTime)
+        {
+            ShotDelayLeft = Mathf.Max(ShotDelayLeft - deltaTime, 0f);
         }
     }
 }

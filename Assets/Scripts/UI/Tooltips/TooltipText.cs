@@ -15,6 +15,9 @@ namespace BarracksAndBolts.UI.Tooltips
             text.Append("Size: ").Append(building.Size.x).Append('x').Append(building.Size.y).Append('\n');
             text.Append("HP: ").Append(building.MaxHp);
 
+            if (building.HasDefense)
+                text.Append(FormattableString.Invariant($"\nDamage: {building.DefenseDamage}\nRange: {building.DefenseRange:0.#}"));
+
             if (building.CanProduce)
             {
                 text.Append("\nProduces: ");

@@ -113,6 +113,7 @@ namespace BarracksAndBolts.Gameplay.Bootstrap
 
             builder.Register<CombatService>(Lifetime.Singleton);
             builder.RegisterSimulationSystem<CombatSystem>();
+            builder.RegisterSimulationSystem<BuildingDefenseSystem>();
             builder.RegisterSimulationSystem<DeathCleanupSystem>();
             builder.RegisterComponentInHierarchy<ProjectileSpawner>();
 

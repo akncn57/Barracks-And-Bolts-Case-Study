@@ -82,8 +82,30 @@ namespace BarracksAndBolts.Gameplay.Combat
         /// <summary>The closest enemy of the faction within the range, unit or building. None if nothing is that close.</summary>
         public GameEntityId FindNearestHostile(Vector2 from, Faction faction, float range)
         {
+            var nearest = FindNearestHostileUnit(from, faction, range, out var nearestDistance);
+            foreach (var building in _buildings.Buildings)
+            {
+                if (building.Faction != faction && TryGetTarget(building.Id, from, out var target) && target.Distance <= nearestDistance)
+                {
+                    nearestDistance = target.Distance;
+                    nearest = building.Id;
+                }
+            }
+
+            return nearest;
+        }
+
+        /// <summary>The closest enemy unit of the faction within the range. None if nothing is that close.</summary>
+        public GameEntityId FindNearestHostileUnit(Vector2 from, Faction faction, float range)
+        {
+            return FindNearestHostileUnit(from, faction, range, out _);
+        }
+
+        // Without a unit in range the distance stays at the range, so a building can still be closer.
+        private GameEntityId FindNearestHostileUnit(Vector2 from, Faction faction, float range, out float nearestDistance)
+        {
             var nearest = GameEntityId.None;
-            var nearestDistance = range;
+            nearestDistance = range;
             foreach (var unit in _units.Units)
             {
                 if (unit.Faction == faction || unit.IsDead)
@@ -94,15 +116,6 @@ namespace BarracksAndBolts.Gameplay.Combat
                 {
                     nearestDistance = distance;
                     nearest = unit.Id;
-                }
-            }
-
-            foreach (var building in _buildings.Buildings)
-            {
-                if (building.Faction != faction && TryGetTarget(building.Id, from, out var target) && target.Distance <= nearestDistance)
-                {
-                    nearestDistance = target.Distance;
-                    nearest = building.Id;
                 }
             }
 
@@ -124,7 +137,7 @@ namespace BarracksAndBolts.Gameplay.Combat
                 if (unit.IsDead)
                     _pendingDeaths.Add(targetId);
                 else if (!unit.HasAttackTarget && !unit.IsMoving)
-                    unit.SetAttackTarget(attackerId);
+                    unit.SpotEnemy(attackerId);
             }
             else if (_buildings.TryGet(targetId, out var building))
             {

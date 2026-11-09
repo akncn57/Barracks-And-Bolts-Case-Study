@@ -465,6 +465,21 @@ namespace BarracksAndBolts.Tests.EditMode.Gameplay
         }
 
         [Test]
+        public void Ai_IdleSoldier_TellsItSpottedAnEnemyForAMoment()
+        {
+            _units.TrySpawn(_knight, new Vector2Int(5, 5), Faction.Player, out var soldier);
+            _units.TrySpawn(_knight, new Vector2Int(8, 5), Faction.Enemy, out var enemy);
+            Assert.IsFalse(soldier.HasJustSpottedEnemy);
+
+            CreateAi().Tick(0.3f);
+            Assert.IsTrue(soldier.HasJustSpottedEnemy);
+
+            soldier.TickCombatTimers(2f);
+            Assert.IsFalse(soldier.HasJustSpottedEnemy);
+            Assert.AreEqual(enemy.Id, soldier.AttackTarget, "Only the icon ends, not the fight.");
+        }
+
+        [Test]
         public void Ai_Villager_LeavesFightingToSoldiers()
         {
             _units.TrySpawn(_villager, new Vector2Int(5, 5), Faction.Player, out var villager);
