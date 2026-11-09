@@ -30,6 +30,7 @@ MonoBehaviour:
     siteSprite: {fileID: 21300000, guid: c5b3050a0e6c418988dcd6596722fa94, type: 3}
   unitSprites:
   - unit: {fileID: 11400000, guid: 5ed1c31b43ef4510b9d5c8966a56d71a, type: 2}
+    portrait: {fileID: -4216416322996058909, guid: d7216114c8492ab40963825ff267108f, type: 3}
     idleFrames:
     - {fileID: 7384290322352760091, guid: f675fa987b8cd6048b13d09a42f09687, type: 3}
     - {fileID: 5558041129755138300, guid: f675fa987b8cd6048b13d09a42f09687, type: 3}
@@ -54,6 +55,7 @@ MonoBehaviour:
     chopFrames: []
     mineFrames: []
   - unit: {fileID: 11400000, guid: 6c1466bac5f640c7956b4a25302ca2c2, type: 2}
+    portrait: {fileID: -1558449054324165317, guid: 753c63139ddbb0248824b9bf2c323ed8, type: 3}
     idleFrames:
     - {fileID: -594197781322936934, guid: b3d47314ef0905943b457d8081b03050, type: 3}
     - {fileID: 455444515322244926, guid: b3d47314ef0905943b457d8081b03050, type: 3}
@@ -81,6 +83,7 @@ MonoBehaviour:
     chopFrames: []
     mineFrames: []
   - unit: {fileID: 11400000, guid: 0126048d48304fddb8ac3633d7d7f700, type: 2}
+    portrait: {fileID: -1955488095112409121, guid: 6424b7b582b0c014f91c4cf7b8d289aa, type: 3}
     idleFrames:
     - {fileID: 7257567913506708742, guid: 72ff7cf415a2955488ad1e617dae0de5, type: 3}
     - {fileID: -7989796299022447421, guid: 72ff7cf415a2955488ad1e617dae0de5, type: 3}
@@ -105,6 +108,7 @@ MonoBehaviour:
     chopFrames: []
     mineFrames: []
   - unit: {fileID: 11400000, guid: 92cce3bd224c0284d995a6d960508313, type: 2}
+    portrait: {fileID: 8826315335589716350, guid: 08133151994788b4884777ec1c45864b, type: 3}
     idleFrames:
     - {fileID: -5948806968594788206, guid: 856dd3cb8df155f4aa6eed8d0927ed51, type: 3}
     - {fileID: -3890830800090718979, guid: 856dd3cb8df155f4aa6eed8d0927ed51, type: 3}

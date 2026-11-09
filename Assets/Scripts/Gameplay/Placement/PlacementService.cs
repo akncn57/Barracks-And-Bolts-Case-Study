@@ -31,8 +31,9 @@ namespace BarracksAndBolts.Gameplay.Placement
     }
 
     /// <summary>
-    /// State of the building placement mode: which building is being placed and where its footprint is.
-    /// Input moves and confirms it; the preview only reads it.
+    /// State of the placement mode: which building, or unit, is being placed and where its footprint is.
+    /// Input moves and confirms it; the preview only reads it. Placing units straight onto the map is a sandbox tool;
+    /// a normal game makes them in buildings.
     /// </summary>
     public sealed class PlacementService
     {
@@ -54,8 +55,15 @@ namespace BarracksAndBolts.Gameplay.Placement
             _eventBus = eventBus;
         }
 
-        public bool IsActive => Definition != null;
+        public bool IsActive => Definition != null || Unit != null;
+
+        /// <summary>The building being placed. Null while a unit is placed.</summary>
         public BuildingDefinition Definition { get; private set; }
+
+        /// <summary>The unit being placed. Null while a building is placed.</summary>
+        public UnitDefinition Unit { get; private set; }
+
+        public bool IsPlacingUnit => Unit != null;
         public Faction Faction { get; private set; }
 
         /// <summary>False until the pointer is over the map, and while it is over a UI panel.</summary>
@@ -69,7 +77,7 @@ namespace BarracksAndBolts.Gameplay.Placement
         /// The building being placed opens territory and could stand here as far as territory goes,
         /// so the player should see what it would open. Price and obstacles don't matter for that.
         /// </summary>
-        public bool ShowsTerritoryPreview => HasArea && Definition.TerritoryRadius > 0f && _territory.IsInside(Area);
+        public bool ShowsTerritoryPreview => HasArea && Definition != null && Definition.TerritoryRadius > 0f && _territory.IsInside(Area);
 
         /// <summary>Why the building can't go where the footprint is now.</summary>
         public PlacementBlock Block
@@ -81,6 +89,15 @@ namespace BarracksAndBolts.Gameplay.Placement
 
                 if (!_gridMap.IsInBounds(Area))
                     return PlacementBlock.OutsideMap;
+
+                // A unit needs one walkable cell. Other units there are fine: it steps to the nearest free cell.
+                if (IsPlacingUnit)
+                {
+                    if (!_gridMap.IsWalkable(Area.position))
+                        return PlacementBlock.Occupied;
+
+                    return _resources.CanAfford(Unit.Cost) ? PlacementBlock.None : PlacementBlock.NotEnoughResources;
+                }
 
                 if (!_territory.IsInside(Area))
                     return PlacementBlock.OutsideTerritory;
@@ -99,6 +116,9 @@ namespace BarracksAndBolts.Gameplay.Placement
         /// <summary>True if this cell of the footprint doesn't stop the building from being placed.</summary>
         public bool IsCellFree(Vector2Int cell)
         {
+            if (IsPlacingUnit)
+                return _gridMap.IsWalkable(cell);
+
             // On uneven ground the footprint's center decides which level is the right one.
             var center = new Vector2Int(Area.x + Area.width / 2, Area.y + Area.height / 2);
             return _gridMap.IsWalkable(cell) && !_gridMap.IsRamp(cell) && _territory.IsInside(cell) &&
@@ -112,9 +132,23 @@ namespace BarracksAndBolts.Gameplay.Placement
                 throw new ArgumentNullException(nameof(definition));
 
             Definition = definition;
+            Unit = null;
             Faction = faction;
             HasArea = false;
             _eventBus.Publish(new PlacementStartedEvent(definition, faction));
+        }
+
+        /// <summary>Starts placing a unit straight onto the map. Calling it while active swaps what is placed.</summary>
+        public void BeginUnit(UnitDefinition unit, Faction faction)
+        {
+            if (unit == null)
+                throw new ArgumentNullException(nameof(unit));
+
+            Definition = null;
+            Unit = unit;
+            Faction = faction;
+            HasArea = false;
+            _eventBus.Publish(new PlacementStartedEvent(null, faction, unit));
         }
 
         /// <summary>Centers the footprint on the world position.</summary>
@@ -123,7 +157,7 @@ namespace BarracksAndBolts.Gameplay.Placement
             if (!IsActive)
                 return;
 
-            Area = _gridMap.GetAreaCenteredAt(worldPosition, Definition.Size);
+            Area = _gridMap.GetAreaCenteredAt(worldPosition, IsPlacingUnit ? Vector2Int.one : Definition.Size);
             HasArea = true;
         }
 
@@ -136,12 +170,28 @@ namespace BarracksAndBolts.Gameplay.Placement
         /// <returns>False if the footprint is hidden or not free; the mode stays active so the player can try elsewhere.</returns>
         public bool TryConfirm(bool keepPlacing)
         {
+            if (IsPlacingUnit)
+                return TryConfirmUnit(keepPlacing);
+
             // A normal game builds over time: the building starts as a site for villagers. Sandbox mode builds at once.
             var asSite = !_resources.IsUnlimited && Definition.BuildTime > 0f;
             if (!IsAreaValid || !_buildingService.TryPlace(Definition, Area.position, Faction, out _, asSite))
                 return false;
 
             _resources.TrySpend(Definition.Cost);
+
+            if (!keepPlacing)
+                End();
+
+            return true;
+        }
+
+        private bool TryConfirmUnit(bool keepPlacing)
+        {
+            if (!IsAreaValid || !_units.TrySpawn(Unit, Area.position, Faction, out _))
+                return false;
+
+            _resources.TrySpend(Unit.Cost);
 
             if (!keepPlacing)
                 End();
@@ -158,6 +208,7 @@ namespace BarracksAndBolts.Gameplay.Placement
         private void End()
         {
             Definition = null;
+            Unit = null;
             HasArea = false;
             _eventBus.Publish(new PlacementEndedEvent());
         }

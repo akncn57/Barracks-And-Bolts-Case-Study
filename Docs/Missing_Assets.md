@@ -12,7 +12,7 @@
 | `Texture_UI_Icons_Arrow_Green`, `_Arrow_Orange` | İleri / geri butonları |
 | `Texture_UI_Icons_Cancel` | İptal, kapat, geçersiz |
 | `Texture_UI_Icons_Settings`, `_Info`, `_Music` | Ayarlar, bilgi, ses ayarı |
-| `Texture_UI_Avatars_01–05` | Birim portreleri: Şövalye, Mızrakçı, Okçu, Rahip, Köylü (ilk üçü `Data_Unit_*` asset'lerine atandı) |
+| `Avatars/<Renk>/Texture_UI_Avatars_<Renk>_<Birim>` | Birim portreleri, iki renkte: Knight, Spearman, Archer, Monk, Villager. Renk setlerinde birimlere atandı (Monk birimi henüz yok) |
 | `Texture_Cursors_Default`, `_Pointer`, `_Forbidden` | Varsayılan imleç, tıklanabilir (el), yasak |
 | `Texture_Cursors_Selection` (köşe çerçevesi) | Seçim / hedef göstergesi |
 | `Texture_UI_Tools_Hammer`, `_Axe`, `_Sword`, `_Pickaxe` | İmleç durumları: inşa/tamir, odun, saldırı, maden. Balta, kazma ve çekiçten 32x32 imleç kopyaları üretildi: `Textures/Cursors/Texture_Cursors_Axe/Pickaxe/Hammer` (kılıç henüz kullanılmıyor) |

@@ -1,6 +1,7 @@
 using BarracksAndBolts.Core.Events;
 using BarracksAndBolts.Gameplay.Combat;
 using BarracksAndBolts.Gameplay.Selection;
+using BarracksAndBolts.Gameplay.Teams;
 using BarracksAndBolts.Gameplay.Units;
 using BarracksAndBolts.Utils.Disposables;
 using TMPro;
@@ -27,13 +28,15 @@ namespace BarracksAndBolts.UI.Information
         private readonly CompositeDisposable _subscriptions = new();
         private SelectionService _selection;
         private UnitService _units;
+        private TeamService _teams;
         private IEventBus _eventBus;
 
         [Inject]
-        private void Construct(SelectionService selection, UnitService units, IEventBus eventBus)
+        private void Construct(SelectionService selection, UnitService units, TeamService teams, IEventBus eventBus)
         {
             _selection = selection;
             _units = units;
+            _teams = teams;
             _eventBus = eventBus;
         }
 
@@ -62,7 +65,8 @@ namespace BarracksAndBolts.UI.Information
             if (!hasUnits)
                 return;
 
-            picture.sprite = primary.Definition.Portrait;
+            // In the unit's own color, so an enemy looks like one.
+            picture.sprite = _teams.GetColorSet(primary.Faction).GetUnitPortrait(primary.Definition);
 
             var count = _selection.Selected.Count;
             nameLabel.text = count == 1 ? primary.Definition.DisplayName : $"{count} Units";

@@ -43,6 +43,7 @@ namespace BarracksAndBolts.Gameplay.Placement
         private GridMap _gridMap;
         private TeamService _teams;
         private BuildingDefinition _shownDefinition;
+        private UnitDefinition _shownUnit;
         private Faction _shownFaction;
 
         [Inject]
@@ -78,8 +79,13 @@ namespace BarracksAndBolts.Gameplay.Placement
             if (!isVisible)
                 return;
 
-            if (_shownDefinition != _placement.Definition || _shownFaction != _placement.Faction)
-                ShowBuilding(_placement.Definition, _placement.Faction);
+            if (_shownDefinition != _placement.Definition || _shownUnit != _placement.Unit || _shownFaction != _placement.Faction)
+            {
+                if (_placement.IsPlacingUnit)
+                    ShowUnit(_placement.Unit, _placement.Faction);
+                else
+                    ShowBuilding(_placement.Definition, _placement.Faction);
+            }
 
             var area = _placement.Area;
             transform.position = _gridMap.AreaToWorldBottomCenter(area);
@@ -113,9 +119,24 @@ namespace BarracksAndBolts.Gameplay.Placement
             _territoryOverlay.SetVisible(_placement.IsActive);
         }
 
+        private void ShowUnit(UnitDefinition unit, Faction faction)
+        {
+            _shownDefinition = null;
+            _shownUnit = unit;
+            _shownFaction = faction;
+
+            // The first idle frame; its pivot is on the feet, and units stand on the middle of their cell.
+            var idleFrames = _teams.GetColorSet(faction).GetUnitSprites(unit).IdleFrames;
+            buildingRenderer.sprite = idleFrames.Count > 0 ? idleFrames[0] : null;
+            buildingRenderer.transform.localPosition = new Vector3(0f, 0.5f, 0f);
+            defenseRing.Hide();
+            ShowCells(1);
+        }
+
         private void ShowBuilding(BuildingDefinition definition, Faction faction)
         {
             _shownDefinition = definition;
+            _shownUnit = null;
             _shownFaction = faction;
 
             var sprite = _teams.GetColorSet(faction).GetBuildingSprite(definition);
@@ -126,7 +147,11 @@ namespace BarracksAndBolts.Gameplay.Placement
             else
                 defenseRing.Hide();
 
-            var cellCount = definition.Size.x * definition.Size.y;
+            ShowCells(definition.Size.x * definition.Size.y);
+        }
+
+        private void ShowCells(int cellCount)
+        {
             while (_cells.Count < cellCount)
                 _cells.Add(Instantiate(cellTemplate, visuals.transform));
 

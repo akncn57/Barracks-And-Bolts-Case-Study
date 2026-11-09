@@ -13,6 +13,7 @@ namespace BarracksAndBolts.Gameplay.Data
         [Tooltip("Stable key for save files. Don't change it once saves exist.")]
         [SerializeField] private string id;
         [SerializeField] private string displayName;
+        [Tooltip("Fallback picture. Each color set can give the unit its own portrait.")]
         [SerializeField] private Sprite portrait;
 
         [Header("Stats")]

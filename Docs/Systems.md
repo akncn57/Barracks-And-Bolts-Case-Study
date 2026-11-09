@@ -3,7 +3,7 @@
 > Oyundaki her sistemin kodda **nasıl** yapıldığını anlatır: yapılanlar ve planlananlar.
 > Kurallar ve mimari: [Technical_Design.md](Technical_Design.md) · Oyun tasarımı: [GDD_Decisions.md](GDD_Decisions.md) · Öncelikler: [Roadmap.md](Roadmap.md) · Assetler: [Missing_Assets.md](Missing_Assets.md)
 >
-> **Son güncelleme:** 9 Kasım 2026 · inşaat, ilerleme çubuğu ve araç imleçleri · 436 EditMode testi
+> **Son güncelleme:** 9 Kasım 2026 · renge göre birim portreleri, Sandbox'ta birim sekmesi · 447 EditMode testi
 >
 > **Durum işaretleri:** ✅ yapıldı · 🟡 kısmen · ⏳ planlandı
 
@@ -233,7 +233,7 @@ ResourceMapInitializer (IStartable) ─► ResourceDistributor (seed) ─► Res
 # C. Binalar
 
 ## 10. Yerleştirme
-**Durum:** ✅ · **Dosyalar:** `Gameplay/Placement/*`, `Gameplay/Input/InputModeController.cs` · **Test:** `PlacementServiceTests`, `TerritoryTests`
+**Durum:** ✅ · **Dosyalar:** `Gameplay/Placement/*`, `Gameplay/Input/InputModeController.cs` · **Test:** `PlacementServiceTests`, `TerritoryTests`, `UnitPlacementTests`
 
 ```
 Production Menu tıklaması ─► PlacementService.Begin(bina, taraf) ─► PlacementStartedEvent ─► InputModeController: Placement map açılır
@@ -246,6 +246,7 @@ LateUpdate: PlacementPreviewView servisi okur, çizer
 - **`IsCellFree(hücre)`** önizlemedeki her kareyi yeşil ya da kırmızı yapar: yürünebilir, üzerinde birim yok, bölge içinde.
 - Footprint fareye ortalanır (`GridMap.GetAreaCenteredAt`); çift boyutta grid çizgisine oturur. `RoundToInt` yerine `Floor(x + 0.5)`, sınırda zıplamasın diye.
 - Fiyat bina konduktan sonra alınır; konamazsa para gitmez. Shift basılıysa mod açık kalır.
+- **Birim modu (Sandbox):** `BeginUnit(birim, taraf)` aynı modu birim için açar: footprint tek hücre, kural "hücre yürünebilir mi". Hücrede başka birim olması sorun değil, yeni birim en yakın boş hücreye çıkar (`UnitService.TrySpawn`). Bölge ve inşaat yok. Input haritaları, Esc, sağ tık iptali ve Shift ile arka arkaya koyma bina ile aynı. Önizlemede birimin ilk bekleme karesi ve tek hücrelik yeşil/kırmızı kare görünür. `Definition` ve `Unit`'ten aynı anda sadece biri dolu.
 - Önizleme kareleri gizli bir şablondan kopyalanır; büyük bina için açılanlar silinmez, kapatılır.
 
 ## 11. Bina Modeli ve Görünümü
@@ -480,11 +481,13 @@ Haritada düşman kalmadı ─► Castle'ın yanında belirir ─► işine dön
 - **Sonsuz scroll (`RecyclingScrollView`, generic):** Sadece görünen satır + 1 kadar hücre oluşur. Veri indeksi `PositiveModulo(satır * sütun + sütun, öğeSayısı)`; liste iki yöne de biter. Hücre sadece gösterdiği öğe değişince yeniden bağlanır, liste dururken hiçbir RectTransform değişmez.
 - Offset döngü uzunluğuna sarılır; saatlerce kaydırılsa da float hassasiyeti bozulmaz. Sürükleme, fırlatma ve tekerlek bileşenin kendisinde, `ScrollRect` yok.
 - `ProductionMenuView` binaları `GameDatabase` sırasıyla, aktif tarafın rengiyle gösterir; Normal modda Castle'ı, Sandbox'ta Karakolu gizler. Tıklama `PlacementService.Begin` çağırır.
+- **Sekmeler (Sandbox):** Başlığın altında *Buildings* ve *Units*. Units sekmesi `GameDatabase.Units`'i portreleriyle listeler, tıklama `PlacementService.BeginUnit` çağırır. Seçili olmayan sekme koyulaşır. Normal modda sekmeler gizli ve liste onların yerine uzar (`tabsSpace`); orada birimler sadece binadan, parayla gelir. Hücre (`ProductionMenuCell`) ne gösterdiğini bilmez, sadece listedeki sırasını (`Index`) tutar; menü sırayı o anki sekmenin listesinde arar.
 - `SlideOutPanel` menüyü soldan DOTween ile kaydırır; obje kapanmaz, sadece konumu değişir.
 
 ## 29. Information Panel ve Birim Kartı
 **Durum:** ✅ · **Dosyalar:** `UI/Information/*`, `UI/Common/ContentFitPanel.cs`, `PanelSizeMath.cs` · **Test:** `PanelSizeMathTests`
 
+- **Portreler renge göre:** `TeamColorDefinition.GetUnitPortrait(birim)` renk setindeki portreyi verir, yoksa birimin kendi `Portrait`'ına düşer. Paneldeki asker butonları binanın tarafının, birim kartı birimin tarafının, Units sekmesi aktif tarafın rengini gösterir; düşman askeri düşman renginde görünür. Dokular `Textures/UI/Avatars/<Renk>/Texture_UI_Avatars_<Renk>_<Birim>`.
 - **Panel sadece bina gösterir:** resim (binanın kendi renginden), ad, HP yazısı ve çubuğu, üretim yapan ve aktif tarafa ait binada asker listesi. HP `EntityDamagedEvent` ile canlı.
 - Boyutu içeriğe göre min ve max arasında; sığmazsa scroll. Ekrandan hiçbir zaman taşmaz.
 - İnşaat alanında üretim listesi gizli, adın altında ilerleme yüzdesi var. Yüzde için event yok; panel gösterdiği inşaatın yüzdesini `LateUpdate`'te okur, sayı değişince yazar.
@@ -521,6 +524,7 @@ Her Esc en üstteki tek katmanı kapatır: yerleştirme (Placement map'inde, `Pl
 
 - `SandboxService.ActiveFaction`: yeni bina ve birimlerin tarafı. Side düğmesi değiştirir; menü o tarafın renginde binaları gösterir. Düşman Barracks'ından düşman askeri üretmek için Side: Enemy olmalı.
 - Kaynak sınırsız, nüfus ve bölge yok, takvim ve baskın kapalı. PDF'teki saldırı maddesini test etmek için yeterli.
+- **Units sekmesi:** Production Menu'den asker ve köylü doğrudan haritaya konur, Side düğmesine göre taraf seçilir (Bölüm 10 ve 28). Barracks'tan üretim (PDF yolu) aynen duruyor.
 - Tam palet: bkz. G.
 
 ---
@@ -561,8 +565,9 @@ Her biri mevcut yapıya şöyle oturacak. Yapılınca kendi bölümüne taşın�
 ### Mini Harita ⏳
 - **Nasıl:** UI'da `MinimapView`: `GridMap` ve kaynaklardan tek `Texture2D` (zemin bir kez, binalar ve kaynaklar event'le), birimler 0,25 sn'de bir nokta. Kameranın gördüğü alan çerçeve. Tıklama `CameraController`'a odak verir, sağ tık `UnitCommandService.MoveTo`. İkinci kamera kullanılmaz (SetPass).
 
-### Tam Sandbox ⏳
-- **Nasıl:** Palet paneli: bütün binalar, birimler ve kaynaklar, iki taraf. Birim yerleştirme `UnitService.TrySpawn`, kaynak `ResourceNodeService.TryPlace`. Silme aracı `BuildingService.Remove` ve `UnitService.Remove`. Zaman kontrolü `GameClock.SetPaused` ve `TimeScale`. Baskını elle başlatma `RaidService`'e bir metot.
+### Tam Sandbox 🟡
+- **Yapıldı:** Bina ve birim yerleştirme, iki taraf (Production Menu sekmeleri).
+- **Nasıl devam eder:** Kaynak sekmesi, kaynak `ResourceNodeService.TryPlace`. Silme aracı `BuildingService.Remove` ve `UnitService.Remove`. Zaman kontrolü `GameClock.SetPaused` ve `TimeScale`. Baskını elle başlatma `RaidService`'e bir metot.
 
 ### Rastgele Zemin Üretimi ⏳
 - **Nasıl:** `Map/MapGenerator` seed'le tilemap'leri doldurur, `TilemapGridSource` ondan sonra grid'i kurar; geri kalan her şey değişmeden çalışır. Ada şekli, platolar ve merdivenler noise ile; yol doğrulaması `ResourceDistributor`'daki flood fill ile aynı yöntem. Ayarlar `MapGenerationSettings`'te.

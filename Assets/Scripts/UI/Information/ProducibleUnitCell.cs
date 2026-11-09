@@ -35,10 +35,11 @@ namespace BarracksAndBolts.UI.Information
             button.onClick.RemoveListener(OnButtonClicked);
         }
 
-        public void Bind(UnitDefinition definition)
+        /// <param name="picture">The unit's portrait in the color of the side that makes it.</param>
+        public void Bind(UnitDefinition definition, Sprite picture)
         {
             Definition = definition;
-            portrait.sprite = definition.Portrait;
+            portrait.sprite = picture;
             nameLabel.text = definition.DisplayName;
         }
 

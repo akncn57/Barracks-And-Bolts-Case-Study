@@ -148,7 +148,7 @@ namespace BarracksAndBolts.UI.Information
             var showProduction = producibles.Count > 0 && building.Faction == _sandbox.ActiveFaction && building.IsBuilt;
             productionSection.SetActive(showProduction);
             if (showProduction)
-                ShowProducibles(producibles);
+                ShowProducibles(producibles, _teams.GetColorSet(building.Faction));
         }
 
         private void ShowHp(BuildingModel building)
@@ -172,7 +172,7 @@ namespace BarracksAndBolts.UI.Information
             return Mathf.FloorToInt(site.BuildProgress * 100f);
         }
 
-        private void ShowProducibles(IReadOnlyList<UnitDefinition> units)
+        private void ShowProducibles(IReadOnlyList<UnitDefinition> units, TeamColorDefinition colors)
         {
             // Cells are kept and reused; a building never has more than a handful of units.
             while (_cells.Count < units.Count)
@@ -191,7 +191,7 @@ namespace BarracksAndBolts.UI.Information
                 var isUsed = i < units.Count;
                 _cells[i].gameObject.SetActive(isUsed);
                 if (isUsed)
-                    _cells[i].Bind(units[i]);
+                    _cells[i].Bind(units[i], colors.GetUnitPortrait(units[i]));
             }
         }
 

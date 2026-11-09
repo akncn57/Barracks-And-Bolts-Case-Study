@@ -43,6 +43,18 @@ namespace BarracksAndBolts.Gameplay.Data
             return GetBuildingSprite(building);
         }
 
+        /// <returns>The unit's portrait in this color, or the unit's own portrait if the set has none.</returns>
+        public Sprite GetUnitPortrait(UnitDefinition unit)
+        {
+            foreach (var entry in unitSprites)
+            {
+                if (entry.Unit == unit && entry.Portrait != null)
+                    return entry.Portrait;
+            }
+
+            return unit != null ? unit.Portrait : null;
+        }
+
         /// <returns>The unit's animations, or an empty set if this color has none for the unit.</returns>
         public UnitSpriteSet GetUnitSprites(UnitDefinition unit)
         {
@@ -73,6 +85,8 @@ namespace BarracksAndBolts.Gameplay.Data
         public struct UnitSpriteSet
         {
             [SerializeField] private UnitDefinition unit;
+            [Tooltip("Picture in panels and menus. Empty uses the unit's own portrait.")]
+            [SerializeField] private Sprite portrait;
             [SerializeField] private Sprite[] idleFrames;
             [SerializeField] private Sprite[] runFrames;
             [SerializeField] private Sprite[] attackFrames;
@@ -84,6 +98,7 @@ namespace BarracksAndBolts.Gameplay.Data
             [SerializeField] private Sprite[] buildFrames;
 
             public UnitDefinition Unit => unit;
+            public Sprite Portrait => portrait;
             public IReadOnlyList<Sprite> BuildFrames => buildFrames ?? Array.Empty<Sprite>();
 
             // The default set of a missing unit has null arrays; readers always get a list.

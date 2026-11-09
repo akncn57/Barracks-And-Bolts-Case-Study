@@ -19,7 +19,7 @@
   - Takvim ve baskınlar açılıp kapatılabilir. Baskın manuel olarak da başlatılabilir.
   - Silme aracı ve zaman kontrolü (durdur, hızlandır) var.
   - Oyuncu kendi savaşlarını kurabilir: kendi ordusu ile düşman birim ve binalarını karşı karşıya koyabilir.
-  - **Şu anki hali (minimal):** Side düğmesi yeni bina ve birimlerin tarafını değiştirir. Düşman binası konur, düşman Barracks'ından düşman asker üretilir. Tam palet P2'de.
+  - **Şu anki hali:** Side düğmesi yeni bina ve birimlerin tarafını değiştirir. Production Menu'de *Buildings* ve *Units* sekmeleri var: binalar ve birimler (Knight, Spearman, Archer, Villager) doğrudan haritaya konur, Shift ile arka arkaya. Barracks'tan üretim de duruyor (PDF). Kaynak koyma, silme aracı ve zaman kontrolü henüz yok.
 - **Zorluk Seviyesi (Normal Mod):** Kolay, Normal, Zor. Düşman sayısını, düşman gücünü ve başlangıç kaynaklarını etkiler. Değerler bir `DifficultySettings` ScriptableObject'inde tutulur.
 
 ### Nüfus (Power Plant karşılığı = House)

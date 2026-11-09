@@ -55,11 +55,14 @@ namespace BarracksAndBolts.Gameplay.Placement
             // Read before confirming: a successful placement ends the mode.
             var block = _placement.Block;
             if (!_placement.TryConfirm(keepPlacing: _actions.ConfirmAndContinue.IsPressed()))
-                _eventBus.Publish(new FloatingTextRequestedEvent(GetBlockMessage(block), pointer, FloatingTextKind.Warning));
+                _eventBus.Publish(new FloatingTextRequestedEvent(GetBlockMessage(block, _placement.IsPlacingUnit), pointer, FloatingTextKind.Warning));
         }
 
-        private static string GetBlockMessage(PlacementBlock block)
+        private static string GetBlockMessage(PlacementBlock block, bool isUnit)
         {
+            if (isUnit)
+                return block == PlacementBlock.NotEnoughResources ? "Not enough resources" : "Can't place a unit here";
+
             switch (block)
             {
                 case PlacementBlock.OutsideMap:

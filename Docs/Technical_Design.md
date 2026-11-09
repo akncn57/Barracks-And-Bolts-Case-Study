@@ -80,7 +80,7 @@ Scripts/
 ├── Popup/       BarracksAndBolts.Popup      Hazır popup sistemi (şu an kullanılmıyor)
 ├── Utils/       BarracksAndBolts.Utils      Unity'den bağımsız yardımcılar (MinHeap, CompositeDisposable)
 └── Tests/
-    └── EditMode/ BarracksAndBolts.Tests.EditMode   436 test
+    └── EditMode/ BarracksAndBolts.Tests.EditMode   447 test
 ```
 - Kayıt (save) ve ayarlar servisi henüz yok; geldiğinde Core'a girer.
 - Tek seferlik editör araçları `Assets/Editor/` altında asmdef'siz durur ve iş bitince silinir.
@@ -244,7 +244,7 @@ public interface IEventBus
 | `BuildingDefinition` | `Id`, `DisplayName`, `Size`, `VisualHeight`, `MaxHp`, `Cost`, `IsDropOff`, `PopulationCapacity`, `Producibles`, `NormalModeProducibles`, `SpawnOffset`; Defense: `Defender`, `DefenderPosition`, `DefenseRange`, `DefenseDamage`, `DefenseCooldown`; `TerritoryRadius`, `IsNormalModeOnly`. Sprite yok, renge bağlı olduğu için `TeamColorDefinition`'da |
 | `UnitDefinition` | `Id`, `DisplayName`, `Portrait`, `MaxHp`, `Damage`, `AttackRange`, `AttackCooldown`, `MoveSpeed`, `PopulationCost`, `Cost`, `CanGather` |
 | `ResourceNodeDefinition` | `Id`, `DisplayName`, `Kind` (Wood, Stone, Food, Gold), `Size`, `VisualHeight`, `Amount`, `WorkDistance`, `Frames`, `RoamRadius`, `WalkFrames`, `IsOneCut` |
-| `TeamColorDefinition` | `Color`, bina → sprite, birim → kareler (bekleme, koşma, saldırı, balta, kazma) |
+| `TeamColorDefinition` | `Color`, bina → sprite ve gri inşaat sprite'ı, birim → portre ve kareler (bekleme, koşma, saldırı, balta, kazma, çekiç) |
 | `GameDatabase` | `Buildings` (Production Menu sırası), `Units`, `TeamColors`, `ResourceDistribution`, `NormalMode`, `Raids` |
 | `NormalModeSettings` | Castle, köylü, başlangıç köylüsü ve kaynağı, taşıma kapasitesi, çalışma süreleri, koyun sayıları |
 | `RaidSettings` | Gündüz ve gece süresi, baskın günleri ve dalgaları, başlama aralığı, dalga arası, doğma mesafesi, `aggroRange`, `shelterRadius` |
@@ -392,14 +392,14 @@ Prefab_Core_GameplayLifetimeScope
 ---
 
 ## 15. Testler (EditMode)
-Toplam **436 test**, 34 dosya (`TestDefinitions` ve `TestMaps` yardımcı). Her biri saf C# servislerini Unity sahnesi olmadan çalıştırır.
+Toplam **447 test**, 36 dosya (`TestDefinitions` ve `TestMaps` yardımcı). Her biri saf C# servislerini Unity sahnesi olmadan çalıştırır.
 
 | Alan | Dosyalar | Kapsadığı durumlar |
 |---|---|---|
 | Altyapı | `EventBusTests`, `GameClockTests`, `SimulationRunnerTests`, `CompositeDisposableTests`, `MinHeapTests`, `GameEntityId*Tests` | Yayın sırasında abonelik değişimi, hata veren handler, pause, oyun hızı, faz sırası |
 | Grid ve yol | `GridMapTests`, `AStarPathfinderTests`, `GridSearchTests` | Köşe kesmeme, hedef yürünemez, yol yok, harita sınırı, grup hedefleri, suyu geçmeme |
 | Bina | `BuildingServiceTests`, `PlacementServiceTests`, `TerritoryTests`, `CoverageRingTests`, `ConstructionTests` | Çakışma, taşma, birim altında yerleştirme, bölge dışı, açılacak alan önizlemesi, halka çizimi, inşaat ve araç imleci |
-| Birim | `UnitServiceTests`, `UnitMovementTests`, `UnitCommandServiceTests`, `UnitProductionServiceTests`, `SelectionServiceTests`, `HoverServiceTests` | Spawn, yeniden yol, dağılma, dost ateşi reddi, kutu seçimi |
+| Birim | `UnitServiceTests`, `UnitMovementTests`, `UnitCommandServiceTests`, `UnitProductionServiceTests`, `UnitPlacementTests`, `SelectionServiceTests`, `HoverServiceTests` | Spawn, yeniden yol, dağılma, dost ateşi reddi, Sandbox'ta birim yerleştirme, kutu seçimi |
 | Savaş | `CombatTests`, `BuildingDefenseTests` | Bekleme süresi, ölümün tek kez işlenmesi, binaya kenardan vurma, kule hedef seçimi |
 | Normal mod | `NormalModeTests`, `VillagerBehaviourTests`, `GameLoopTests`, `ResourceDistributorTests` | Harcama, toplama döngüsü, tükenme, sığınma, takvim, baskın, oyun sonu, seed |
 | Diğer | `SandboxServiceTests`, `TeamServiceTests`, `CameraMathTests`, UI testleri (`EscapeInputHandler`, `PanelSizeMath`, `RecyclingScrollMath`, `Tooltip`) | Renk ataması, kamera sınırı, sonsuz scroll matematiği |

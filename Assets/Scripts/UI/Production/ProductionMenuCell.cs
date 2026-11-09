@@ -1,5 +1,4 @@
 using System;
-using BarracksAndBolts.Gameplay.Data;
 using BarracksAndBolts.UI.Scroll;
 using TMPro;
 using UnityEngine;
@@ -8,6 +7,7 @@ using UnityEngine.UI;
 
 namespace BarracksAndBolts.UI.Production
 {
+    /// <summary>One entry of the production menu: a building or, in sandbox mode, a unit. The menu knows which by the index.</summary>
     public sealed class ProductionMenuCell : RecyclingScrollCell, IPointerEnterHandler, IPointerExitHandler
     {
         [SerializeField] private Button button;
@@ -16,17 +16,18 @@ namespace BarracksAndBolts.UI.Production
 
         private bool _isPointerOver;
 
-        /// <summary>Raised with the building the cell shows at the moment of the click.</summary>
-        public event Action<BuildingDefinition> Clicked;
+        /// <summary>Raised on click; read <see cref="Index"/> for what the cell shows at that moment.</summary>
+        public event Action<ProductionMenuCell> Clicked;
 
         public event Action<ProductionMenuCell> HoverStarted;
         public event Action<ProductionMenuCell> HoverEnded;
 
-        public BuildingDefinition Definition { get; private set; }
+        /// <summary>Index of the shown item in the menu's current list. -1 before the first bind.</summary>
+        public int Index { get; private set; } = -1;
 
         private void Awake()
         {
-            // Hooked once; the cell is reused for other buildings, so the click reads the current Definition.
+            // Hooked once; the cell is reused for other items, so the click reads the current index.
             button.onClick.AddListener(OnButtonClicked);
         }
 
@@ -35,13 +36,13 @@ namespace BarracksAndBolts.UI.Production
             button.onClick.RemoveListener(OnButtonClicked);
         }
 
-        public void Bind(BuildingDefinition definition, Sprite sprite)
+        public void Bind(int index, string displayName, Sprite sprite)
         {
-            Definition = definition;
+            Index = index;
             icon.sprite = sprite;
-            nameLabel.text = definition.DisplayName;
+            nameLabel.text = displayName;
 
-            // Scrolling can bring another building under a resting mouse.
+            // Scrolling can bring another item under a resting mouse.
             if (_isPointerOver)
                 HoverStarted?.Invoke(this);
         }
@@ -74,8 +75,8 @@ namespace BarracksAndBolts.UI.Production
 
         private void OnButtonClicked()
         {
-            if (Definition != null)
-                Clicked?.Invoke(Definition);
+            if (Index >= 0)
+                Clicked?.Invoke(this);
         }
     }
 }
