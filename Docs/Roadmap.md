@@ -1,6 +1,7 @@
 # Barracks & Bolts – Öncelik ve Takvim
 
-> **Durum (8 Kasım):** Altyapı, grid, kamera, A* (algoritma), tüm P0/P1 assetleri, veri tanımları, bina yerleştirme, Production Menu, binaya sol tıkla seçim, Information Panel, birimler, Barracks'tan asker üretimi, birim seçimi (sol tık ve kutu) ve sağ tıkla hareket hazır ve oyunda denendi. Saldırı, yok olma ve minimal Sandbox da hazır ve oyunda denendi. P0+ istekleri de bitti. SetPass 10, Windows build denendi. **Sıradaki adım:** kullanıcının yeni istekleri, sonra README. Efekt turunda yapılacak: vuruş zamanlaması ve ölüm efekti.
+> **Durum (9 Kasım):** P0 ve P0+ bitti, sadece README kaldı. P1 oyun döngüsü kuruldu ve oynandı: kaynaklar, köylüler, maliyet, nüfus, takvim, baskınlar, düşman AI, sığınma, oyun sonu. P2'den kule ve bölge sistemi (Karakol, kapsama halkaları) yapıldı. SetPass 10 (son özelliklerden önce ölçüldü), Windows build 8 Kasım'da denendi. **Sıradaki adım:** Tarla (kullanıcı onayıyla), sonra denge, Test Runner sonucu, yeni build, README en son. Efekt turunda yapılacak: vuruş zamanlaması ve ölüm efekti.
+> Sistemlerin kodda nasıl çalıştığı: [Systems.md](Systems.md)
 
 > **Teslim tarihi:** 13 Kasım 2026, Cuma
 > **Ana kural:** Her öncelik seviyesi bitmeden bir sonrakine geçilmez. `main` branch'i her zaman çalışan ve build alınabilen bir halde tutulur.
@@ -50,22 +51,24 @@ Oyunu deneyince çıkan kullanılabilirlik istekleri. Sandbox'ta da olmalı, bui
 - [x] **Normal modun ilk dilimi:** menüde Play; Castle, 3 köylü ve başlangıç kaynağıyla başlangıç; sayaçlar; bina ve asker maliyetleri, yetmezse uyarı; köylüyle toplama, Castle'a taşıma, kaynağın tükenmesi
 - [x] **Oyun döngüsü (aşağıdaki maddeler):** kuruldu ve oynandı; dengesi henüz ayarlanmadı
 - [x] **Durum ikonları:** boştaki köylüde "Zz" baloncuğu, düşman fark eden askerde kırmızı "!"
-- [ ] Koyunların çoğalması: her sabah yeni koyun, üst sınırla
+- [x] Koyunların çoğalması: her sabah 3 yeni koyun, en fazla 30
 - [x] **İlk oyun notları:** köylü kaynağın dibinde çalışıyor, düşman yaklaşınca Castle'a sığınıyor, boştayken ikon, koyunlar geziyor ve tek kesimde ölüyor, isim etiketi hedefin üstünde
-- [ ] Köylü: Castle'dan üretim, sadece Normal modda
+- [x] Köylü: Castle'dan üretim, sadece Normal modda
 - [ ] Bina ve birim maliyetlerinin Production Menu hücresinde görünmesi (tooltip'te var)
-- [ ] Nüfus sistemi: Castle ve House kapasite verir, barda `kullanılan/kapasite`
-- [ ] Takvim: gündüz/gece döngüsü, gece kararması, saldırı günleri, baskın sırasında zamanın durması
-- [ ] Düşman AI: Castle'a yürür, yolundakine saldırır, kapalı yolda binayı yıkar. Boştaki askerler de yakındaki düşmana saldırır
-- [ ] Dalga sistemi ve baskın bildirimleri (ses ve mini harita yok; yön yazıyla söyleniyor)
-- [ ] Kazanma ve kaybetme koşulları ve oyun sonu ekranı
+- [x] Nüfus sistemi: Castle ve House kapasite verir, barda `kullanılan/kapasite`
+- [x] Takvim: gündüz/gece döngüsü, gece kararması, saldırı günleri, baskın sırasında zamanın durması
+- [x] Düşman AI: Castle'a yürür, yolundakine saldırır, kapalı yolda binayı yıkar. Boştaki askerler de yakındaki düşmana saldırır
+- [x] Dalga sistemi ve baskın bildirimleri (ses ve mini harita yok; yön yazıyla söyleniyor)
+- [x] Kazanma ve kaybetme koşulları ve oyun sonu ekranı
+- [ ] Oyun döngüsünün dengesi (süreler, maliyetler, dalga büyüklükleri)
+- [ ] Test Runner sonucu (412 test) ve son SetPass ölçümü
 
 ## P2 – Derinlik (zaman kaldıkça, aşağıdaki sırayla)
 **Hedef: 12 Kasım Perşembe.**
 
 1. [x] Kule: üzerindeki okçu otomatik ateş eder (okçu sayısı ve gücü yükseltme sistemiyle gelecek)
 2. [ ] Bina yükseltme sistemi (HP, nüfus, kule gücü, asker seviyesi, depo kapasitesi)
-3. [ ] Seed tabanlı rastgele harita üretimi ve yol doğrulaması
+3. [ ] Seed tabanlı rastgele harita üretimi ve yol doğrulaması (kaynaklar zaten seed'le dağılıyor; zemin sabit)
 4. [ ] Mini harita
 5. [ ] Kilise ve Monk (kendiliğinden iyileştirme)
 6. [ ] Köylünün inşa etmesi ve manuel tamir
@@ -84,8 +87,16 @@ Oyunu deneyince çıkan kullanılabilirlik istekleri. Sandbox'ta da olmalı, bui
 - [ ] Ses ve müzik
 - [ ] Tutorial
 - [ ] Kontrol grupları, AttackMove, HoldPosition, oyun hızı
-- [ ] Tarla
+- [ ] Tarla (asset hazır, kuralları onay bekliyor; sıradaki iş)
 - [ ] Düşman yerleşkeleri
+- [ ] Efekt turu: vuruşun animasyon karesine alınması, ölüm ve yıkılma efekti, dünya üzerinde can barı
+
+## Teslim Öncesi
+- [ ] Sahne ayırıcıları: `----- CAMERAS-----` adı ve `----- WORLD -----`'ın yeri
+- [ ] Company Name (`DefaultCompany`)
+- [ ] `Assets/Editor` altındaki tek seferlik aracın silinmesi
+- [ ] Yeni Windows build, GitHub Release'e zip (`_BurstDebugInformation_DoNotShip` hariç), `v1.0-pdf` tag'i
+- [ ] README (en son)
 
 ---
 

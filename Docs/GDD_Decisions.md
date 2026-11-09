@@ -1,7 +1,8 @@
 # Barracks & Bolts – GDD Kararları (Taslak)
 
 > Kaynak: Panteon "Game Developer – Strategy Game Demo" case study PDF'i.
-> Bu dosya GDD öncesi alınan kararların kaydıdır.
+> Bu dosya oyun tasarımı kararlarının kaydıdır. "Şu anki hali" notları oyunda yapılmış olanı, geri kalanı hedeflenen tasarımı anlatır.
+> Kodun nasıl çalıştığı: [Systems.md](Systems.md)
 
 ## Alınan Kararlar
 - **Tema:** Ortaçağ (eldeki free asset paketi ortaçağ temalı).
@@ -26,6 +27,7 @@
 - House inşa etmek nüfus kapasitesini artırır.
 - **Askerler ve köylüler nüfustan yer kaplar.**
 - House: 50 HP, üretim menüsü yok. PDF'teki Power Plant'in birebir karşılığı.
+- **Şu anki hali:** Oyuncu 3 köylüyle başlıyor; Castle ve House 5'er kapasite veriyor. Barda `kullanılan/kapasite` yazıyor. Sandbox'ta sınır yok.
 
 ### Ekonomi
 - Kaynaklar: **Odun, Taş, Yemek, Altın** (ileride başkaları da eklenebilir).
@@ -128,9 +130,9 @@ Bu değerler ScriptableObject üzerinden ayarlanabilir olacak, ileride değişti
 - **Klasör yapısı renge göredir:** `Buildings/<Renk>/Texture_Buildings_<Renk>_<Bina>`, `Units/<Renk>/<Birim>/Texture_Units_<Renk>_<Birim>_<Animasyon>`. Renksiz assetler ayrı klasördedir: `Units/Sheep`, `Units/Projectiles` (ok), `VFX`.
 - Tablodaki asset adları renk öneki olmadan yazılmıştır (ör. `Castle` → `Texture_Buildings_Red_Castle`).
 - **Taban** binanın grid'de kapladığı alandır. Sprite'ın üst kısmı (çatı) tabanın dışına taşar ve üstteki hücreleri örter (pivot altta).
-- Assette olmayanlar (üretilecek): Depolar (4 adet), Karakol, Tarla, ses ve müzik. Düşman renkli birimleri kullanıcı ekleyecek.
+- Assette olmayanlar üretildi: Depolar (4 adet), Karakol, Tarla. Ses ve müzik hâlâ yok. İkinci renk (Sarı) birim ve binaları eklendi.
 - Oyun içi sprite'ların PPU değeri 64'e çekildi (1 tile = 1 Unity birimi = 1 grid hücresi). UI ve imleç texture'ları 100'de kaldı.
-- **Archery:** Asker üretmiyor; PDF'e uymak için şövalye, mızrakçı ve okçunun üçünü de Barracks üretir. Archery'nin sundurması, hedefleri silinip dört depo binasının ortak görseli oldu. Karakol için başka bir görsel bulunacak.
+- **Archery:** Asker üretmiyor; PDF'e uymak için şövalye, mızrakçı ve okçunun üçünü de Barracks üretir. Archery'nin sundurması, hedefleri silinip dört depo binasının ortak görseli oldu. Karakolun görseli Tower + takım renginde bayrak.
 - Zeminde su olduğu kesin: su yürünemez alan olacak. Tileset yükseltilmiş zemin ve uçurum da içeriyorsa onlar da kullanılabilir.
 
 ## Gameplay Kuralları
@@ -159,7 +161,7 @@ Bu değerler ScriptableObject üzerinden ayarlanabilir olacak, ileride değişti
 
 ### Kaynak Tükenmesi
 - Ağaç, taş kayalığı ve altın madeninin sınırlı miktarda kaynağı vardır. Biten kaynak haritadan kaldırılır ve grid'deki hücreleri yürünebilir hale gelir (A* güncellenir).
-- Koyunlar her sabah belirli bir sayıda yeniden doğar. Haritada maksimum koyun sayısı sınırı vardır.
+- Koyunlar her sabah belirli bir sayıda yeniden doğar. Haritada maksimum koyun sayısı sınırı vardır. **Şu anki hali:** ilk sabah hariç her sabah 3 koyun, en fazla 30 (`Data_Config_NormalMode`).
 - Koyun kendi hücresinin içinde küçük adımlarla gezer. Tek kesimde ölür ve bütün yemeği (40) tek seferde taşınır, köylünün taşıma kapasitesine bakılmaz.
 - Kaynağı biten köylü, yakındaki aynı tipte bir kaynağa otomatik geçer. Yakında yoksa boşta bekler.
 
@@ -315,6 +317,8 @@ Tuşlar Age of Empires, StarCraft ve Warcraft III gibi RTS oyunlarının alış�
 | `GameSpeed` | + / − | Button | Oyun hızı 1x, 2x, 3x (opsiyonel) |
 | `ToggleHealthBars` | Alt (basılı tutulduğunda) | Button | Tüm can barlarını gösterir |
 
+> **Şu anki hali:** Yapılanlar: `Pan`, `DragPan`, `Zoom`, `EdgePan` (ayarda kapalı), `Select`, `BoxSelect`, `Command`, Placement map'inin üçü, Esc ile katman kapatma. Geri kalanlar (kontrol grupları, AttackMove, Stop, HoldPosition, kısayollar, Pause, oyun hızı) henüz yok.
+
 ### Edge Case Notları
 - Mouse UI üzerindeyken (`EventSystem.IsPointerOverGameObject`) dünya inputları (Select, Command, Placement) çalışmaz.
 - Placement modu açıkken `Gameplay` map'i devre dışı kalır. Modlar arası geçiş tek bir yerden yönetilir.
@@ -323,7 +327,7 @@ Tuşlar Age of Empires, StarCraft ve Warcraft III gibi RTS oyunlarının alış�
 - Tüm tuşlar Input Actions asset'inde tanımlanır. İleride ayarlardan tuş değiştirme (rebinding) eklenebilir.
 
 ## Açık Sorular
-1. Asset paketi incelenecek: Barracks hangi bina olacak, binaların boyutları, HP'leri ve maliyetleri ne olacak?
-2. Tarla asseti (bulunacak ya da yapılacak).
+1. ~~Asset paketi: Barracks hangi bina, boyutlar, HP ve maliyetler.~~ Karar verildi; değerler tanım asset'lerinde (geçici, dengeyle değişebilir).
+2. **Tarla kuralları.** Asset hazır (`Texture_Buildings_Neutral_Farm`). Öneri: 3x3, 40 odun, bir köylü çalıştırır, hiç bitmez, koyundan yavaş yemek verir. Onay bekliyor.
 3. Yükseltme maliyetleri ve maksimum seviye sayısı.
 4. Takvim ve dalga değerleri test edildikten sonra kesinleştirilecek.

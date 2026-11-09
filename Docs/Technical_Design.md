@@ -1,7 +1,9 @@
 # Barracks & Bolts – Teknik Tasarım Dokümanı
 
-> Oyun tasarımı: [GDD_Decisions.md](GDD_Decisions.md) · Öncelikler: [Roadmap.md](Roadmap.md) · Assetler: [Missing_Assets.md](Missing_Assets.md)
-> Unity 6000.3.16f1 (6.3 LTS) · URP 2D · Input System · VContainer · UniTask · DOTween
+> Oyun tasarımı: [GDD_Decisions.md](GDD_Decisions.md) · Sistemlerin nasıl çalıştığı: [Systems.md](Systems.md) · Öncelikler: [Roadmap.md](Roadmap.md) · Assetler: [Missing_Assets.md](Missing_Assets.md)
+> Unity 6000.3.16f1 (6.3 LTS) · URP 2D · Input System · VContainer · UniTask · DOTween · Cinemachine 3
+>
+> Bu doküman kuralları ve mimariyi anlatır. Sistem sistem "kod nasıl çalışıyor" için [Systems.md](Systems.md).
 
 ---
 
@@ -11,7 +13,7 @@
 | Mimari | Oyun mantığı **saf C# servislerinde**, MonoBehaviour'lar sadece **görünüm (View)** ve input'la ilgilenir. Bağlantılar VContainer ile kurulur. |
 | İletişim | Sistemler birbirine **merkezi bir event bus** üzerinden tipli mesajlarla haber verir. |
 | Güncelleme | Birimler ve sistemler **tek bir merkezi tick** üzerinden, belirli bir sırayla güncellenir. MonoBehaviour `Update` oyun mantığı için kullanılmaz. |
-| Animasyon | Her birim tipi için bir **Animator Controller**, her renk için bir **AnimatorOverrideController**. |
+| Animasyon | **Animator yok.** Birimler, renk setindeki sprite karelerini oyun saatine göre kendisi çalar (bkz. Bölüm 13). |
 | Sahneler | **Bootstrap → MainMenu → Gameplay** |
 | Test | Kritik sistemler için **EditMode unit testleri** |
 | Dil | Kod, yorumlar, commit mesajları ve README **İngilizce**. Tasarım dokümanları Türkçe. |
@@ -24,9 +26,7 @@
 ## 2. Klasör Yapısı
 ```
 Assets/
-├── Animations/                 Anim_<Renk>_<Birim>_<Aksiyon>.anim
-│   └── <Birim>/
-├── Animators/                  Animator_<Birim>.controller, AnimatorOverride_<Renk>_<Birim>.overrideController
+├── Animations/, Animators/     Şimdilik boş. Animator kullanılmıyor (bkz. Bölüm 13)
 ├── Atlases/                    Atlases_Gameplay, Atlases_UI, Atlases_Effects
 ├── Audio/
 │   ├── Music/                  Music_<İsim>
@@ -39,8 +39,10 @@ Assets/
 │   ├── TeamColors/             Data_TeamColor_<Renk>.asset
 │   └── Configs/                Data_Config_<İsim>.asset (harita, takvim, zorluk...)
 ├── Materials/
+├── Editor/                     Tek seferlik editör araçları (iş bitince silinir)
 ├── Plugins/                    3. parti kütüphaneler (dokunulmaz)
 ├── Prefabs/
+│   ├── Core/                   Prefab_Core_<İsim>LifetimeScope
 │   ├── Gameplay/               Prefab_Gameplay_<İsim>
 │   │   ├── Buildings/
 │   │   ├── Units/
@@ -51,13 +53,13 @@ Assets/
 │   │   ├── Commands/
 │   │   ├── Hover/
 │   │   └── Territory/
-│   └── UI/                     Prefab_UI_<Kategori>_<İsim>
+│   └── UI/                     Prefab_UI_<Kategori>_<İsim>, Canvases/ (Main + MainMenu ve Gameplay varyantları)
 ├── Resources/                  Sadece kütüphanelerin zorunlu tuttuğu dosyalar (ör. DOTweenSettings). Bu isimdeki klasör build'e komple girer, başka yerde kullanılmaz
 ├── Scenes/                     Bootstrap, MainMenu, Gameplay
 ├── Scripts/                    (bkz. Bölüm 3)
 ├── Settings/                   URP, Renderer2D, Input Actions
 ├── Textures/                   Texture_<Klasör yolu>_<İsim>.png (renge göre: Red/, Yellow/)
-│   └── Markers/<Renk>/         Dünya üzerindeki işaretler (ör. toplanma bayrağı)
+│   └── Markers/                Dünya üzerindeki işaretler (seçim halkası, yerleştirme hücresi, durum ikonları); renkliler Markers/<Renk>/
 │   (Buildings/Neutral/ takım rengi olmayan yapılar, ör. tarla)
 ├── Tiles/
 │   ├── Palettes/               Palette_<İsim>.prefab
@@ -72,15 +74,16 @@ Her modül kendi `.asmdef` dosyasına sahiptir. Bu, derleme süresini kısaltır
 
 ```
 Scripts/
-├── Core/        BarracksAndBolts.Core       Altyapı: EventBus, tick, pool, sahne yükleme, kayıt, ayarlar
+├── Core/        BarracksAndBolts.Core       Altyapı: EventBus, simülasyon döngüsü, oyun saati, sahne yükleme, oturum ayarları, root scope
 ├── Gameplay/    BarracksAndBolts.Gameplay   Oyun mantığı ve dünya görünümleri
-├── UI/          BarracksAndBolts.UI         Ekranlar, paneller, HUD
-├── Popup/       BarracksAndBolts.Popup      Popup sistemi (mevcut)
-├── Utils/       BarracksAndBolts.Utils      Bağımsız yardımcılar (MinHeap, uzantı metotları)
-├── Editor/      BarracksAndBolts.Editor     Editor araçları (sadece Editor platformu)
+├── UI/          BarracksAndBolts.UI         Ana menü, paneller, HUD, sonsuz scroll, tooltip, uçan yazı
+├── Popup/       BarracksAndBolts.Popup      Hazır popup sistemi (şu an kullanılmıyor)
+├── Utils/       BarracksAndBolts.Utils      Unity'den bağımsız yardımcılar (MinHeap, CompositeDisposable)
 └── Tests/
-    └── EditMode/ BarracksAndBolts.Tests.EditMode
+    └── EditMode/ BarracksAndBolts.Tests.EditMode   412 test
 ```
+- Kayıt (save) ve ayarlar servisi henüz yok; geldiğinde Core'a girer.
+- Tek seferlik editör araçları `Assets/Editor/` altında asmdef'siz durur ve iş bitince silinir.
 
 **Bağımlılık yönü** (oklar "bağımlıdır" anlamındadır):
 ```
@@ -92,30 +95,49 @@ Tests.EditMode ──► Gameplay, UI, Core, Utils
 ### Gameplay alt yapısı (namespace = klasör)
 ```
 Gameplay/
-├── Bootstrap/      GameplayLifetimeScope, GameplayEntryPoint
-├── Data/           BuildingDefinition, UnitDefinition, TeamColorDefinition, GameDatabase (ScriptableObject)
+├── Bootstrap/      GameplayLifetimeScope
+├── Data/           BuildingDefinition, UnitDefinition, ResourceNodeDefinition, TeamColorDefinition, GameDatabase,
+│                   NormalModeSettings, RaidSettings, ResourceDistributionSettings, ResourceCost
 ├── Entities/       GameEntityId, GameEntityIdGenerator
-├── Grid/           GridMap, GridCell, GridCoordinates
+├── Grid/           GridMap, TilemapGridSource, GridChangedEvent
 ├── Pathfinding/    AStarPathfinder, PathStatus, GridSearch
-├── Placement/      PlacementService, PlacementInputHandler, PlacementPreviewView (bölge kuralı gelince: PlacementValidator)
-├── Buildings/      BuildingService, BuildingModel, BuildingView, BuildingViewSpawner, Production/ (UnitProductionService)
-├── Units/          UnitService, UnitModel, UnitMovementSystem, UnitView, UnitViewSpawner, States/
+├── Placement/      PlacementService, PlacementInputHandler, PlacementPreviewView, Placement*Event
+├── Buildings/      BuildingService, BuildingModel, BuildingView, BuildingViewSpawner, BuildingSpriteLayout,
+│                   BuildingDefenderView, CoverageRingView, Production/ (UnitProductionService)
+├── Units/          UnitService, UnitModel, UnitMovementSystem, UnitView, UnitViewSpawner, Unit*Event
 ├── Territory/      TerritoryService, TerritoryOverlayView
-├── Combat/         CombatService, CombatSystem, BuildingDefenseSystem, DeathCleanupSystem, DamageFlash, ProjectileSpawner, ProjectileView
+├── Combat/         CombatService, CombatSystem, BuildingDefenseSystem, DeathCleanupSystem, DamageFlash,
+│                   ProjectileSpawner, ProjectileView, CombatEvents
 ├── Hover/          HoverService, HoverInputHandler, HoverHighlightView
 ├── Feedback/       FloatingTextRequestedEvent (çizen: UI/Feedback/FloatingTextSpawner)
 ├── Selection/      SelectionService, SelectionInputHandler, BoxSelectionView
 ├── Commands/       UnitCommandService, CommandInputHandler, MoveMarkerView (AttackMove vb. gelince: IUnitCommand)
 ├── Sandbox/        SandboxService (minimal: taraf seçimi; tam palet P2)
 ├── Teams/          Faction, TeamService (TeamColor, menüden taşındığı için Core.Session içinde)
-├── ResourceNodes/  ResourceNodeService, ResourceDistributor, ResourceMapInitializer, ResourceRoamSystem, ResourceNodeView, ResourceNodeViewSpawner
-├── Economy/        ResourceService, PopulationService, NormalModeStarter, ResourceRespawnService, GameOutcomeService (StorageService sonra)
+├── ResourceNodes/  ResourceNodeService, ResourceNodeModel, ResourceDistributor, ResourceMapInitializer,
+│                   ResourceRoamSystem, ResourceNodeView, ResourceNodeViewSpawner
+├── Economy/        ResourceService, PopulationService, NormalModeStarter, ResourceRespawnService, GameOutcomeService
 ├── Gathering/      GatheringSystem
 ├── Calendar/       CalendarService (görünüm: UI/Hud/DayNightOverlayView, CalendarLabelView)
 ├── Raids/          RaidService, BattleAiSystem, ShelterSystem
-├── Map/            MapGenerator, MapGenerationSettings                     (P2)
-├── Input/          GameplayInputService, InputModeController
-└── CameraControl/  CameraController
+├── Input/          GameInputActions (üretilen), InputModeController
+└── CameraControl/  CameraController, CameraMath, CameraConfig
+```
+Planlanan klasörler: `Map/` (zemin üretimi), `Upgrades/`, `Storage/`, `Construction/`, `Minimap/`, `Save/`. Ayrıntı: [Systems.md](Systems.md).
+
+### UI alt yapısı
+```
+UI/
+├── Bootstrap/      GameplayUiLifetimeScope
+├── MainMenu/       MainMenuLifetimeScope, MainMenuView
+├── Common/         SlideOutPanel, ContentFitPanel, PanelSizeMath, EscapeInputHandler, ICloseablePanel
+├── Scroll/         RecyclingScrollView, RecyclingScrollCell, RecyclingScrollMath
+├── Production/     ProductionMenuView, ProductionMenuCell
+├── Information/    InformationPanelView, ProducibleUnitCell, UnitSelectionCardView
+├── Hud/            ResourceBarView, CalendarLabelView, DayNightOverlayView, NoticeBannerView, GameEndView
+├── Feedback/       FloatingTextSpawner, FloatingTextView, HoverLabelView
+├── Tooltips/       TooltipView, TooltipPlacement, TooltipText
+└── Sandbox/        SandboxFactionToggleView
 ```
 
 ---
@@ -133,7 +155,7 @@ Gameplay/
                                                         └──────────────────┘
 ```
 - **Definition (ScriptableObject):** Değişmeyen tasarım verisi. Ad, görsel, boyut, HP, hasar, maliyet. Runtime'da **asla değiştirilmez**.
-- **Model (saf C#):** Runtime durumu. Örnek: `BuildingModel` (Id, Definition, Team, Origin, CurrentHp). Unity'ye bağımlı değildir, test edilebilir.
+- **Model (saf C#):** Runtime durumu. Örnek: `BuildingModel` (Id, Definition, Faction, Area, CurrentHp). Unity'ye bağımlı değildir, test edilebilir.
 - **Service (saf C#):** Kuralları uygular ve modelleri yönetir. Örnek: `BuildingService.TryPlace(...)`, `CombatService.ApplyDamage(...)`. Sonuçları event olarak yayınlar.
 - **View (MonoBehaviour):** Modeli ekranda gösterir (sprite, animasyon, can barı). Mantık içermez. Event'leri dinler ya da modelden okur.
 - **Input / UI:** Oyuncunun niyetini servislere iletir (ör. "şu birimleri şuraya gönder"). Sonucu kendisi uygulamaz.
@@ -150,9 +172,11 @@ Her bina ve birimin bir `GameEntityId` değeri vardır (artan `int`). Servisler 
 ## 5. VContainer Scope'ları
 | Scope | Sahne | Ömür | Kayıtlar |
 |---|---|---|---|
-| `ProjectLifetimeScope` | Bootstrap | Uygulama boyunca (DontDestroyOnLoad) | `SceneLoader`, `SettingsService`, `SaveService`, `AudioService`, `CursorService`, `GameSessionSettings` |
-| `MainMenuLifetimeScope` | MainMenu | Sahne | Menü ekranları, `PopupSystem` |
-| `GameplayLifetimeScope` | Gameplay | Sahne | `EventBus`, `SimulationRunner`, tüm gameplay servisleri, View'lar (`RegisterComponentInHierarchy`) |
+| `ProjectLifetimeScope` | Root prefab | Uygulama boyunca (DontDestroyOnLoad) | `SceneLoader`, `GameSessionSettings`. Planlanan: `SettingsService`, `SaveService`, `AudioService` |
+| `BootstrapLifetimeScope` | Bootstrap | Sahne | `BootstrapFlow` (MainMenu'yü yükler) |
+| `MainMenuLifetimeScope` | MainMenu | Sahne | `MainMenuView` |
+| `GameplayLifetimeScope` | Gameplay | Sahne | `EventBus`, `GameClock`, `SimulationRunner`, tüm gameplay servisleri ve sistemleri, dünya View'ları (`RegisterComponentInHierarchy`) |
+| `GameplayUiLifetimeScope` | Gameplay (canvas) | Sahne, parent = Gameplay | Bütün UI view'ları ve `EscapeInputHandler`. UI tipleri Gameplay assembly'sinden görünmediği için ayrı scope |
 
 - `EventBus` **Gameplay scope'una** kaydedilir. Sahne kapanınca tüm abonelikler de onunla birlikte yok olur, sahneler arası abonelik sızıntısı olmaz.
 - `GameSessionSettings` yeni oyun ayarlarını (mod, renk, zorluk, seed) menüden Gameplay'e taşır.
@@ -176,15 +200,21 @@ public interface IEventBus
 ---
 
 ## 7. Simülasyon Döngüsü (Merkezi Tick)
-- `SimulationRunner`, VContainer'ın `ITickable` arayüzünü uygular ve her karede sistemleri **sabit bir sırayla** çağırır:
-  1. Input → komutlar
-  2. Takvim / zaman
-  3. AI (P1)
-  4. Birim hareketi
-  5. Savaş
-  6. Ölümler ve temizlik
-  7. View senkronizasyonu
-- Sistemler `ISimulationSystem.Tick(float deltaTime)` arayüzünü uygular.
+- `SimulationRunner`, VContainer'ın `ITickable` arayüzünü uygular ve her karede sistemleri **sabit bir sırayla** çağırır (`SimulationPhase`):
+
+| Faz | Değer | Sistemler |
+|---|---|---|
+| `Input` | 0 | Boş. Input handler'lar simülasyonun dışında, `IPostTickable` olarak çalışır |
+| `Time` | 100 | `CalendarService` |
+| `AI` | 200 | `RaidService`, `BattleAiSystem`, `ShelterSystem` |
+| `Movement` | 300 | `UnitMovementSystem`, `ResourceRoamSystem` |
+| `Gathering` | 350 | `GatheringSystem` |
+| `Combat` | 400 | `CombatSystem`, `BuildingDefenseSystem` |
+| `Cleanup` | 500 | `DeathCleanupSystem` |
+| `Presentation` | 600 | Boş. View'lar kendi `LateUpdate`'lerinde modeli okur |
+
+- Sistemler `ISimulationSystem.Tick(float deltaTime)` arayüzünü uygular ve `builder.RegisterSimulationSystem<T>()` ile kaydedilir.
+- **Kare sırası:** `SimulationRunner.Tick` (ITickable) → MonoBehaviour `Update` (kamera) → input handler'lar (`IPostTickable`, kameranın bu karedeki yerini görür) → View'ların `LateUpdate`'i. Oyuncunun bu karedeki emri simülasyona bir sonraki karede girer.
 - `GameClock` oyun zamanını tutar: **duraklatma** (`IsPaused`) ve **oyun hızı** (`TimeScale`) yalnızca burada uygulanır. `Time.timeScale` kullanılmaz, böylece UI animasyonları duraklatmadan etkilenmez.
 - Ölümler tick'in sonunda toplu işlenir. Böylece aynı karede hasar alan birimlerin işlem sırası sonucu değiştirmez ve bir koleksiyon üzerinde dolaşırken o koleksiyondan eleman silinmez.
 
@@ -192,13 +222,13 @@ public interface IEventBus
 
 ## 8. Grid ve Pathfinding
 - **1 hücre = 1 Unity birimi = 64px** (oyun içi sprite'larda PPU 64). Görsel taraf Unity `Grid` + `Tilemap`, mantık tarafı `GridMap` ile çalışır.
-- `GridMap`, her hücre için şu bilgileri tutar: yürünebilir mi, üzerinde hangi bina veya kaynak var (`GameEntityId`), bölge içinde mi (P2).
+- `GridMap`, her hücre için şu bilgileri tutar: zemin yürünebilir mi, üzerinde hangi bina veya kaynak var (`GameEntityId`), seviyesi, rampa mı. Bölge bilgisi ayrı bir dizide, `TerritoryService`'te durur; grid'i değiştirmez.
 - **Yükseklik:** Her hücrenin bir seviyesi var (0 düz zemin, 1 plato). Komşu iki hücre arasında sadece aynı seviyede ya da rampa üzerinden geçilir. Bina tek seviyede durmalı, rampaya konamaz.
 - **Birimler hücre işgal etmez.** Sadece binalar ve kaynaklar engeldir. Bu sayede birimler birbirini kilitleyemez. Üst üste binmeyi `GridSearch.CollectDestinations` önler; hafif bir ayırma (separation) kuvveti henüz yok, birimler yürürken birbirinin içinden geçebilir. Üzerinde birim duran hücreye bina konamaz; yoksa birim binanın içinde kalır.
 - **A\***:
   - 8 yönlü hareket. Köşe kesmeye izin verilmez (iki yanı dolu çaprazdan geçilmez).
   - Octile mesafe sezgiseli kullanılır.
-  - Açık liste için `MinHeap` kullanılır. .NET Standard 2.1'de `PriorityQueue` olmadığı için kendimiz yazacağız.
+  - Açık liste için kendi `MinHeap`'imiz kullanılır (.NET Standard 2.1'de `PriorityQueue` yok).
   - Arama bitince düğüm tamponları temizlenir ve sonraki aramada tekrar kullanılır, her aramada yeni bellek ayrılmaz.
   - Hedef yürünemezse en yakın yürünebilir hücreye gidilir. Hiç yol yoksa ulaşılabilen en yakın hücreye gidilir.
 - **Grup hareketi:** `GridSearch.CollectDestinations`, hedefe en yakın boş hücreden başlayıp sadece yürünebilir hücreler üzerinden BFS ile yayılır ve her birime ayrı bir hücre verir.
@@ -209,13 +239,18 @@ public interface IEventBus
 ## 9. Veri Tanımları (ScriptableObject)
 | Tip | Önemli Alanlar |
 |---|---|
-| `BuildingDefinition` | `Id`, `DisplayName`, `Size (Vector2Int)`, `MaxHp`, `Producibles (UnitDefinition[])`, `SpawnOffset`. `Cost` P1'de eklenecek. Sprite yok, renge bağlı olduğu için `TeamColorDefinition`'da. |
-| `UnitDefinition` | `Id`, `DisplayName`, `Portrait`, `MaxHp`, `Damage`, `AttackRange`, `AttackCooldown`, `MoveSpeed`, `PopulationCost` |
-| `TeamColorDefinition` | `Color`, bina → sprite listesi. Birimler gelince her birim tipi için `AnimatorOverrideController` |
-| `GameDatabase` | `Buildings` (Production Menu sırası), `Units`, `TeamColors` |
-| `GameConfig` ve diğer config'ler | Takvim, harita, zorluk değerleri |
+| `BuildingDefinition` | `Id`, `DisplayName`, `Size`, `VisualHeight`, `MaxHp`, `Cost`, `IsDropOff`, `PopulationCapacity`, `Producibles`, `NormalModeProducibles`, `SpawnOffset`; Defense: `Defender`, `DefenderPosition`, `DefenseRange`, `DefenseDamage`, `DefenseCooldown`; `TerritoryRadius`, `IsNormalModeOnly`. Sprite yok, renge bağlı olduğu için `TeamColorDefinition`'da |
+| `UnitDefinition` | `Id`, `DisplayName`, `Portrait`, `MaxHp`, `Damage`, `AttackRange`, `AttackCooldown`, `MoveSpeed`, `PopulationCost`, `Cost`, `CanGather` |
+| `ResourceNodeDefinition` | `Id`, `DisplayName`, `Kind` (Wood, Stone, Food, Gold), `Size`, `VisualHeight`, `Amount`, `WorkDistance`, `Frames`, `RoamRadius`, `WalkFrames`, `IsOneCut` |
+| `TeamColorDefinition` | `Color`, bina → sprite, birim → kareler (bekleme, koşma, saldırı, balta, kazma) |
+| `GameDatabase` | `Buildings` (Production Menu sırası), `Units`, `TeamColors`, `ResourceDistribution`, `NormalMode`, `Raids` |
+| `NormalModeSettings` | Castle, köylü, başlangıç köylüsü ve kaynağı, taşıma kapasitesi, çalışma süreleri, koyun sayıları |
+| `RaidSettings` | Gündüz ve gece süresi, baskın günleri ve dalgaları, başlama aralığı, dalga arası, doğma mesafesi, `aggroRange`, `shelterRadius` |
+| `ResourceDistributionSettings` | Boş alan yarıçapları ve kaynak grupları |
+| `CameraConfig` | Kaydırma, zoom ve sınır değerleri |
 
 - PDF değerleri bu asset'lerde tutulur: Barracks 100 HP, House 50 HP, askerler 10 HP ve 10 / 5 / 2 hasar.
+- Zorluk (`DifficultySettings`) henüz yok; `Difficulty` enum'u oturum ayarlarında hazır bekliyor.
 - Tüm tanımlar bir `GameDatabase` asset'inde toplanır ve VContainer'a bu şekilde kaydedilir.
 - Her tanımın `OnValidate` metodu geçersiz değerleri editörde yakalar: boyut ≤ 0, HP ≤ 0, `Producibles` listesinde null eleman gibi.
 
@@ -224,17 +259,20 @@ public interface IEventBus
 ## 10. Render ve SetPass (< 20)
 - Tüm oyun içi sprite'lar **Sprite Atlas**'larda toplanır. Atlas'lar üst klasörleri referans alır, yeni eklenen alt klasörler otomatik olarak dahil olur.
 - Tek bir sprite materyali kullanılır (URP `Sprite-Lit-Default`). Özel shader sayısı en az tutulur.
-- **Can barları:** World-space Canvas yerine SpriteRenderer (atlas'taki bar sprite'ları) kullanılır, birimlerle aynı batch'e girer.
-- **Derinlik sıralaması:** Renderer2D'de Transparency Sort Mode = Custom Axis (0, 1, 0). Pivotlar tabanda olur.
-- **Mini harita:** İkinci bir kamera kullanılmaz. Grid verisinden üretilen tek bir `Texture2D` kullanılır.
-- **UI:** Statik ve sık değişen elemanlar ayrı Canvas'lara bölünür (statik çerçeve / HUD sayaçları / popuplar).
-- **Gece efekti:** Ekstra çizim maliyeti olmaması için tek bir Global Light 2D'nin rengi ve şiddeti değiştirilir.
-- Ölçüm her özellikten sonra Frame Debugger ve Game view Stats ile yapılır. Sonuçlar README'ye yazılır.
+- **Can barları (planlandı):** World-space Canvas yerine SpriteRenderer (atlas'taki bar sprite'ları) kullanılacak, birimlerle aynı batch'e girer. Şu an HP panelde ve kartta.
+- **Derinlik sıralaması:** Renderer2D'de Transparency Sort Mode = Custom Axis (0, 1, 0). Pivotlar tabanda olur. Bina ve birim köklerinde Sorting Group var.
+- **Kodla üretilen dokular:** Bölge katmanı (`TerritoryOverlayView`) ve kapsama halkaları (`CoverageRingView`) çalışırken `Texture2D` olarak bir kez çizilir; atlas dışı oldukları için her biri bir çizim ekler, sadece yerleştirme ya da seçim sırasında görünürler.
+- **Mini harita (planlandı):** İkinci bir kamera kullanılmaz. Grid verisinden üretilen tek bir `Texture2D` kullanılır.
+- **UI:** Statik ve sık değişen elemanlar ayrı Canvas'lara bölünür (`StaticCanvas` / `DynamicCanvas`).
+- **Gece efekti:** Ekranı kaplayan tek bir yarı saydam UI görseli (`DayNightOverlayView`), alfası takvimden gelir. Işık sistemi kullanılmıyor.
+- **Çizim sırası (Order in Layer):** su -5, köpük -4, zemin -3, plato ve merdiven -2, bölge katmanı ve halkalar -1, bina, birim ve kaynak 0, yerleştirme önizlemesi 99-100, ok 150, durum ikonu 160, hover çerçevesi 190, seçim kutusu 200.
+- Ölçüm Frame Debugger ve Game view Stats ile yapılır: savaş sırasında **10 SetPass**. Son özelliklerden sonra tekrar ölçülecek, sonuç README'ye yazılacak.
 
 ---
 
 ## 11. Object Pooling ve Sonsuz Scroll
-- `PoolService`, Unity'nin `UnityEngine.Pool.ObjectPool<T>` sınıfını prefab bazında sarar. Birimler, mermiler, efektler ve hasar sayıları pool'dan gelir. Pool'a geri dönen nesne `IPoolable.OnDespawn` ile durumunu sıfırlar.
+- Ayrı bir `PoolService` yok. Sık oluşan görseller Unity'nin `UnityEngine.Pool.ObjectPool<T>` sınıfını doğrudan kullanır: oklar (`ProjectileSpawner`) ve uçan yazılar (`FloatingTextSpawner`). Information Panel'deki asker hücreleri ve yerleştirme önizlemesinin kareleri elle havuzlanır: fazlası silinmez, kapatılır.
+- Birim ve bina görünümleri havuzlanmıyor; ölüm ve yıkım seyrek olduğu için `Instantiate`/`Destroy` yeterli. Efekt turunda ölüm efektleri gelirse onlar havuzdan gelecek.
 - **Production Menu (sonsuz scroll):** `RecyclingScrollView`
 - **Kaynak barı:** `ResourceBarView`, ekranın üstünde tam genişlik. Üstteki paneller barın altından başlar.
 - **Sol kenardan açılan panel:** `SlideOutPanel` (DOTween). Production Menu kapalı başlar; panel kapalıyken de kendi butonu ekranda kalır.
@@ -248,19 +286,29 @@ public interface IEventBus
 ---
 
 ## 12. Input
-- Varsayılan `InputSystem_Actions` şablonu kaldırılır. Yerine GDD'deki action map'lerle (Camera, Gameplay, Placement, UI) yeni bir asset oluşturulur: `Settings/Input/GameInputActions.inputactions`. Bu asset'ten C# sınıfı otomatik üretilir.
-- `GameplayInputService` şunlardan sorumludur:
-  - Mod geçişleri (Gameplay ↔ Placement ↔ Pause). Aynı anda tek bir mod aktif olur ve bu tek bir yerden yönetilir.
-  - Pointer UI üzerindeyse dünyaya tıklamayı engellemek.
-  - Bağlama göre sağ tık: zemin → hareket, düşman → saldırı, kaynak → toplama.
+- Varsayılan `InputSystem_Actions` şablonu kaldırıldı. Yerine `Settings/Input/GameInputActions.inputactions` geldi; C# sınıfı otomatik üretiliyor. Map'ler: **Camera** (her zaman açık), **Gameplay** ve **Placement** (ikisinden biri açık). Pause map'i oyun içi menüyle gelecek.
+- Tek bir büyük input servisi yok; her özelliğin kendi küçük handler'ı var:
+
+| Sınıf | Görevi |
+|---|---|
+| `InputModeController` | Mod geçişi: `PlacementStartedEvent` gelince Gameplay'i kapatıp Placement'ı açar, `PlacementEndedEvent` ile tersini yapar. Aynı anda tek mod açık |
+| `PlacementInputHandler` | Yerleştirme: footprint'i fareye taşır, onaylar, iptal eder |
+| `SelectionInputHandler` | Sol tık ve kutu seçimi |
+| `CommandInputHandler` | Sağ tık; bağlama göre karar `UnitCommandService.CommandAt`'te: düşman → saldırı, kaynak → toplama, zemin → hareket |
+| `HoverInputHandler` | Farenin altındaki şey |
+| `EscapeInputHandler` (UI) | Esc her basışta en üstteki katmanı kapatır |
+| `CameraController` | Kaydırma, sürükleme, zoom |
+
+- Her handler fare UI üzerindeyse (`EventSystem.IsPointerOverGameObject`) dünyaya tıklamayı yok sayar.
 
 ---
 
 ## 13. Animasyon ve Renk Sistemi
-- Her birim tipi için bir controller: `Animator_Warrior.controller` (Idle, Run, Attack, Death).
-- Her renk için override: `AnimatorOverride_Red_Warrior`, `AnimatorOverride_Yellow_Warrior`. Bir renkte eksik olan animasyon, override'da varsayılan klibe bırakılır.
-- Animator parametreleri tek bir sabit sınıfında tutulur: `AnimatorParams.IsMoving = Animator.StringToHash("IsMoving")`. Kodda string kullanılmaz.
-- Binalar animasyonsuzdur. Renk değişimi `TeamColorDefinition` üzerinden sprite değiştirilerek yapılır.
+- **Karar: Animator yok.** İlk plan her birim için Animator Controller ve her renk için override idi. 4 birim x 2 renk için bunun yerine sprite dizileri seçildi: `TeamColorDefinition.UnitSpriteSet` birimin bekleme, koşma, saldırı, balta ve kazma karelerini tutar.
+- `UnitView`, kareyi `GameClock.ElapsedTime`'dan hesaplar: oyun durunca birimler donar, hızlanınca hızlanır. Faz birim id'sinden gelir, grup aynı anda nefes almaz. Öncelik: saldırı > çalışma > koşma > bekleme.
+- Kaynaklar (ağaç, koyun) ve kuledeki okçu da aynı şekilde kare çalar; ağaçların hepsini tek döngüde `ResourceNodeViewSpawner` günceller.
+- Bir renkte eksik kare varsa uyarı yazılır ve boş set döner. Binalar animasyonsuzdur. Renk değişimi `TeamColorDefinition` üzerinden sprite değiştirilerek yapılır.
+- Ölüm ve yıkılma animasyonu yok; efekt turunda `Textures/VFX` kareleriyle gelecek.
 - Kod hiçbir yerde renkten taraf çıkarmaz: `Faction` (Player/Enemy) ile `TeamColor` (Red/Yellow) birbirinden bağımsızdır.
 
 ---
@@ -303,9 +351,11 @@ public interface IEventBus
 
 ### Sahne Hiyerarşisi (Gameplay)
 ```
-GameplayLifetimeScope
+Prefab_Core_GameplayLifetimeScope
 ----- CAMERAS -----
-    Main Camera
+    Main Camera                (CinemachineBrain)
+    CameraTarget               (CameraController)
+    CinemachineCamera_Gameplay
 ----- GRIDS -----
     Grid
         Tilemap_Water      (order -5)
@@ -316,7 +366,7 @@ GameplayLifetimeScope
         Tilemap_Blocking   (çizilmez; dolu hücre yürünemez)
 ----- WORLD -----
     Prefab_Gameplay_Building_Spawner      (runtime'da üretilenlerin parent'ı, BuildingViewSpawner)
-    Prefab_Gameplay_Placement_Preview     (yerleştirme önizlemesi)
+    Prefab_Gameplay_Placement_Preview     (yerleştirme önizlemesi; Normal modda yanına Prefab_Gameplay_Territory_Overlay'i kendisi oluşturur)
     Prefab_Gameplay_Unit_Spawner          (runtime'da üretilenlerin parent'ı, UnitViewSpawner)
     Prefab_Gameplay_ResourceNode_Spawner  (kaynakların parent'ı, ResourceNodeViewSpawner)
     Prefab_Gameplay_Selection_Box         (kutu seçimi çerçevesi, BoxSelectionView)
@@ -324,44 +374,46 @@ GameplayLifetimeScope
     Prefab_Gameplay_Projectile_Spawner    (havuzdan gelen oklar, ProjectileSpawner)
     Prefab_Gameplay_Hover_Highlight       (mouse'un altındakinin çerçevesi, HoverHighlightView)
     Prefab_UI_FloatingText_Spawner        (havuzdan gelen uçan yazılar, FloatingTextSpawner)
-    Resources
-    Effects
 ----- MANAGERS -----
-    (sadece MonoBehaviour gerektiren köprüler, ör. PoolRoot)
+    (şu an boş; sadece MonoBehaviour gerektiren köprüler için)
 ----- UI -----
     EventSystem
     Prefab_UI_Canvas_Gameplay_Variant (GameplayUiLifetimeScope, parent = GameplayLifetimeScope)
         StaticCanvas / DynamicCanvas (Production Menu ve Information Panel burada; içerikleri oyun sırasında değişir)
------ LIGHTS -----
-    Global Light 2D
 ```
+- Sahnede ışık yok; sprite'lar ışıksız çiziliyor, gece efekti UI katmanı.
 - Ayırıcı objeler (`----- X -----`) boş GameObject'tir. Transform'ları sıfırda durur, üzerlerinde component yoktur.
 - Runtime'da üretilen nesneler her zaman ilgili parent'ın altına konur. Hiyerarşinin kök seviyesine nesne eklenmez.
+- Scope'lar objeleri adla değil bileşen tipiyle bulur; obje adı değişikliği davranışı etkilemez.
+- **Sahnede düzeltilecek:** `----- CAMERAS-----` ayırıcısında boşluk eksik ve `----- WORLD -----` şu an `----- GRIDS -----`'ın altında duruyor. Yukarıdaki düzen hedeflenen düzendir.
 
 ---
 
 ## 15. Testler (EditMode)
-| Sistem | Test Edilecek Durumlar |
-|---|---|
-| A\* | Düz yol, engel etrafından dolaşma, köşe kesmeme, hedef yürünemez, yol yok, başlangıç = hedef, harita sınırı |
-| GridMap / Yerleştirme | Geçerli alan, çakışma, harita dışına taşma, yıkılan binanın hücreleri boşaltması |
-| GridSearch | N birim → N farklı hücre, bina altındaki hedef, suyu geçmeme, en yakın boş hücre |
-| Combat | Hasar, HP'nin 0'ın altına inmemesi, ölümün tek kez tetiklenmesi, ölü hedefe saldırmama, dost ateşi engeli |
-| EventBus | Yayın, abonelikten çıkma, yayın sırasında abonelikten çıkma |
-| Ekonomi (P1) | Yetersiz kaynak, depo kapasitesi, nüfus sınırı |
+Toplam **412 test**, 33 dosya (`TestDefinitions` ve `TestMaps` yardımcı). Her biri saf C# servislerini Unity sahnesi olmadan çalıştırır.
 
-Testler Test Runner'dan çalıştırılır. README'de nasıl çalıştırılacağı anlatılır.
+| Alan | Dosyalar | Kapsadığı durumlar |
+|---|---|---|
+| Altyapı | `EventBusTests`, `GameClockTests`, `SimulationRunnerTests`, `CompositeDisposableTests`, `MinHeapTests`, `GameEntityId*Tests` | Yayın sırasında abonelik değişimi, hata veren handler, pause, oyun hızı, faz sırası |
+| Grid ve yol | `GridMapTests`, `AStarPathfinderTests`, `GridSearchTests` | Köşe kesmeme, hedef yürünemez, yol yok, harita sınırı, grup hedefleri, suyu geçmeme |
+| Bina | `BuildingServiceTests`, `PlacementServiceTests`, `TerritoryTests`, `CoverageRingTests` | Çakışma, taşma, birim altında yerleştirme, bölge dışı, açılacak alan önizlemesi, halka çizimi |
+| Birim | `UnitServiceTests`, `UnitMovementTests`, `UnitCommandServiceTests`, `UnitProductionServiceTests`, `SelectionServiceTests`, `HoverServiceTests` | Spawn, yeniden yol, dağılma, dost ateşi reddi, kutu seçimi |
+| Savaş | `CombatTests`, `BuildingDefenseTests` | Bekleme süresi, ölümün tek kez işlenmesi, binaya kenardan vurma, kule hedef seçimi |
+| Normal mod | `NormalModeTests`, `VillagerBehaviourTests`, `GameLoopTests`, `ResourceDistributorTests` | Harcama, toplama döngüsü, tükenme, sığınma, takvim, baskın, oyun sonu, seed |
+| Diğer | `SandboxServiceTests`, `TeamServiceTests`, `CameraMathTests`, UI testleri (`EscapeInputHandler`, `PanelSizeMath`, `RecyclingScrollMath`, `Tooltip`) | Renk ataması, kamera sınırı, sonsuz scroll matematiği |
+
+Testler *Window → General → Test Runner → EditMode → Run All* ile çalışır. README'de anlatılacak.
 
 ---
 
 ## 16. Build ve Proje Ayarları
-- [ ] **Player Settings → Resizable Window: açık** (şu an `resizableWindow: 0`, PDF bunu zorunlu tutuyor)
-- [ ] Fullscreen Mode: **Windowed**, varsayılan çözünürlük 1600x900
+- [x] **Player Settings → Resizable Window: açık** (PDF zorunlu tutuyor)
+- [x] Fullscreen Mode: **Windowed**, varsayılan çözünürlük 1600x900
 - [ ] Company Name: `DefaultCompany` → gerçek bir isim
-- [ ] Build Settings sahne sırası: Bootstrap, MainMenu, Gameplay
-- [ ] Kamera: ortografik boyut, ekran oranı değişince harita sınırlarına göre yeniden hesaplanır
-- [ ] Canvas Scaler: Scale With Screen Size, referans 1920x1080, Match 0.5
-- [ ] Build çıktısı `Builds/` klasörüne alınır (git'e girmez). Teslim için GitHub Release'e zip olarak eklenir.
+- [x] Build Settings sahne sırası: Bootstrap, MainMenu, Gameplay
+- [x] Kamera: ekran oranı değişince harita sınırlarına göre her karede yeniden kısıtlanır
+- [x] Canvas Scaler: Scale With Screen Size, referans 1920x1080, Match 0.5
+- [ ] Build çıktısı `Builds/` klasörüne alınır (git'e girmez). Teslim için GitHub Release'e zip olarak eklenir; `_BurstDebugInformation_DoNotShip` klasörü zip'e girmez.
 
 ---
 

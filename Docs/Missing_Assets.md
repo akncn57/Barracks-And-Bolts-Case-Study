@@ -27,7 +27,7 @@
 | 1 | ~~İkinci renk birimler~~ | ✅ Sarı set eklendi (Warrior, Lancer, Archer, Monk, Pawn) | – |
 | 2 | ~~İkinci renk binalar~~ | ✅ Sarı set eklendi (Castle, Barracks, House, Monastery, Tower, Archery) | – |
 | 2a | ~~Sarı `Pawn_Interact_Axe`~~ | ✅ Eklendi | – |
-| 3 | Yerleştirme önizlemesi (yeşil/kırmızı hücre) | PDF: geçersiz alan kırmızı | 💻 Beyaz kare sprite + renk |
+| 3 | ~~Yerleştirme önizlemesi (yeşil/kırmızı hücre)~~ | ✅ `Texture_Markers_PlacementCell`, rengi kod veriyor | – |
 | 4 | ~~Seçim göstergesi (birimin altında halka/elips)~~ | ✅ Üretildi: `Texture_Markers_SelectionRing` | – |
 | 5 | ~~Kutu seçimi dikdörtgeni~~ | ✅ Üretildi: `Texture_Markers_SelectionBox` (dünyada Sliced SpriteRenderer) | – |
 | 6 | ~~Hareket/saldırı emri işareti~~ | ✅ `Texture_Markers_SelectionRing`: hareket yeşil, saldırı kırmızı | – |
@@ -42,7 +42,7 @@
 | 11 | Baskın uyarı ikonu ve ekran kenarı yön oku | Baskın bildirimi | 🛠 Kılıç ikonu + ok ikonu |
 | 12 | Koyun kesme imleci | Yemek toplama | 🛠 Et ikonu veya kılıç aracı |
 | 13 | Kaynak taşıyan köylü (odun/altın/et taşırken) | Görsel geri bildirim (opsiyonel) | 🔍 Tiny Swords'ta var. Alternatif: köylünün üstünde küçük kaynak ikonu |
-| 14 | Kaynak toplama ve hasar sayıları (ör. "+5", "-10") | Geri bildirim | 💻 TextMeshPro (`MedievalSharp` fontu var) |
+| 14 | Kaynak toplama ve hasar sayıları (ör. "+5", "-10") | Geri bildirim | 💻 Uçan yazı sistemi hazır (`FloatingTextSpawner`, şu an uyarılar için); sayılar efekt turunda |
 | 15 | Ana menü arka planı | Ana menü | 🛠 Oyun sahnesinden bir görüntü veya Banner/Paper ile |
 | 16 | Kazandın / Kaybettin ekranı görseli | Oyun sonu | 🛠 Banner + Ribbon |
 
@@ -55,6 +55,7 @@
 | 20 | ~~Hasarlı bina efekti~~ | ✅ `Texture_VFX_Fire_*` | – |
 | 21 | Rütbe / seviye simgesi (asker ve bina seviyesi) | Yükseltme sistemi | 🛠 / 💻 Küçük yıldız veya çizgiler |
 | 22 | ~~Bölge sınırı görseli~~ | ✅ Kodla: haritanın üstünde tek doku, `TerritoryOverlayView` | – |
+| 22a | ~~Menzil ve bölge halkası~~ | ✅ Kodla: `CoverageRingView` halka dokusunu kendisi çiziyor | – |
 | 23 | Mini harita çerçevesi | Mini harita | 🛠 `Papers_*` / `WoodTable_*` 9-slice |
 | 24 | ~~Kuledeki okçu~~ | ✅ `Archer` kareleri kulenin platformunda, takım rengine göre | – |
 | 25 | ~~Toplanma noktası bayrağı~~ | ✅ Kurdeleden üretildi: `Textures/Markers/<Renk>/Texture_Markers_<Renk>_RallyFlag` (atlas'a eklendi) | – |
