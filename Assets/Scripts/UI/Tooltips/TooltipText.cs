@@ -33,6 +33,9 @@ namespace BarracksAndBolts.UI.Tooltips
             if (isNormalMode && building.TerritoryRadius > 0f)
                 text.Append(FormattableString.Invariant($"\nTerritory: {building.TerritoryRadius:0.#}"));
 
+            if (isNormalMode && building.BuildTime > 0f)
+                text.Append(FormattableString.Invariant($"\nBuild time: {building.BuildTime:0.#}s"));
+
             if (isNormalMode)
                 AppendCost(text, building.Cost);
 

@@ -62,6 +62,9 @@ namespace BarracksAndBolts.Gameplay.Units
         /// <summary>What the unit is working on right now. Null when it isn't working.</summary>
         public ResourceKind? HarvestingKind { get; private set; }
 
+        /// <summary>Hammering at a building site right now.</summary>
+        public bool IsBuilding { get; private set; }
+
         /// <summary>The unit has a job to go back to, even if it isn't working this very moment.</summary>
         public bool IsOnJob { get; private set; }
 
@@ -102,6 +105,11 @@ namespace BarracksAndBolts.Gameplay.Units
         public void SetHarvesting(ResourceKind? kind)
         {
             HarvestingKind = kind;
+        }
+
+        public void SetBuilding(bool isBuilding)
+        {
+            IsBuilding = isBuilding;
         }
 
         public void SetOnJob(bool isOnJob)

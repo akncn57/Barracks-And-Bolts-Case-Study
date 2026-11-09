@@ -40,6 +40,7 @@ namespace BarracksAndBolts.Gameplay.Buildings
             _territory = territory;
             eventBus.Subscribe<SelectionChangedEvent>(_ => RefreshSelection()).AddTo(_subscriptions);
             eventBus.Subscribe<BuildingPlacedEvent>(OnBuildingPlaced).AddTo(_subscriptions);
+            eventBus.Subscribe<BuildingCompletedEvent>(OnBuildingCompleted).AddTo(_subscriptions);
             eventBus.Subscribe<BuildingDestroyedEvent>(OnBuildingDestroyed).AddTo(_subscriptions);
             eventBus.Subscribe<EntityDamagedEvent>(OnEntityDamaged).AddTo(_subscriptions);
             eventBus.Subscribe<BuildingFiredEvent>(OnBuildingFired).AddTo(_subscriptions);
@@ -58,11 +59,27 @@ namespace BarracksAndBolts.Gameplay.Buildings
 
             var view = Instantiate(buildingPrefab, transform);
             var opensTerritory = _territory.IsEnabled && building.Faction == Faction.Player;
-            view.Bind(building, colorSet.GetBuildingSprite(definition), _gridMap.AreaToWorldBottomCenter(building.Area), opensTerritory);
-            if (definition.Defender != null)
-                view.ShowDefender(colorSet.GetUnitSprites(definition.Defender), definition.DefenderPosition, _clock);
-
+            var sprite = colorSet.GetBuildingSprite(definition);
+            var siteSprite = building.IsBuilt ? sprite : colorSet.GetBuildingSiteSprite(definition);
+            view.Bind(building, sprite, siteSprite, _gridMap.AreaToWorldBottomCenter(building.Area), opensTerritory);
             _views.Add(building.Id, view);
+
+            // A site gets its defender when it is finished.
+            if (building.IsBuilt)
+                ShowDefender(building, view);
+        }
+
+        private void OnBuildingCompleted(BuildingCompletedEvent completedEvent)
+        {
+            if (_views.TryGetValue(completedEvent.Building.Id, out var view))
+                ShowDefender(completedEvent.Building, view);
+        }
+
+        private void ShowDefender(BuildingModel building, BuildingView view)
+        {
+            var definition = building.Definition;
+            if (definition.Defender != null)
+                view.ShowDefender(_teams.GetColorSet(building.Faction).GetUnitSprites(definition.Defender), definition.DefenderPosition, _clock);
         }
 
         private void OnBuildingDestroyed(BuildingDestroyedEvent destroyedEvent)

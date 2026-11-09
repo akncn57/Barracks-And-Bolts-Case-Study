@@ -30,8 +30,9 @@ namespace BarracksAndBolts.Gameplay.Buildings
         public Dictionary<GameEntityId, BuildingModel>.ValueCollection Buildings => _buildings.Values;
 
         /// <param name="origin">Bottom-left cell of the footprint.</param>
+        /// <param name="asSite">Starts as a building site that villagers must finish.</param>
         /// <returns>False if any footprint cell is outside the map, blocked or taken.</returns>
-        public bool TryPlace(BuildingDefinition definition, Vector2Int origin, Faction faction, out BuildingModel building)
+        public bool TryPlace(BuildingDefinition definition, Vector2Int origin, Faction faction, out BuildingModel building, bool asSite = false)
         {
             if (definition == null)
                 throw new ArgumentNullException(nameof(definition));
@@ -46,6 +47,9 @@ namespace BarracksAndBolts.Gameplay.Buildings
             }
 
             building = new BuildingModel(id, definition, faction, area);
+            if (asSite)
+                building.StartAsSite();
+
             _buildings.Add(id, building);
 
             _eventBus.Publish(new BuildingPlacedEvent(building));

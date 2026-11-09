@@ -11,7 +11,7 @@ namespace BarracksAndBolts.Gameplay.Territory
 {
     /// <summary>
     /// Which cells the player may build on in a normal game: the circles around the Castle, outposts and towers.
-    /// Worked out only when one of those buildings comes or goes. Buildings left outside stay and keep working.
+    /// Worked out only when one of those buildings is finished or goes. A building site opens nothing yet. Buildings left outside stay and keep working.
     /// Sandbox mode has no territory, so every cell counts as inside.
     /// </summary>
     public sealed class TerritoryService : IDisposable
@@ -31,6 +31,7 @@ namespace BarracksAndBolts.Gameplay.Territory
 
             _isInside = new bool[gridMap.Width * gridMap.Height];
             eventBus.Subscribe<BuildingPlacedEvent>(e => RebuildIfSource(e.Building)).AddTo(_subscriptions);
+            eventBus.Subscribe<BuildingCompletedEvent>(e => RebuildIfSource(e.Building)).AddTo(_subscriptions);
             eventBus.Subscribe<BuildingDestroyedEvent>(e => RebuildIfSource(e.Building)).AddTo(_subscriptions);
 
             // The Castle may already stand, depending on who was created first.
@@ -78,7 +79,8 @@ namespace BarracksAndBolts.Gameplay.Territory
 
         private void RebuildIfSource(BuildingModel building)
         {
-            if (IsSource(building))
+            // A site opens nothing, so placing or losing one changes nothing. Finishing it does.
+            if (IsSource(building) && building.IsBuilt)
                 Rebuild();
         }
 
@@ -92,7 +94,7 @@ namespace BarracksAndBolts.Gameplay.Territory
             Array.Clear(_isInside, 0, _isInside.Length);
             foreach (var building in _buildings.Buildings)
             {
-                if (IsSource(building))
+                if (IsSource(building) && building.IsBuilt)
                     MarkCircle(building.Area.center, building.Definition.TerritoryRadius);
             }
 

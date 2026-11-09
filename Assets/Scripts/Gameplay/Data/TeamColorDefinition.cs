@@ -31,6 +31,18 @@ namespace BarracksAndBolts.Gameplay.Data
             return null;
         }
 
+        /// <returns>The grey look of the building while it is a site, or its normal sprite if there is none.</returns>
+        public Sprite GetBuildingSiteSprite(BuildingDefinition building)
+        {
+            foreach (var entry in buildingSprites)
+            {
+                if (entry.Building == building)
+                    return entry.SiteSprite != null ? entry.SiteSprite : entry.Sprite;
+            }
+
+            return GetBuildingSprite(building);
+        }
+
         /// <returns>The unit's animations, or an empty set if this color has none for the unit.</returns>
         public UnitSpriteSet GetUnitSprites(UnitDefinition unit)
         {
@@ -49,9 +61,12 @@ namespace BarracksAndBolts.Gameplay.Data
         {
             [SerializeField] private BuildingDefinition building;
             [SerializeField] private Sprite sprite;
+            [Tooltip("Grey version shown while the building is a site. Empty for buildings that are never built by villagers.")]
+            [SerializeField] private Sprite siteSprite;
 
             public BuildingDefinition Building => building;
             public Sprite Sprite => sprite;
+            public Sprite SiteSprite => siteSprite;
         }
 
         [Serializable]
@@ -65,8 +80,11 @@ namespace BarracksAndBolts.Gameplay.Data
             [SerializeField] private Sprite[] chopFrames;
             [Tooltip("Work on stone and gold. Empty for units that don't gather.")]
             [SerializeField] private Sprite[] mineFrames;
+            [Tooltip("Hammer work on building sites. Empty for units that don't build.")]
+            [SerializeField] private Sprite[] buildFrames;
 
             public UnitDefinition Unit => unit;
+            public IReadOnlyList<Sprite> BuildFrames => buildFrames ?? Array.Empty<Sprite>();
 
             // The default set of a missing unit has null arrays; readers always get a list.
             public IReadOnlyList<Sprite> IdleFrames => idleFrames ?? Array.Empty<Sprite>();

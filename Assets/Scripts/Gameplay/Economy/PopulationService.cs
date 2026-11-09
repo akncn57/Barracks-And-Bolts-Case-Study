@@ -46,7 +46,8 @@ namespace BarracksAndBolts.Gameplay.Economy
                 var capacity = 0;
                 foreach (var building in _buildings.Buildings)
                 {
-                    if (building.Faction == Faction.Player)
+                    // A house still being built shelters nobody.
+                    if (building.Faction == Faction.Player && building.IsBuilt)
                         capacity += building.Definition.PopulationCapacity;
                 }
 

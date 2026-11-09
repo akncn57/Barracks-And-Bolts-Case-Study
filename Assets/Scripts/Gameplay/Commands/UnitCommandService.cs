@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using BarracksAndBolts.Core.Events;
+using BarracksAndBolts.Gameplay.Buildings;
 using BarracksAndBolts.Gameplay.Combat;
+using BarracksAndBolts.Gameplay.Construction;
 using BarracksAndBolts.Gameplay.Entities;
 using BarracksAndBolts.Gameplay.Gathering;
 using BarracksAndBolts.Gameplay.Grid;
@@ -13,7 +15,7 @@ using UnityEngine;
 
 namespace BarracksAndBolts.Gameplay.Commands
 {
-    /// <summary>Turns the player's orders into unit actions: attack an enemy, gather a resource, or move.</summary>
+    /// <summary>Turns the player's orders into unit actions: attack an enemy, build a site, gather a resource, or move.</summary>
     public sealed class UnitCommandService
     {
         private readonly UnitService _units;
@@ -22,19 +24,21 @@ namespace BarracksAndBolts.Gameplay.Commands
         private readonly GridSearch _gridSearch;
         private readonly GridMap _gridMap;
         private readonly GatheringSystem _gathering;
+        private readonly ConstructionSystem _construction;
+        private readonly BuildingService _buildings;
         private readonly ResourceNodeService _nodes;
         private readonly IEventBus _eventBus;
 
         private readonly List<UnitModel> _group = new();
         private readonly HashSet<GameEntityId> _groupIds = new();
         private readonly List<Vector2Int> _destinations = new();
-        private readonly List<GameEntityId> _nonGatherers = new();
+        private readonly List<GameEntityId> _nonWorkers = new();
 
         // Kept in a field so a command doesn't allocate a new delegate.
         private readonly Predicate<Vector2Int> _isDestinationFree;
 
         public UnitCommandService(UnitService units, UnitMovementSystem movement, CombatService combat, GridSearch gridSearch, GridMap gridMap,
-            GatheringSystem gathering, ResourceNodeService nodes, IEventBus eventBus)
+            GatheringSystem gathering, ConstructionSystem construction, BuildingService buildings, ResourceNodeService nodes, IEventBus eventBus)
         {
             _units = units;
             _movement = movement;
@@ -42,18 +46,23 @@ namespace BarracksAndBolts.Gameplay.Commands
             _gridSearch = gridSearch;
             _gridMap = gridMap;
             _gathering = gathering;
+            _construction = construction;
+            _buildings = buildings;
             _nodes = nodes;
             _eventBus = eventBus;
             _isDestinationFree = cell => !_units.IsDestinationTaken(cell, _groupIds);
         }
 
-        /// <summary>The right click order: attack the enemy under the point, gather the resource under it, or move there.</summary>
+        /// <summary>The right click order: attack the enemy under the point, build the player's site under it, gather the resource under it, or move there.</summary>
         /// <returns>False if the list holds no unit that can take the order.</returns>
         public bool CommandAt(IReadOnlyList<GameEntityId> ids, Vector2 worldPosition)
         {
             var enemy = _combat.GetHostileAt(worldPosition, Faction.Player);
             if (enemy.IsValid)
                 return Attack(ids, enemy, worldPosition);
+
+            if (_buildings.TryGet(_buildings.GetBuildingAt(worldPosition), out var building) && building.Faction == Faction.Player && !building.IsBuilt)
+                return Build(ids, building, worldPosition);
 
             var node = _nodes.GetNodeAt(worldPosition);
             return node != null ? Gather(ids, node, worldPosition) : MoveTo(ids, worldPosition);
@@ -65,23 +74,50 @@ namespace BarracksAndBolts.Gameplay.Commands
         {
             CollectGroup(ids);
             AnnounceOrder();
-            _nonGatherers.Clear();
+            _nonWorkers.Clear();
             var hasGatherer = false;
             foreach (var unit in _group)
             {
+                _construction.Cancel(unit.Id);
                 if (_gathering.TryOrder(unit, node))
                     hasGatherer = true;
                 else
-                    _nonGatherers.Add(unit.Id);
+                    _nonWorkers.Add(unit.Id);
             }
 
-            if (_nonGatherers.Count > 0)
-                return MoveTo(_nonGatherers, worldPosition) || hasGatherer;
+            if (_nonWorkers.Count > 0)
+                return MoveTo(_nonWorkers, worldPosition) || hasGatherer;
 
             if (hasGatherer)
                 _eventBus.Publish(new MoveCommandIssuedEvent(worldPosition));
 
             return hasGatherer;
+        }
+
+        /// <summary>Villagers among the ids go to work on the site. Everyone else walks up to it.</summary>
+        /// <returns>False if the list holds no unit that can take the order.</returns>
+        public bool Build(IReadOnlyList<GameEntityId> ids, BuildingModel site, Vector2 worldPosition)
+        {
+            CollectGroup(ids);
+            AnnounceOrder();
+            _nonWorkers.Clear();
+            var hasBuilder = false;
+            foreach (var unit in _group)
+            {
+                _gathering.Cancel(unit.Id);
+                if (_construction.TryOrder(unit, site))
+                    hasBuilder = true;
+                else
+                    _nonWorkers.Add(unit.Id);
+            }
+
+            if (_nonWorkers.Count > 0)
+                return MoveTo(_nonWorkers, worldPosition) || hasBuilder;
+
+            if (hasBuilder)
+                _eventBus.Publish(new MoveCommandIssuedEvent(worldPosition));
+
+            return hasBuilder;
         }
 
         /// <summary>Orders the player's units among the ids to attack the target. There is no friendly fire.</summary>
@@ -98,7 +134,7 @@ namespace BarracksAndBolts.Gameplay.Commands
             AnnounceOrder();
             foreach (var unit in _group)
             {
-                _gathering.Cancel(unit.Id);
+                CancelJobs(unit.Id);
                 unit.SetAttackTarget(targetId);
             }
 
@@ -129,7 +165,7 @@ namespace BarracksAndBolts.Gameplay.Commands
 
             AnnounceOrder();
             foreach (var unit in _group)
-                _gathering.Cancel(unit.Id);
+                CancelJobs(unit.Id);
 
             AssignDestinations();
             _eventBus.Publish(new MoveCommandIssuedEvent(worldPosition));
@@ -154,6 +190,12 @@ namespace BarracksAndBolts.Gameplay.Commands
                 _group.Add(unit);
                 _groupIds.Add(id);
             }
+        }
+
+        private void CancelJobs(GameEntityId unitId)
+        {
+            _gathering.Cancel(unitId);
+            _construction.Cancel(unitId);
         }
 
         private void AnnounceOrder()

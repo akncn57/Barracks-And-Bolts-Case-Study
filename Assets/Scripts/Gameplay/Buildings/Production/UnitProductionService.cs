@@ -12,6 +12,9 @@ namespace BarracksAndBolts.Gameplay.Buildings.Production
         /// <summary>This building doesn't make this unit.</summary>
         NotAvailable,
 
+        /// <summary>The building is still a site.</summary>
+        UnderConstruction,
+
         NotEnoughResources,
 
         NoHousing,
@@ -45,6 +48,9 @@ namespace BarracksAndBolts.Gameplay.Buildings.Production
         {
             if (!CanProduce(building.Definition, unit))
                 return ProductionBlock.NotAvailable;
+
+            if (!building.IsBuilt)
+                return ProductionBlock.UnderConstruction;
 
             if (!_resources.CanAfford(unit.Cost))
                 return ProductionBlock.NotEnoughResources;

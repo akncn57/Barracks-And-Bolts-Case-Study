@@ -58,7 +58,7 @@
 - **Şu anki hali:** Köylüler 3 kişi başlıyor, Castle sadece Normal modda köylü üretiyor. Sağ tıkla kaynağa gönderiliyor. Bırakma noktası sadece Castle. Castle ve House 5'er nüfus veriyor. Sayılar geçici: `Data_Config_NormalMode`, `Data_Config_Raids` ve tanım asset'lerinde.
 - **Kaynak toplama (köylü):**
   1. Oyuncu köylüyü sol tıkla seçer.
-  2. İmleç bir kaynağın (ağaç, taş, yemek) üstüne gelince toplama imlecine dönüşür.
+  2. İmleç bir kaynağın (ağaç, taş, yemek) üstüne gelince toplama imlecine dönüşür. **Şu anki hali:** Normal modda köylü seçili olmasa da dönüşüyor: ağaç ve koyunda balta, taş ve altında kazma.
   3. Oyuncu kaynağa tıklar. Köylü A* ile oraya gider ve kaynak toplamaya başlar.
   4. Topladığı kaynağı en yakın uygun depoya (veya Castle'a) taşır ve geri döner. Ayrıntılar "Depo Sistemi" bölümünde.
 
@@ -143,6 +143,7 @@ Bu değerler ScriptableObject üzerinden ayarlanabilir olacak, ileride değişti
 - İnşa tamamlanmadan bina üretim yapamaz ve nüfus kapasitesi vermez.
 - İnşa iptal edilirse harcanan kaynağın bir kısmı (ör. %50) geri verilir.
 - **Sandbox Modu:** İnşa anında tamamlanır. Bu, PDF'teki "üretim süresi yok" maddesini karşılar.
+- **Şu anki hali:** Bina gri ve yarı saydam bir inşaat alanı olarak konur, %10 HP ile başlar. Köylü seçilip inşaata sağ tıklanınca (imleç çekiç olur) binanın dibine gidip çekiçle çalışır, 4-7 saniyede bir etrafında yer değiştirir. Süreler tek köylü için: House 20, Barracks 35, Kule 30, Karakol 30 saniye (`buildTime`). Bitmeden üretim, nüfus, kule atışı ve bölge yok. Bitince köylü boşta kalır. İptal ve tamir henüz yok.
 
 ### Açlık
 - Yemek her gün sabah nüfus başına tüketilir.

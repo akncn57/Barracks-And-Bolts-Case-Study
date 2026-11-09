@@ -396,7 +396,7 @@ namespace BarracksAndBolts.Gameplay.Gathering
             var nearestDistance = float.MaxValue;
             foreach (var building in _buildings.Buildings)
             {
-                if (!building.Definition.IsDropOff || building.Faction != Faction.Player)
+                if (!building.Definition.IsDropOff || building.Faction != Faction.Player || !building.IsBuilt)
                     continue;
 
                 var distance = (building.Area.center + _gridMap.Origin - from).sqrMagnitude;

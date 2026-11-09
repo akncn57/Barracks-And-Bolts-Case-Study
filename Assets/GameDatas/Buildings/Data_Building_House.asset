@@ -21,6 +21,7 @@ MonoBehaviour:
   - kind: 0
     amount: 30
   isDropOff: 0
+  buildTime: 20
   populationCapacity: 5
   producibles: []
   normalModeProducibles: []

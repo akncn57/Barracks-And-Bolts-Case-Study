@@ -27,6 +27,9 @@ namespace BarracksAndBolts.Gameplay.Hover
 
         public GameEntityId Hovered { get; private set; }
 
+        /// <summary>The resource under the mouse, or null. Resources have their own service, so they come separately.</summary>
+        public ResourceNodeModel HoveredNode => _hoveredNode;
+
         public void UpdateAt(Vector2 worldPosition)
         {
             var unit = _units.GetUnitAt(worldPosition);

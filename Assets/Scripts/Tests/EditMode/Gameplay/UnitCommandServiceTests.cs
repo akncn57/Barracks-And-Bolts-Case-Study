@@ -40,7 +40,9 @@ namespace BarracksAndBolts.Tests.EditMode.Gameplay
             var nodes = new ResourceNodeService(_map, ids, _eventBus);
             var gathering = new GatheringSystem(_units, _movement, nodes, _buildings, TestDefinitions.CreateFreeResources(_eventBus), search, _map,
                 ScriptableObject.CreateInstance<NormalModeSettings>(), _eventBus);
-            _commands = new UnitCommandService(_units, _movement, new BarracksAndBolts.Gameplay.Combat.CombatService(_units, _buildings, _map, _eventBus), search, _map, gathering, nodes, _eventBus);
+            var construction = new BarracksAndBolts.Gameplay.Construction.ConstructionSystem(_units, _movement, _buildings, _map, _eventBus);
+            _commands = new UnitCommandService(_units, _movement, new BarracksAndBolts.Gameplay.Combat.CombatService(_units, _buildings, _map, _eventBus), search, _map,
+                gathering, construction, _buildings, nodes, _eventBus);
             _knight = TestDefinitions.CreateUnit("knight");
             _house = TestDefinitions.CreateBuilding("house", new Vector2Int(2, 2));
         }

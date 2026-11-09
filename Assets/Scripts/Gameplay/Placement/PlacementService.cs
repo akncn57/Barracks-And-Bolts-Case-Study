@@ -136,7 +136,9 @@ namespace BarracksAndBolts.Gameplay.Placement
         /// <returns>False if the footprint is hidden or not free; the mode stays active so the player can try elsewhere.</returns>
         public bool TryConfirm(bool keepPlacing)
         {
-            if (!IsAreaValid || !_buildingService.TryPlace(Definition, Area.position, Faction, out _))
+            // A normal game builds over time: the building starts as a site for villagers. Sandbox mode builds at once.
+            var asSite = !_resources.IsUnlimited && Definition.BuildTime > 0f;
+            if (!IsAreaValid || !_buildingService.TryPlace(Definition, Area.position, Faction, out _, asSite))
                 return false;
 
             _resources.TrySpend(Definition.Cost);

@@ -4,6 +4,7 @@ using BarracksAndBolts.Core.Events;
 using BarracksAndBolts.Core.Simulation;
 using BarracksAndBolts.Gameplay.Buildings;
 using BarracksAndBolts.Gameplay.Commands;
+using BarracksAndBolts.Gameplay.Construction;
 using BarracksAndBolts.Gameplay.Data;
 using BarracksAndBolts.Gameplay.Entities;
 using BarracksAndBolts.Gameplay.Gathering;
@@ -33,6 +34,7 @@ namespace BarracksAndBolts.Gameplay.Raids
         private readonly BuildingService _buildings;
         private readonly UnitMovementSystem _movement;
         private readonly GatheringSystem _gathering;
+        private readonly ConstructionSystem _construction;
         private readonly GridSearch _search;
         private readonly GridMap _gridMap;
         private readonly RaidSettings _settings;
@@ -48,13 +50,14 @@ namespace BarracksAndBolts.Gameplay.Raids
         private float _time;
         private float _scanDelayLeft;
 
-        public ShelterSystem(UnitService units, BuildingService buildings, UnitMovementSystem movement, GatheringSystem gathering, GridSearch search,
+        public ShelterSystem(UnitService units, BuildingService buildings, UnitMovementSystem movement, GatheringSystem gathering, ConstructionSystem construction, GridSearch search,
             GridMap gridMap, RaidSettings settings, NormalModeSettings normalMode, SandboxService sandbox, IEventBus eventBus)
         {
             _units = units;
             _buildings = buildings;
             _movement = movement;
             _gathering = gathering;
+            _construction = construction;
             _search = search;
             _gridMap = gridMap;
             _settings = settings;
@@ -113,7 +116,7 @@ namespace BarracksAndBolts.Gameplay.Raids
                     continue;
 
                 _fleeing.RemoveAt(i);
-                _gathering.Cancel(id);
+                CancelWork(id);
             }
         }
 
@@ -126,7 +129,7 @@ namespace BarracksAndBolts.Gameplay.Raids
                 if (!_units.TryGet(unit.Id, out _) || unit.IsDead)
                 {
                     _fleeing.RemoveAt(i);
-                    _gathering.Cancel(unit.Id);
+                    CancelWork(unit.Id);
                 }
                 else if (!unit.IsMoving)
                 {
@@ -147,7 +150,7 @@ namespace BarracksAndBolts.Gameplay.Raids
 
             // Something is in the way. Better back to work than standing around.
             _leftAloneUntil[unit.Id] = _time + LeftAloneSeconds;
-            _gathering.Resume(unit);
+            ResumeWork(unit);
         }
 
         private void GoInside(UnitModel unit)
@@ -165,7 +168,7 @@ namespace BarracksAndBolts.Gameplay.Raids
             foreach (var unit in _fleeing)
             {
                 unit.Stop();
-                _gathering.Resume(unit);
+                ResumeWork(unit);
             }
 
             _fleeing.Clear();
@@ -180,10 +183,23 @@ namespace BarracksAndBolts.Gameplay.Raids
                     door = cell;
 
                 _units.BringOut(unit, door);
-                _gathering.Resume(unit);
+                ResumeWork(unit);
             }
 
             _inside.Clear();
+        }
+
+        private void CancelWork(GameEntityId unitId)
+        {
+            _gathering.Cancel(unitId);
+            _construction.Cancel(unitId);
+        }
+
+        // A villager has at most one of the two jobs suspended.
+        private void ResumeWork(UnitModel unit)
+        {
+            if (!_gathering.Resume(unit))
+                _construction.Resume(unit);
         }
 
         private void CollectEnemies()
@@ -220,6 +236,7 @@ namespace BarracksAndBolts.Gameplay.Raids
                 return;
 
             _gathering.Suspend(unit.Id);
+            _construction.Suspend(unit.Id);
             unit.ClearAttackTarget();
             _movement.SendTo(unit, door);
             _fleeing.Add(unit);

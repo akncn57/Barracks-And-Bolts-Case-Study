@@ -1,6 +1,6 @@
 # Barracks & Bolts – Öncelik ve Takvim
 
-> **Durum (9 Kasım):** P0 ve P0+ bitti, sadece README kaldı. P1 oyun döngüsü kuruldu ve oynandı: kaynaklar, köylüler, maliyet, nüfus, takvim, baskınlar, düşman AI, sığınma, oyun sonu. P2'den kule ve bölge sistemi (Karakol, kapsama halkaları) yapıldı. SetPass 10 (son özelliklerden önce ölçüldü), Windows build 8 Kasım'da denendi. **Sıradaki adım:** Tarla (kullanıcı onayıyla), sonra denge, Test Runner sonucu, yeni build, README en son. Efekt turunda yapılacak: vuruş zamanlaması ve ölüm efekti.
+> **Durum (9 Kasım):** P0 ve P0+ bitti, sadece README kaldı. P1 oyun döngüsü kuruldu ve oynandı: kaynaklar, köylüler, maliyet, nüfus, takvim, baskınlar, düşman AI, sığınma, oyun sonu. P2'den kule, bölge sistemi (Karakol, kapsama halkaları) ve köylünün inşaatı yapıldı; kaynakta ve inşaatta araç imleci var. SetPass 10 (son özelliklerden önce ölçüldü), Windows build 8 Kasım'da denendi. **Sıradaki adım:** Tarla (kullanıcı onayıyla), sonra denge, Test Runner sonucu, yeni build, README en son. Efekt turunda yapılacak: vuruş zamanlaması ve ölüm efekti.
 > Sistemlerin kodda nasıl çalıştığı: [Systems.md](Systems.md)
 
 > **Teslim tarihi:** 13 Kasım 2026, Cuma
@@ -61,7 +61,7 @@ Oyunu deneyince çıkan kullanılabilirlik istekleri. Sandbox'ta da olmalı, bui
 - [x] Dalga sistemi ve baskın bildirimleri (ses ve mini harita yok; yön yazıyla söyleniyor)
 - [x] Kazanma ve kaybetme koşulları ve oyun sonu ekranı
 - [ ] Oyun döngüsünün dengesi (süreler, maliyetler, dalga büyüklükleri)
-- [ ] Test Runner sonucu (412 test) ve son SetPass ölçümü
+- [ ] Test Runner sonucu (436 test) ve son SetPass ölçümü
 
 ## P2 – Derinlik (zaman kaldıkça, aşağıdaki sırayla)
 **Hedef: 12 Kasım Perşembe.**
@@ -71,7 +71,7 @@ Oyunu deneyince çıkan kullanılabilirlik istekleri. Sandbox'ta da olmalı, bui
 3. [ ] Seed tabanlı rastgele harita üretimi ve yol doğrulaması (kaynaklar zaten seed'le dağılıyor; zemin sabit)
 4. [ ] Mini harita
 5. [ ] Kilise ve Monk (kendiliğinden iyileştirme)
-6. [ ] Köylünün inşa etmesi ve manuel tamir
+6. [x] Köylünün inşa etmesi: Normal modda bina gri inşaat alanı olarak konur, köylüler bitirir, üstünde ilerleme çubuğu var. Kaynakta ve inşaatta araç imleci. (Tamir ve iptal sonra)
 7. [ ] Depo binaları ve kapasite sistemi
 8. [ ] Açlık
 9. [x] Bölge sistemi ve Karakol (yarıçap yükseltmesi, yükseltme sistemiyle gelecek). Seçili binada menzil ve bölge halkası

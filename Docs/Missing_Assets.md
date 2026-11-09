@@ -15,7 +15,7 @@
 | `Texture_UI_Avatars_01–05` | Birim portreleri: Şövalye, Mızrakçı, Okçu, Rahip, Köylü (ilk üçü `Data_Unit_*` asset'lerine atandı) |
 | `Texture_Cursors_Default`, `_Pointer`, `_Forbidden` | Varsayılan imleç, tıklanabilir (el), yasak |
 | `Texture_Cursors_Selection` (köşe çerçevesi) | Seçim / hedef göstergesi |
-| `Texture_UI_Tools_Hammer`, `_Axe`, `_Sword`, `_Pickaxe` | İmleç durumları: inşa/tamir, odun, saldırı, maden |
+| `Texture_UI_Tools_Hammer`, `_Axe`, `_Sword`, `_Pickaxe` | İmleç durumları: inşa/tamir, odun, saldırı, maden. Balta, kazma ve çekiçten 32x32 imleç kopyaları üretildi: `Textures/Cursors/Texture_Cursors_Axe/Pickaxe/Hammer` (kılıç henüz kullanılmıyor) |
 | `Texture_UI_Bars_Big_*`, `_Small_*` | Can barı, ilerleme barı |
 | `Texture_UI_Ribbons_Small_<Renk>_<Fork/Point>`, `_Banners_*`, `_Papers_*`, `_WoodTable_*` | Panel arka planları, başlıklar, slotlar |
 
@@ -40,7 +40,7 @@
 | 9 | ~~Nüfus ikonu~~ | ✅ Gri köylü avatarından: `Texture_UI_Icons_Population` | – |
 | 10 | Gün / gece / takvim ikonu | Takvim UI'ı | 🔍 / 🛠 |
 | 11 | Baskın uyarı ikonu ve ekran kenarı yön oku | Baskın bildirimi | 🛠 Kılıç ikonu + ok ikonu |
-| 12 | Koyun kesme imleci | Yemek toplama | 🛠 Et ikonu veya kılıç aracı |
+| 12 | ~~Koyun kesme imleci~~ | ✅ Koyunda da balta imleci (`Texture_Cursors_Axe`) | – |
 | 13 | Kaynak taşıyan köylü (odun/altın/et taşırken) | Görsel geri bildirim (opsiyonel) | 🔍 Tiny Swords'ta var. Alternatif: köylünün üstünde küçük kaynak ikonu |
 | 14 | Kaynak toplama ve hasar sayıları (ör. "+5", "-10") | Geri bildirim | 💻 Uçan yazı sistemi hazır (`FloatingTextSpawner`, şu an uyarılar için); sayılar efekt turunda |
 | 15 | Ana menü arka planı | Ana menü | 🛠 Oyun sahnesinden bir görüntü veya Banner/Paper ile |
@@ -51,7 +51,7 @@
 |---|---|---|---|
 | 17 | ~~Depo binaları (4 adet)~~ | ✅ Üretildi: Archery sundurması (hedefler silindi) + avluda tek kaynak yığını. `Texture_Buildings_<Renk>_Storage_Wood/Food/Gold/Stone` | – |
 | 18 | ~~Karakol~~ | ✅ Tower + takım renginde bayrak: `Texture_Buildings_<Renk>_Outpost` | – |
-| 19 | İnşa halindeki bina (iskele) | Köylünün inşa etmesi | 🔍 Tiny Swords'ta "Construction" varyantları var. Alternatif: 💻 yarı saydam bina ve alttan dolan maske |
+| 19 | ~~İnşa halindeki bina~~ | ✅ Binaların gri kopyaları üretildi: `Texture_Buildings_<Renk>_<Bina>_Site` (House, Barracks, Tower, Outpost). Yarı saydam başlar, işlendikçe koyulaşır. Üstünde ilerleme çubuğu: paketin küçük bar çerçevesi Gameplay atlas'ına kopyalandı, altın dolgu üretildi (`Texture_Markers_ProgressBar_Frame/Fill`) | – |
 | 20 | ~~Hasarlı bina efekti~~ | ✅ `Texture_VFX_Fire_*` | – |
 | 21 | Rütbe / seviye simgesi (asker ve bina seviyesi) | Yükseltme sistemi | 🛠 / 💻 Küçük yıldız veya çizgiler |
 | 22 | ~~Bölge sınırı görseli~~ | ✅ Kodla: haritanın üstünde tek doku, `TerritoryOverlayView` | – |

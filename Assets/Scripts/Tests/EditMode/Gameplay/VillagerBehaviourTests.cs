@@ -5,6 +5,7 @@ using BarracksAndBolts.Core.Events;
 using BarracksAndBolts.Core.Session;
 using BarracksAndBolts.Gameplay.Buildings;
 using BarracksAndBolts.Gameplay.Combat;
+using BarracksAndBolts.Gameplay.Construction;
 using BarracksAndBolts.Gameplay.Commands;
 using BarracksAndBolts.Gameplay.Data;
 using BarracksAndBolts.Gameplay.Economy;
@@ -40,6 +41,7 @@ namespace BarracksAndBolts.Tests.EditMode.Gameplay
         private ResourceNodeService _nodes;
         private UnitMovementSystem _movement;
         private GatheringSystem _gathering;
+        private ConstructionSystem _construction;
         private CombatService _combat;
         private ShelterSystem _shelter;
         private ResourceRoamSystem _roam;
@@ -93,6 +95,7 @@ namespace BarracksAndBolts.Tests.EditMode.Gameplay
             raids.ApplyModifiedPropertiesWithoutUndo();
 
             _gathering = new GatheringSystem(_units, _movement, _nodes, _buildings, _resources, _search, _map, _normal, _eventBus);
+            _construction = new ConstructionSystem(_units, _movement, _buildings, _map, _eventBus);
             _shelter = CreateShelter(_sandbox);
             _roam = new ResourceRoamSystem(_nodes, new GameSessionSettings { Seed = 4 });
         }
@@ -109,7 +112,7 @@ namespace BarracksAndBolts.Tests.EditMode.Gameplay
 
         private ShelterSystem CreateShelter(SandboxService sandbox)
         {
-            return new ShelterSystem(_units, _buildings, _movement, _gathering, _search, _map, _raids, _normal, sandbox, _eventBus);
+            return new ShelterSystem(_units, _buildings, _movement, _gathering, _construction, _search, _map, _raids, _normal, sandbox, _eventBus);
         }
 
         private T Track<T>(T asset) where T : Object
@@ -164,6 +167,7 @@ namespace BarracksAndBolts.Tests.EditMode.Gameplay
         {
             _movement.Tick(Step);
             _gathering.Tick(Step);
+            _construction.Tick(Step);
             shelter.Tick(Step);
         }
 
@@ -438,6 +442,28 @@ namespace BarracksAndBolts.Tests.EditMode.Gameplay
         }
 
         [Test]
+        public void Shelter_Builder_GoesBackToTheSite()
+        {
+            PlaceCastle();
+            var house = Track(TestDefinitions.CreateBuilding("house", new Vector2Int(2, 2)));
+            var serialized = new SerializedObject(house);
+            serialized.FindProperty("buildTime").floatValue = 1000f;
+            serialized.ApplyModifiedPropertiesWithoutUndo();
+            _buildings.TryPlace(house, new Vector2Int(24, 31), Faction.Player, out var site, asSite: true);
+            var villager = SpawnVillager(20, 31);
+            _construction.TryOrder(villager, site);
+            var enemy = SpawnEnemy(18, 31);
+            RunUntil(() => !_units.TryGet(villager.Id, out _));
+            Assert.IsFalse(_construction.IsBuilding(villager.Id), "It left the site to hide.");
+
+            _units.Remove(enemy.Id);
+            RunUntil(() => _units.TryGet(villager.Id, out _));
+
+            Assert.IsTrue(_construction.IsBuilding(villager.Id));
+            Assert.IsFalse(villager.IsIdle);
+        }
+
+        [Test]
         public void Shelter_NoJobBefore_ComesOutIdle()
         {
             PlaceCastle();
@@ -472,7 +498,7 @@ namespace BarracksAndBolts.Tests.EditMode.Gameplay
         public void Shelter_PlayerOrder_BeatsTheFlight()
         {
             PlaceCastle();
-            var commands = new UnitCommandService(_units, _movement, _combat, _search, _map, _gathering, _nodes, _eventBus);
+            var commands = new UnitCommandService(_units, _movement, _combat, _search, _map, _gathering, _construction, _buildings, _nodes, _eventBus);
             var villager = SpawnVillager(8, 31);
             SpawnEnemy(12, 31);
             Run(0.5f);

@@ -6,6 +6,7 @@ using BarracksAndBolts.Gameplay.Buildings.Production;
 using BarracksAndBolts.Gameplay.Calendar;
 using BarracksAndBolts.Gameplay.CameraControl;
 using BarracksAndBolts.Gameplay.Combat;
+using BarracksAndBolts.Gameplay.Construction;
 using BarracksAndBolts.Gameplay.Commands;
 using BarracksAndBolts.Gameplay.Data;
 using BarracksAndBolts.Gameplay.Economy;
@@ -92,6 +93,7 @@ namespace BarracksAndBolts.Gameplay.Bootstrap
             builder.Register<ResourceRespawnService>(Lifetime.Singleton);
             builder.Register<GameOutcomeService>(Lifetime.Singleton);
             builder.RegisterSimulationSystem<GatheringSystem>();
+            builder.RegisterSimulationSystem<ConstructionSystem>();
             builder.RegisterSimulationSystem<CalendarService>();
             builder.RegisterSimulationSystem<RaidService>();
             builder.RegisterSimulationSystem<BattleAiSystem>();
@@ -153,6 +155,7 @@ namespace BarracksAndBolts.Gameplay.Bootstrap
             builder.Register<HoverService>(Lifetime.Singleton);
             builder.RegisterEntryPoint<HoverInputHandler>();
             builder.RegisterComponentInHierarchy<HoverHighlightView>();
+            builder.RegisterComponentInHierarchy<ToolCursorView>();
         }
     }
 }

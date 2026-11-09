@@ -54,6 +54,10 @@ namespace BarracksAndBolts.UI.Information
         private TooltipView _tooltip;
         private IEventBus _eventBus;
 
+        // The site on show and the percent last written, so the label is only rewritten when the number changes.
+        private BuildingModel _shownSite;
+        private int _shownPercent = -1;
+
         [Inject]
         private void Construct(SelectionService selection, BuildingService buildings, TeamService teams,
             UnitProductionService production, SandboxService sandbox, TooltipView tooltip, IEventBus eventBus)
@@ -73,6 +77,7 @@ namespace BarracksAndBolts.UI.Information
             _eventBus.Subscribe<SelectionChangedEvent>(_ => OnSelectionChanged()).AddTo(_subscriptions);
             _eventBus.Subscribe<SandboxFactionChangedEvent>(_ => Refresh()).AddTo(_subscriptions);
             _eventBus.Subscribe<EntityDamagedEvent>(OnEntityDamaged).AddTo(_subscriptions);
+            _eventBus.Subscribe<BuildingCompletedEvent>(OnBuildingCompleted).AddTo(_subscriptions);
             Refresh();
         }
 
@@ -101,8 +106,24 @@ namespace BarracksAndBolts.UI.Information
                 Refresh();
         }
 
+        private void OnBuildingCompleted(BuildingCompletedEvent completedEvent)
+        {
+            if (_selection.IsSelected(completedEvent.Building.Id))
+                Refresh();
+        }
+
+        // Work on a site moves every frame, with no event for it; only the progress line is kept up to date here.
+        private void LateUpdate()
+        {
+            if (_shownSite == null || _shownSite.IsBuilt || GetPercent(_shownSite) == _shownPercent)
+                return;
+
+            ShowSiteProgress(_shownSite);
+        }
+
         private void Refresh()
         {
+            _shownSite = null;
             var hasBuilding = _buildings.TryGet(_selection.Primary, out var building);
             content.SetActive(hasBuilding);
             if (!hasBuilding)
@@ -117,15 +138,38 @@ namespace BarracksAndBolts.UI.Information
             var definition = building.Definition;
             picture.sprite = _teams.GetColorSet(building.Faction).GetBuildingSprite(definition);
             nameLabel.text = definition.DisplayName;
-            hpLabel.text = $"{building.CurrentHp} / {definition.MaxHp}";
-            hpFill.fillAmount = (float)building.CurrentHp / definition.MaxHp;
+            ShowHp(building);
+            if (!building.IsBuilt)
+                ShowSiteProgress(building);
 
             // Only the side being built for lists its units. Outside sandbox mode that is always the player.
+            // A site makes nothing until it is finished.
             var producibles = _production.GetProducibles(definition);
-            var showProduction = producibles.Count > 0 && building.Faction == _sandbox.ActiveFaction;
+            var showProduction = producibles.Count > 0 && building.Faction == _sandbox.ActiveFaction && building.IsBuilt;
             productionSection.SetActive(showProduction);
             if (showProduction)
                 ShowProducibles(producibles);
+        }
+
+        private void ShowHp(BuildingModel building)
+        {
+            hpLabel.text = $"{building.CurrentHp} / {building.Definition.MaxHp}";
+            hpFill.fillAmount = (float)building.CurrentHp / building.Definition.MaxHp;
+        }
+
+        private void ShowSiteProgress(BuildingModel site)
+        {
+            _shownSite = site;
+            _shownPercent = GetPercent(site);
+            nameLabel.text = $"{site.Definition.DisplayName}\n<size=70%>Under construction {_shownPercent}%</size>";
+
+            // HP grows with the work.
+            ShowHp(site);
+        }
+
+        private static int GetPercent(BuildingModel site)
+        {
+            return Mathf.FloorToInt(site.BuildProgress * 100f);
         }
 
         private void ShowProducibles(IReadOnlyList<UnitDefinition> units)
@@ -177,6 +221,8 @@ namespace BarracksAndBolts.UI.Information
                     return "Not enough resources";
                 case ProductionBlock.NoHousing:
                     return "Build more houses";
+                case ProductionBlock.UnderConstruction:
+                    return "Still being built";
                 default:
                     return "Can't make this here";
             }

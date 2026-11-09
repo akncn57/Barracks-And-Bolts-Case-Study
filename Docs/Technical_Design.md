@@ -80,7 +80,7 @@ Scripts/
 ├── Popup/       BarracksAndBolts.Popup      Hazır popup sistemi (şu an kullanılmıyor)
 ├── Utils/       BarracksAndBolts.Utils      Unity'den bağımsız yardımcılar (MinHeap, CompositeDisposable)
 └── Tests/
-    └── EditMode/ BarracksAndBolts.Tests.EditMode   412 test
+    └── EditMode/ BarracksAndBolts.Tests.EditMode   436 test
 ```
 - Kayıt (save) ve ayarlar servisi henüz yok; geldiğinde Core'a girer.
 - Tek seferlik editör araçları `Assets/Editor/` altında asmdef'siz durur ve iş bitince silinir.
@@ -103,12 +103,13 @@ Gameplay/
 ├── Pathfinding/    AStarPathfinder, PathStatus, GridSearch
 ├── Placement/      PlacementService, PlacementInputHandler, PlacementPreviewView, Placement*Event
 ├── Buildings/      BuildingService, BuildingModel, BuildingView, BuildingViewSpawner, BuildingSpriteLayout,
-│                   BuildingDefenderView, CoverageRingView, Production/ (UnitProductionService)
+│                   BuildingDefenderView, CoverageRingView, BuildProgressBarView, BuildingCompletedEvent,
+│                   Production/ (UnitProductionService)
 ├── Units/          UnitService, UnitModel, UnitMovementSystem, UnitView, UnitViewSpawner, Unit*Event
 ├── Territory/      TerritoryService, TerritoryOverlayView
 ├── Combat/         CombatService, CombatSystem, BuildingDefenseSystem, DeathCleanupSystem, DamageFlash,
 │                   ProjectileSpawner, ProjectileView, CombatEvents
-├── Hover/          HoverService, HoverInputHandler, HoverHighlightView
+├── Hover/          HoverService, HoverInputHandler, HoverHighlightView, ToolCursor, ToolCursorPicker, ToolCursorView
 ├── Feedback/       FloatingTextRequestedEvent (çizen: UI/Feedback/FloatingTextSpawner)
 ├── Selection/      SelectionService, SelectionInputHandler, BoxSelectionView
 ├── Commands/       UnitCommandService, CommandInputHandler, MoveMarkerView (AttackMove vb. gelince: IUnitCommand)
@@ -118,12 +119,13 @@ Gameplay/
 │                   ResourceRoamSystem, ResourceNodeView, ResourceNodeViewSpawner
 ├── Economy/        ResourceService, PopulationService, NormalModeStarter, ResourceRespawnService, GameOutcomeService
 ├── Gathering/      GatheringSystem
+├── Construction/   ConstructionSystem (inşaat alanı; durum BuildingModel'de, BuildingCompletedEvent)
 ├── Calendar/       CalendarService (görünüm: UI/Hud/DayNightOverlayView, CalendarLabelView)
 ├── Raids/          RaidService, BattleAiSystem, ShelterSystem
 ├── Input/          GameInputActions (üretilen), InputModeController
 └── CameraControl/  CameraController, CameraMath, CameraConfig
 ```
-Planlanan klasörler: `Map/` (zemin üretimi), `Upgrades/`, `Storage/`, `Construction/`, `Minimap/`, `Save/`. Ayrıntı: [Systems.md](Systems.md).
+Planlanan klasörler: `Map/` (zemin üretimi), `Upgrades/`, `Storage/`, `Minimap/`, `Save/`. Ayrıntı: [Systems.md](Systems.md).
 
 ### UI alt yapısı
 ```
@@ -208,7 +210,7 @@ public interface IEventBus
 | `Time` | 100 | `CalendarService` |
 | `AI` | 200 | `RaidService`, `BattleAiSystem`, `ShelterSystem` |
 | `Movement` | 300 | `UnitMovementSystem`, `ResourceRoamSystem` |
-| `Gathering` | 350 | `GatheringSystem` |
+| `Gathering` | 350 | `GatheringSystem`, `ConstructionSystem` |
 | `Combat` | 400 | `CombatSystem`, `BuildingDefenseSystem` |
 | `Cleanup` | 500 | `DeathCleanupSystem` |
 | `Presentation` | 600 | Boş. View'lar kendi `LateUpdate`'lerinde modeli okur |
@@ -265,7 +267,7 @@ public interface IEventBus
 - **Mini harita (planlandı):** İkinci bir kamera kullanılmaz. Grid verisinden üretilen tek bir `Texture2D` kullanılır.
 - **UI:** Statik ve sık değişen elemanlar ayrı Canvas'lara bölünür (`StaticCanvas` / `DynamicCanvas`).
 - **Gece efekti:** Ekranı kaplayan tek bir yarı saydam UI görseli (`DayNightOverlayView`), alfası takvimden gelir. Işık sistemi kullanılmıyor.
-- **Çizim sırası (Order in Layer):** su -5, köpük -4, zemin -3, plato ve merdiven -2, bölge katmanı ve halkalar -1, bina, birim ve kaynak 0, yerleştirme önizlemesi 99-100, ok 150, durum ikonu 160, hover çerçevesi 190, seçim kutusu 200.
+- **Çizim sırası (Order in Layer):** su -5, köpük -4, zemin -3, plato ve merdiven -2, bölge katmanı ve halkalar -1, bina, birim ve kaynak 0, yerleştirme önizlemesi 99-100, ok 150, inşaat çubuğu 155, durum ikonu 160, hover çerçevesi 190, seçim kutusu 200.
 - Ölçüm Frame Debugger ve Game view Stats ile yapılır: savaş sırasında **10 SetPass**. Son özelliklerden sonra tekrar ölçülecek, sonuç README'ye yazılacak.
 
 ---
@@ -390,13 +392,13 @@ Prefab_Core_GameplayLifetimeScope
 ---
 
 ## 15. Testler (EditMode)
-Toplam **412 test**, 33 dosya (`TestDefinitions` ve `TestMaps` yardımcı). Her biri saf C# servislerini Unity sahnesi olmadan çalıştırır.
+Toplam **436 test**, 34 dosya (`TestDefinitions` ve `TestMaps` yardımcı). Her biri saf C# servislerini Unity sahnesi olmadan çalıştırır.
 
 | Alan | Dosyalar | Kapsadığı durumlar |
 |---|---|---|
 | Altyapı | `EventBusTests`, `GameClockTests`, `SimulationRunnerTests`, `CompositeDisposableTests`, `MinHeapTests`, `GameEntityId*Tests` | Yayın sırasında abonelik değişimi, hata veren handler, pause, oyun hızı, faz sırası |
 | Grid ve yol | `GridMapTests`, `AStarPathfinderTests`, `GridSearchTests` | Köşe kesmeme, hedef yürünemez, yol yok, harita sınırı, grup hedefleri, suyu geçmeme |
-| Bina | `BuildingServiceTests`, `PlacementServiceTests`, `TerritoryTests`, `CoverageRingTests` | Çakışma, taşma, birim altında yerleştirme, bölge dışı, açılacak alan önizlemesi, halka çizimi |
+| Bina | `BuildingServiceTests`, `PlacementServiceTests`, `TerritoryTests`, `CoverageRingTests`, `ConstructionTests` | Çakışma, taşma, birim altında yerleştirme, bölge dışı, açılacak alan önizlemesi, halka çizimi, inşaat ve araç imleci |
 | Birim | `UnitServiceTests`, `UnitMovementTests`, `UnitCommandServiceTests`, `UnitProductionServiceTests`, `SelectionServiceTests`, `HoverServiceTests` | Spawn, yeniden yol, dağılma, dost ateşi reddi, kutu seçimi |
 | Savaş | `CombatTests`, `BuildingDefenseTests` | Bekleme süresi, ölümün tek kez işlenmesi, binaya kenardan vurma, kule hedef seçimi |
 | Normal mod | `NormalModeTests`, `VillagerBehaviourTests`, `GameLoopTests`, `ResourceDistributorTests` | Harcama, toplama döngüsü, tükenme, sığınma, takvim, baskın, oyun sonu, seed |

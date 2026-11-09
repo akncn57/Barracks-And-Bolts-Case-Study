@@ -16,14 +16,18 @@ MonoBehaviour:
   buildingSprites:
   - building: {fileID: 11400000, guid: 7203bca9a6fb4e1aabda4f97f03ce912, type: 2}
     sprite: {fileID: 21300000, guid: 4c72e0ad8c7c8c2448fe5c5dc1ef0db4, type: 3}
+    siteSprite: {fileID: 21300000, guid: 69d26af008dc4140bf18aa0efea110a3, type: 3}
   - building: {fileID: 11400000, guid: ee40f9169f0246349aee673a63fd2e42, type: 2}
     sprite: {fileID: 21300000, guid: f9c6a7127ff930640a76d36d636d58dc, type: 3}
+    siteSprite: {fileID: 21300000, guid: 8276c00360fd4e929fa28d570a8a51fc, type: 3}
   - building: {fileID: 11400000, guid: b963e66968e640c4a55a996c00888780, type: 2}
     sprite: {fileID: 21300000, guid: 582f46eef424fd34e88c840876f00dde, type: 3}
+    siteSprite: {fileID: 21300000, guid: 33551a3332e54d0fac620dc1f3f5aaa2, type: 3}
   - building: {fileID: 11400000, guid: b58af5da5df14d3eb4fb3bfbc613f8df, type: 2}
     sprite: {fileID: 21300000, guid: c06493c231f444c469efbbfba35fa782, type: 3}
   - building: {fileID: 11400000, guid: a82d5c1f7e3946b0bd14f06c92e7a351, type: 2}
     sprite: {fileID: 21300000, guid: 616234ed193f4ecab05d7946e0277056, type: 3}
+    siteSprite: {fileID: 21300000, guid: 4e5706561ae348dc92a7853ffd91ef91, type: 3}
   unitSprites:
   - unit: {fileID: 11400000, guid: 5ed1c31b43ef4510b9d5c8966a56d71a, type: 2}
     idleFrames:
@@ -138,3 +142,7 @@ MonoBehaviour:
     - {fileID: 8139064838421837713, guid: 8b9e4ea28c0e57749bf9aa94a8d1ae8f, type: 3}
     - {fileID: 7619391525816745755, guid: 8b9e4ea28c0e57749bf9aa94a8d1ae8f, type: 3}
     - {fileID: 851498041175006395, guid: 8b9e4ea28c0e57749bf9aa94a8d1ae8f, type: 3}
+    buildFrames:
+    - {fileID: -1241957522165214808, guid: b895467234a38ea47b66f07ef9aebfe1, type: 3}
+    - {fileID: -4152304209030961917, guid: b895467234a38ea47b66f07ef9aebfe1, type: 3}
+    - {fileID: -7438993905676777009, guid: b895467234a38ea47b66f07ef9aebfe1, type: 3}

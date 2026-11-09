@@ -25,6 +25,8 @@ namespace BarracksAndBolts.Gameplay.Data
         [SerializeField] private bool isDropOff;
         [Tooltip("How many units this building houses in a normal game.")]
         [SerializeField, Min(0)] private int populationCapacity;
+        [Tooltip("Seconds one villager needs to build it in a normal game. More villagers build faster. 0 means it stands at once.")]
+        [SerializeField, Min(0f)] private float buildTime;
 
         [Header("Production")]
         [SerializeField] private UnitDefinition[] producibles = Array.Empty<UnitDefinition>();
@@ -58,6 +60,7 @@ namespace BarracksAndBolts.Gameplay.Data
         public IReadOnlyList<ResourceCost> Cost => cost;
         public bool IsDropOff => isDropOff;
         public int PopulationCapacity => populationCapacity;
+        public float BuildTime => buildTime;
         public IReadOnlyList<UnitDefinition> NormalModeProducibles => normalModeProducibles;
         public IReadOnlyList<UnitDefinition> Producibles => producibles;
         public bool CanProduce => producibles.Length > 0;

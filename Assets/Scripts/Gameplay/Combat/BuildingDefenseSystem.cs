@@ -38,7 +38,8 @@ namespace BarracksAndBolts.Gameplay.Combat
         {
             foreach (var building in _buildings.Buildings)
             {
-                if (!building.Definition.HasDefense || building.IsDead)
+                // The archer only climbs up once the tower is finished.
+                if (!building.Definition.HasDefense || building.IsDead || !building.IsBuilt)
                     continue;
 
                 building.TickShotDelay(deltaTime);

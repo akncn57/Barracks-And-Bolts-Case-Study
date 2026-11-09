@@ -92,13 +92,15 @@ namespace BarracksAndBolts.Gameplay.Units
 
             transform.position = _unit.Position;
             spriteRenderer.flipX = _unit.IsFacingLeft;
-            _damageFlash.Update(spriteRenderer, Time.deltaTime);
+            _damageFlash.Update(spriteRenderer, Time.deltaTime, Color.white);
             UpdateStatusIcon();
 
             if (TryShowAttackFrame())
                 return;
 
-            if (_unit.HarvestingKind.HasValue)
+            if (_unit.IsBuilding)
+                ShowLoopingFrame(_sprites.BuildFrames);
+            else if (_unit.HarvestingKind.HasValue)
                 ShowLoopingFrame(_sprites.GetWorkFrames(_unit.HarvestingKind.Value));
             else
                 ShowLoopingFrame(_unit.IsMoving ? _sprites.RunFrames : _sprites.IdleFrames);

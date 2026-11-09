@@ -19,22 +19,42 @@ namespace BarracksAndBolts.Gameplay.Buildings
         [SerializeField] private CoverageRingView defenseRing;
         [SerializeField] private CoverageRingView territoryRing;
 
+        [Header("Building site")]
+        [Tooltip("Hidden child that shows how far the work has come.")]
+        [SerializeField] private BuildProgressBarView progressBar;
+        [Tooltip("Tint of the grey site sprite nobody has worked on yet.")]
+        [SerializeField] private Color siteStartColor = new(0.85f, 0.85f, 0.85f, 0.7f);
+        [Tooltip("Tint just before the site is finished. The colored sprite comes when it stands.")]
+        [SerializeField] private Color siteEndColor = new(1f, 1f, 1f, 0.95f);
+
         private readonly DamageFlash _damageFlash = new();
+        private BuildingModel _building;
         private BuildingDefinition _definition;
+        private Sprite _sprite;
+        private Sprite _siteSprite;
         private Vector2 _footprintCenter;
         private bool _opensTerritory;
 
         public GameEntityId BuildingId { get; private set; }
 
+        /// <param name="siteSprite">Grey look while the building is a site.</param>
         /// <param name="opensTerritory">False in sandbox mode and for the enemy, who have no territory to show.</param>
-        public void Bind(BuildingModel building, Sprite sprite, Vector2 position, bool opensTerritory)
+        public void Bind(BuildingModel building, Sprite sprite, Sprite siteSprite, Vector2 position, bool opensTerritory)
         {
             BuildingId = building.Id;
             name = $"{building.Definition.DisplayName} ({building.Id})";
             transform.position = position;
-            BuildingSpriteLayout.PlaceOnFootprint(spriteRenderer, sprite);
 
+            _building = building;
             _definition = building.Definition;
+            _sprite = sprite;
+            _siteSprite = siteSprite;
+
+            if (!building.IsBuilt)
+                progressBar.Show(building.Area.width, _definition.VisualHeight);
+
+            // Right away, so a new site doesn't show in full color for its first frame.
+            UpdateLook();
             _footprintCenter = new Vector2(0f, building.Area.height * 0.5f);
             _opensTerritory = opensTerritory && _definition.TerritoryRadius > 0f;
         }
@@ -70,7 +90,36 @@ namespace BarracksAndBolts.Gameplay.Buildings
 
         private void Update()
         {
-            _damageFlash.Update(spriteRenderer, Time.deltaTime);
+            if (_building == null)
+                return;
+
+            UpdateLook();
+        }
+
+        private void UpdateLook()
+        {
+            var shownSprite = _building.IsBuilt ? _sprite : _siteSprite;
+            if (spriteRenderer.sprite != shownSprite)
+                BuildingSpriteLayout.PlaceOnFootprint(spriteRenderer, shownSprite);
+
+            if (progressBar.isActiveAndEnabled)
+            {
+                if (_building.IsBuilt)
+                    progressBar.Hide();
+                else
+                    progressBar.SetProgress(_building.BuildProgress);
+            }
+
+            var restColor = GetRestColor();
+            _damageFlash.Update(spriteRenderer, Time.deltaTime, restColor);
+            if (!_damageFlash.IsActive && spriteRenderer.color != restColor)
+                spriteRenderer.color = restColor;
+        }
+
+        // A site is see-through and gets solid as the villagers work, so the progress shows on the map.
+        private Color GetRestColor()
+        {
+            return _building.IsBuilt ? Color.white : Color.Lerp(siteStartColor, siteEndColor, _building.BuildProgress);
         }
     }
 }

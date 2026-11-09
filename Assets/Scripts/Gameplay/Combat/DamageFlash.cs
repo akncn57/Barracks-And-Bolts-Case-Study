@@ -10,18 +10,21 @@ namespace BarracksAndBolts.Gameplay.Combat
 
         private float _timeLeft;
 
+        public bool IsActive => _timeLeft > 0f;
+
         public void Start()
         {
             _timeLeft = Duration;
         }
 
-        public void Update(SpriteRenderer spriteRenderer, float deltaTime)
+        /// <param name="restColor">The color the sprite goes back to when the flash ends.</param>
+        public void Update(SpriteRenderer spriteRenderer, float deltaTime, Color restColor)
         {
             if (_timeLeft <= 0f)
                 return;
 
             _timeLeft -= deltaTime;
-            spriteRenderer.color = _timeLeft > 0f ? FlashColor : Color.white;
+            spriteRenderer.color = _timeLeft > 0f ? FlashColor : restColor;
         }
     }
 }
