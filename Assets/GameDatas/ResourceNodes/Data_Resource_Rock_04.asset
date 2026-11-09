@@ -16,5 +16,7 @@ MonoBehaviour:
   displayName: Stone
   kind: 1
   size: {x: 1, y: 1}
+  visualHeight: 1
+  amount: 100
   frames:
   - {fileID: -5114542402921555521, guid: bfe93b27a50c113418ebe44534cde076, type: 3}

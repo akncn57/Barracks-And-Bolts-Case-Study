@@ -9,6 +9,7 @@ namespace BarracksAndBolts.Core.Simulation
         Time = 100,
         AI = 200,
         Movement = 300,
+        Gathering = 350,
         Combat = 400,
         Cleanup = 500,
         Presentation = 600

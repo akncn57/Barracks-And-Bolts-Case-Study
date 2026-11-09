@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace BarracksAndBolts.Gameplay.Data
@@ -23,6 +25,10 @@ namespace BarracksAndBolts.Gameplay.Data
         [Tooltip("Cells per second.")]
         [SerializeField, Min(0.1f)] private float moveSpeed = 2.5f;
         [SerializeField, Min(0)] private int populationCost = 1;
+        [Tooltip("Price in a normal game. Sandbox mode ignores it.")]
+        [SerializeField] private ResourceCost[] cost = Array.Empty<ResourceCost>();
+        [Tooltip("Can collect resources from the map.")]
+        [SerializeField] private bool canGather;
 
         public string Id => id;
         public string DisplayName => displayName;
@@ -37,6 +43,8 @@ namespace BarracksAndBolts.Gameplay.Data
 
         public float MoveSpeed => moveSpeed;
         public int PopulationCost => populationCost;
+        public IReadOnlyList<ResourceCost> Cost => cost;
+        public bool CanGather => canGather;
 
         private void OnValidate()
         {

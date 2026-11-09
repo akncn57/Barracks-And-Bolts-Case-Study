@@ -61,6 +61,10 @@ namespace BarracksAndBolts.Gameplay.Data
             [SerializeField] private Sprite[] idleFrames;
             [SerializeField] private Sprite[] runFrames;
             [SerializeField] private Sprite[] attackFrames;
+            [Tooltip("Work on trees and sheep. Empty for units that don't gather.")]
+            [SerializeField] private Sprite[] chopFrames;
+            [Tooltip("Work on stone and gold. Empty for units that don't gather.")]
+            [SerializeField] private Sprite[] mineFrames;
 
             public UnitDefinition Unit => unit;
 
@@ -68,6 +72,12 @@ namespace BarracksAndBolts.Gameplay.Data
             public IReadOnlyList<Sprite> IdleFrames => idleFrames ?? Array.Empty<Sprite>();
             public IReadOnlyList<Sprite> RunFrames => runFrames ?? Array.Empty<Sprite>();
             public IReadOnlyList<Sprite> AttackFrames => attackFrames ?? Array.Empty<Sprite>();
+
+            public IReadOnlyList<Sprite> GetWorkFrames(ResourceKind kind)
+            {
+                var isMining = kind == ResourceKind.Stone || kind == ResourceKind.Gold;
+                return (isMining ? mineFrames : chopFrames) ?? Array.Empty<Sprite>();
+            }
         }
     }
 }

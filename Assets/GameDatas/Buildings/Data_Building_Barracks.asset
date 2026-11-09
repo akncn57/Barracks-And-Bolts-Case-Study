@@ -17,6 +17,12 @@ MonoBehaviour:
   size: {x: 3, y: 3}
   visualHeight: 3
   maxHp: 100
+  cost:
+  - kind: 0
+    amount: 80
+  - kind: 1
+    amount: 20
+  isDropOff: 0
   producibles:
   - {fileID: 11400000, guid: 5ed1c31b43ef4510b9d5c8966a56d71a, type: 2}
   - {fileID: 11400000, guid: 6c1466bac5f640c7956b4a25302ca2c2, type: 2}

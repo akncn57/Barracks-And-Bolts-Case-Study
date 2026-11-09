@@ -16,31 +16,50 @@ namespace BarracksAndBolts.Gameplay.ResourceNodes
         // Overlapping trees would swap places every frame, so each column sits a bit higher. Far less than a pixel.
         private const float SortNudgePerColumn = 0.0001f;
 
+        // A villager works with its feet on the node's base line. This keeps it drawn in front, so the swing shows.
+        private const float BaseLift = 0.02f;
+
         [SerializeField] private SpriteRenderer spriteRenderer;
 
+        private ResourceNodeModel _node;
         private IReadOnlyList<Sprite> _frames;
+        private IReadOnlyList<Sprite> _shownFrames;
+        private Vector2 _basePosition;
+        private bool _roams;
         private float _phase;
         private int _shownFrame;
 
-        public bool IsAnimated => _frames.Count > 1;
+        public bool IsAnimated => _roams || _frames.Count > 1;
 
         public void Bind(ResourceNodeModel node, Vector2 position)
         {
+            _node = node;
             _frames = node.Definition.Frames;
+            _shownFrames = _frames;
+            _roams = node.Definition.RoamRadius > 0f;
             _phase = node.Id.Value * PhasePerId;
             name = $"{node.Definition.DisplayName} ({node.Id})";
-            transform.position = position + Vector2.up * (node.Area.x * SortNudgePerColumn);
+            _basePosition = position + Vector2.up * (BaseLift + node.Area.x * SortNudgePerColumn);
+            transform.position = _basePosition;
             spriteRenderer.sprite = _frames[0];
         }
 
         public void ShowFrameAt(float frameTime)
         {
-            var frame = Mathf.FloorToInt(frameTime + _phase * _frames.Count) % _frames.Count;
-            if (frame == _shownFrame)
+            if (_roams)
+            {
+                transform.position = _basePosition + _node.Offset;
+                spriteRenderer.flipX = _node.IsFacingLeft;
+            }
+
+            var frames = _node.IsWalking && _node.Definition.WalkFrames.Count > 0 ? _node.Definition.WalkFrames : _frames;
+            var frame = Mathf.FloorToInt(frameTime + _phase * frames.Count) % frames.Count;
+            if (frame == _shownFrame && frames == _shownFrames)
                 return;
 
+            _shownFrames = frames;
             _shownFrame = frame;
-            spriteRenderer.sprite = _frames[frame];
+            spriteRenderer.sprite = frames[frame];
         }
     }
 }

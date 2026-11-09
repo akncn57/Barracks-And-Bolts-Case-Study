@@ -16,5 +16,7 @@ MonoBehaviour:
   displayName: Gold Mine
   kind: 3
   size: {x: 2, y: 1}
+  visualHeight: 1.3
+  amount: 200
   frames:
   - {fileID: -8972816534716894786, guid: a72e74372c0236f449fe5682c4a69a68, type: 3}

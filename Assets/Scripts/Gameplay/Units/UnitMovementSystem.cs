@@ -64,6 +64,14 @@ namespace BarracksAndBolts.Gameplay.Units
             unit.SetPath(_worldPath);
         }
 
+        /// <summary>Walks straight to the point, without a path. Only for a short step with nothing in the way.</summary>
+        public void StepTo(UnitModel unit, Vector2 point)
+        {
+            _worldPath.Clear();
+            _worldPath.Add(point);
+            unit.SetPath(_worldPath);
+        }
+
         public void Dispose()
         {
             _subscriptions.Dispose();

@@ -16,6 +16,8 @@ MonoBehaviour:
   displayName: Tree
   kind: 0
   size: {x: 1, y: 1}
+  visualHeight: 3
+  amount: 50
   frames:
   - {fileID: 5354429476588687777, guid: 2fbd4622fac466e44a4b5da91bdb4de9, type: 3}
   - {fileID: -6125760586055823200, guid: 2fbd4622fac466e44a4b5da91bdb4de9, type: 3}

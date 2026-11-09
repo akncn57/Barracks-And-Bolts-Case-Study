@@ -29,6 +29,7 @@ namespace BarracksAndBolts.Gameplay.ResourceNodes
         private readonly bool[] _visited;
         private readonly Vector2 _center;
 
+        private Random _random;
         private Vector2Int _start;
         private int _reachableCount;
 
@@ -49,12 +50,63 @@ namespace BarracksAndBolts.Gameplay.ResourceNodes
 
             _reachableCount = CountReachable(default);
 
-            var random = new Random(seed);
+            _random = new Random(seed);
             foreach (var group in _settings.Groups)
             {
                 if (group.Definitions.Count > 0)
-                    PlaceGroup(group, random);
+                    PlaceGroup(group, _random);
             }
+        }
+
+        /// <summary>
+        /// Adds nodes of that kind during the game, next to one of its kind if there is any left.
+        /// Follows the same rules as the first distribution. Call <see cref="Distribute"/> first.
+        /// </summary>
+        public void AddNodes(ResourceKind kind, int count)
+        {
+            var group = FindGroup(kind);
+            if (group == null || !_search.TryFindNearestWalkable(Vector2Int.FloorToInt(_center), out _start))
+                return;
+
+            // Buildings have changed the map since the last count.
+            _reachableCount = CountReachable(default);
+            _random ??= new Random(0);
+
+            for (var i = 0; i < count; i++)
+            {
+                var definition = group.Definitions[_random.Next(group.Definitions.Count)];
+                if (!TryPlaceBesideSameKind(definition, kind) &&
+                    TryPickDepositCenter(group, false, new List<Vector2Int>(), _random, out var center))
+                    TryPlace(definition, center);
+            }
+        }
+
+        private ResourceDistributionSettings.Group FindGroup(ResourceKind kind)
+        {
+            foreach (var group in _settings.Groups)
+            {
+                if (group.Definitions.Count > 0 && group.Definitions[0].Kind == kind)
+                    return group;
+            }
+
+            return null;
+        }
+
+        private bool TryPlaceBesideSameKind(ResourceNodeDefinition definition, ResourceKind kind)
+        {
+            var sameKind = new List<ResourceNodeModel>();
+            foreach (var node in _nodes.Nodes)
+            {
+                if (node.Definition.Kind == kind)
+                    sameKind.Add(node);
+            }
+
+            if (sameKind.Count == 0)
+                return false;
+
+            var neighbour = sameKind[_random.Next(sameKind.Count)];
+            var from = neighbour.Area.position + new Vector2(_random.Next(-2, 3), _random.Next(-2, 3));
+            return _search.TryFindCellBeside(neighbour.Area, from, out var cell) && TryPlace(definition, cell);
         }
 
         private void PlaceGroup(ResourceDistributionSettings.Group group, Random random)

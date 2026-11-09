@@ -4,6 +4,7 @@ using BarracksAndBolts.Gameplay.Buildings;
 using BarracksAndBolts.Gameplay.Buildings.Production;
 using BarracksAndBolts.Gameplay.Combat;
 using BarracksAndBolts.Gameplay.Data;
+using BarracksAndBolts.Gameplay.Feedback;
 using BarracksAndBolts.Gameplay.Sandbox;
 using BarracksAndBolts.Gameplay.Selection;
 using BarracksAndBolts.Gameplay.Teams;
@@ -120,10 +121,11 @@ namespace BarracksAndBolts.UI.Information
             hpFill.fillAmount = (float)building.CurrentHp / definition.MaxHp;
 
             // Only the side being built for lists its units. Outside sandbox mode that is always the player.
-            var showProduction = definition.CanProduce && building.Faction == _sandbox.ActiveFaction;
+            var producibles = _production.GetProducibles(definition);
+            var showProduction = producibles.Count > 0 && building.Faction == _sandbox.ActiveFaction;
             productionSection.SetActive(showProduction);
             if (showProduction)
-                ShowProducibles(definition.Producibles);
+                ShowProducibles(producibles);
         }
 
         private void ShowProducibles(IReadOnlyList<UnitDefinition> units)
@@ -151,14 +153,33 @@ namespace BarracksAndBolts.UI.Information
 
         private void OnCellHoverStarted(ProducibleUnitCell cell)
         {
-            _tooltip.Show(cell.Definition.DisplayName, TooltipText.ForUnit(cell.Definition), (RectTransform)cell.transform);
+            _tooltip.Show(cell.Definition.DisplayName, TooltipText.ForUnit(cell.Definition, showCost: !_sandbox.IsEnabled), (RectTransform)cell.transform);
         }
 
         private void OnUnitClicked(UnitDefinition unit)
         {
             // The selection may have changed since the panel drew, so the building is looked up at click time.
-            if (_buildings.TryGet(_selection.Primary, out var building))
+            if (!_buildings.TryGet(_selection.Primary, out var building))
+                return;
+
+            var block = _production.GetBlock(building, unit);
+            if (block == ProductionBlock.None)
                 _production.TryProduce(building, unit, out _);
+            else
+                _eventBus.Publish(new FloatingTextRequestedEvent(GetBlockMessage(block), _buildings.GetVisibleArea(building).center, FloatingTextKind.Warning));
+        }
+
+        private static string GetBlockMessage(ProductionBlock block)
+        {
+            switch (block)
+            {
+                case ProductionBlock.NotEnoughResources:
+                    return "Not enough resources";
+                case ProductionBlock.NoHousing:
+                    return "Build more houses";
+                default:
+                    return "Can't make this here";
+            }
         }
     }
 }

@@ -3,16 +3,20 @@ using BarracksAndBolts.Core.Events;
 using BarracksAndBolts.Core.Simulation;
 using BarracksAndBolts.Gameplay.Buildings;
 using BarracksAndBolts.Gameplay.Buildings.Production;
+using BarracksAndBolts.Gameplay.Calendar;
 using BarracksAndBolts.Gameplay.CameraControl;
 using BarracksAndBolts.Gameplay.Combat;
 using BarracksAndBolts.Gameplay.Commands;
 using BarracksAndBolts.Gameplay.Data;
+using BarracksAndBolts.Gameplay.Economy;
 using BarracksAndBolts.Gameplay.Entities;
+using BarracksAndBolts.Gameplay.Gathering;
 using BarracksAndBolts.Gameplay.Grid;
 using BarracksAndBolts.Gameplay.Hover;
 using BarracksAndBolts.Gameplay.Input;
 using BarracksAndBolts.Gameplay.Pathfinding;
 using BarracksAndBolts.Gameplay.Placement;
+using BarracksAndBolts.Gameplay.Raids;
 using BarracksAndBolts.Gameplay.ResourceNodes;
 using BarracksAndBolts.Gameplay.Sandbox;
 using BarracksAndBolts.Gameplay.Selection;
@@ -55,6 +59,7 @@ namespace BarracksAndBolts.Gameplay.Bootstrap
             RegisterUnits(builder);
             RegisterBuildings(builder);
             RegisterResourceNodes(builder);
+            RegisterEconomy(builder);
             builder.RegisterComponentInHierarchy<CameraController>();
         }
 
@@ -68,6 +73,36 @@ namespace BarracksAndBolts.Gameplay.Bootstrap
             builder.Register<ResourceDistributor>(Lifetime.Singleton);
             builder.RegisterEntryPoint<ResourceMapInitializer>();
             builder.RegisterComponentInHierarchy<ResourceNodeViewSpawner>();
+        }
+
+        private void RegisterEconomy(IContainerBuilder builder)
+        {
+            if (gameDatabase.NormalMode == null)
+                throw new InvalidOperationException($"{gameDatabase.name}: normal mode settings are not assigned.");
+
+            if (gameDatabase.Raids == null)
+                throw new InvalidOperationException($"{gameDatabase.name}: raid settings are not assigned.");
+
+            builder.RegisterInstance(gameDatabase.NormalMode);
+            builder.RegisterInstance(gameDatabase.Raids);
+            builder.Register<ResourceService>(Lifetime.Singleton);
+            builder.Register<PopulationService>(Lifetime.Singleton);
+            builder.RegisterEntryPoint<NormalModeStarter>();
+            builder.Register<ResourceRespawnService>(Lifetime.Singleton);
+            builder.Register<GameOutcomeService>(Lifetime.Singleton);
+            builder.RegisterSimulationSystem<GatheringSystem>();
+            builder.RegisterSimulationSystem<CalendarService>();
+            builder.RegisterSimulationSystem<RaidService>();
+            builder.RegisterSimulationSystem<BattleAiSystem>();
+            builder.RegisterSimulationSystem<ShelterSystem>();
+            builder.RegisterSimulationSystem<ResourceRoamSystem>();
+
+            // Nothing asks for these two; they only listen to events, so they are created here.
+            builder.RegisterBuildCallback(container =>
+            {
+                container.Resolve<ResourceRespawnService>();
+                container.Resolve<GameOutcomeService>();
+            });
         }
 
         private static void RegisterUnits(IContainerBuilder builder)

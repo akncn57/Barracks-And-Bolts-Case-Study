@@ -21,7 +21,10 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 5ed1c31b43ef4510b9d5c8966a56d71a, type: 2}
   - {fileID: 11400000, guid: 6c1466bac5f640c7956b4a25302ca2c2, type: 2}
   - {fileID: 11400000, guid: 0126048d48304fddb8ac3633d7d7f700, type: 2}
+  - {fileID: 11400000, guid: 92cce3bd224c0284d995a6d960508313, type: 2}
   teamColors:
   - {fileID: 11400000, guid: f94dc58a74734471bc142acb1505acb8, type: 2}
   - {fileID: 11400000, guid: 20473e0c6a124e238c80631725cf4d11, type: 2}
   resourceDistribution: {fileID: 11400000, guid: 56baf061acdf5d740a737e44469f60f8, type: 2}
+  normalMode: {fileID: 11400000, guid: 2a85679b7f21539449fc98383e665931, type: 2}
+  raids: {fileID: 11400000, guid: e266f1764497aa844a78f953d44a2391, type: 2}

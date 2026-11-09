@@ -34,6 +34,8 @@ namespace BarracksAndBolts.Gameplay.Units
             _selection = selection;
             eventBus.Subscribe<UnitSpawnedEvent>(OnUnitSpawned).AddTo(_subscriptions);
             eventBus.Subscribe<UnitDiedEvent>(OnUnitDied).AddTo(_subscriptions);
+            eventBus.Subscribe<UnitShelteredEvent>(e => SetViewActive(e.Unit, false)).AddTo(_subscriptions);
+            eventBus.Subscribe<UnitLeftShelterEvent>(e => SetViewActive(e.Unit, true)).AddTo(_subscriptions);
             eventBus.Subscribe<UnitAttackedEvent>(OnUnitAttacked).AddTo(_subscriptions);
             eventBus.Subscribe<EntityDamagedEvent>(OnEntityDamaged).AddTo(_subscriptions);
             eventBus.Subscribe<SelectionChangedEvent>(_ => RefreshSelectionMarkers()).AddTo(_subscriptions);
@@ -61,6 +63,12 @@ namespace BarracksAndBolts.Gameplay.Units
 
             _selectedViews.Remove(view);
             Destroy(view.gameObject);
+        }
+
+        private void SetViewActive(UnitModel unit, bool isActive)
+        {
+            if (_views.TryGetValue(unit.Id, out var view))
+                view.gameObject.SetActive(isActive);
         }
 
         private void OnUnitAttacked(UnitAttackedEvent attackedEvent)

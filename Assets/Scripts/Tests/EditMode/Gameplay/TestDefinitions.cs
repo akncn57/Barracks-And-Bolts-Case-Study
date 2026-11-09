@@ -1,4 +1,10 @@
+using BarracksAndBolts.Core.Events;
+using BarracksAndBolts.Core.Session;
+using BarracksAndBolts.Gameplay.Buildings;
 using BarracksAndBolts.Gameplay.Data;
+using BarracksAndBolts.Gameplay.Economy;
+using BarracksAndBolts.Gameplay.Sandbox;
+using BarracksAndBolts.Gameplay.Units;
 using UnityEditor;
 using UnityEngine;
 
@@ -6,6 +12,18 @@ namespace BarracksAndBolts.Tests.EditMode.Gameplay
 {
     internal static class TestDefinitions
     {
+        /// <summary>A sandbox wallet: tests that aren't about prices don't have to think about them.</summary>
+        public static ResourceService CreateFreeResources(IEventBus eventBus)
+        {
+            return new ResourceService(new SandboxService(new GameSessionSettings { Mode = GameMode.Sandbox }, eventBus), eventBus);
+        }
+
+        /// <summary>Sandbox housing: no limit, for tests that aren't about population.</summary>
+        public static PopulationService CreateFreePopulation(UnitService units, BuildingService buildings, IEventBus eventBus)
+        {
+            return new PopulationService(new SandboxService(new GameSessionSettings { Mode = GameMode.Sandbox }, eventBus), units, buildings);
+        }
+
         /// <summary>Destroy the result in TearDown; ScriptableObjects are not garbage collected.</summary>
         public static BuildingDefinition CreateBuilding(string id, Vector2Int size, int maxHp = 100, float visualHeight = 0f)
         {

@@ -138,8 +138,8 @@ TextureImporter:
         y: 56
         width: 64
         height: 76
-      alignment: 0
-      pivot: {x: 0, y: 0}
+      alignment: 9
+      pivot: {x: 0.64062, y: 0.01316}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -160,8 +160,8 @@ TextureImporter:
         y: 56
         width: 62
         height: 77
-      alignment: 0
-      pivot: {x: 0, y: 0}
+      alignment: 9
+      pivot: {x: 0.66129, y: 0.01299}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -175,37 +175,15 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Pawn_Interact Axe_2
-      rect:
-        serializedVersion: 2
-        x: 442
-        y: 78
-        width: 11
-        height: 11
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 5fcb6f442a650f600800000000000000
-      internalID: 499994813579836661
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
       name: Pawn_Interact Axe_3
       rect:
         serializedVersion: 2
-        x: 451
+        x: 442
         y: 56
-        width: 88
+        width: 97
         height: 72
-      alignment: 0
-      pivot: {x: 0, y: 0}
+      alignment: 9
+      pivot: {x: 0.39175, y: 0.01389}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -226,8 +204,8 @@ TextureImporter:
         y: 56
         width: 77
         height: 69
-      alignment: 0
-      pivot: {x: 0, y: 0}
+      alignment: 9
+      pivot: {x: 0.23377, y: 0.01449}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -248,8 +226,8 @@ TextureImporter:
         y: 56
         width: 63
         height: 73
-      alignment: 0
-      pivot: {x: 0, y: 0}
+      alignment: 9
+      pivot: {x: 0.33333, y: 0.01370}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -270,8 +248,8 @@ TextureImporter:
         y: 56
         width: 58
         height: 74
-      alignment: 0
-      pivot: {x: 0, y: 0}
+      alignment: 9
+      pivot: {x: 0.53448, y: 0.01351}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -300,7 +278,6 @@ TextureImporter:
     nameFileIdTable:
       Pawn_Interact Axe_0: 4690516624981630074
       Pawn_Interact Axe_1: 4820607410664315775
-      Pawn_Interact Axe_2: 499994813579836661
       Pawn_Interact Axe_3: 5281750946635039065
       Pawn_Interact Axe_4: 6324080537177615244
       Pawn_Interact Axe_5: 3960961710712497688

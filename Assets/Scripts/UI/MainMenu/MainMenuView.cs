@@ -10,6 +10,7 @@ namespace BarracksAndBolts.UI.MainMenu
 {
     public sealed class MainMenuView : MonoBehaviour
     {
+        [SerializeField] private Button playButton;
         [SerializeField] private Button sandboxButton;
         [SerializeField] private Button quitButton;
 
@@ -25,19 +26,31 @@ namespace BarracksAndBolts.UI.MainMenu
 
         private void OnEnable()
         {
+            playButton.onClick.AddListener(OnPlayClicked);
             sandboxButton.onClick.AddListener(OnSandboxClicked);
             quitButton.onClick.AddListener(OnQuitClicked);
         }
 
         private void OnDisable()
         {
+            playButton.onClick.RemoveListener(OnPlayClicked);
             sandboxButton.onClick.RemoveListener(OnSandboxClicked);
             quitButton.onClick.RemoveListener(OnQuitClicked);
         }
 
+        private void OnPlayClicked()
+        {
+            StartGame(GameMode.Normal);
+        }
+
         private void OnSandboxClicked()
         {
-            _sessionSettings.Mode = GameMode.Sandbox;
+            StartGame(GameMode.Sandbox);
+        }
+
+        private void StartGame(GameMode mode)
+        {
+            _sessionSettings.Mode = mode;
             _sessionSettings.Seed = Environment.TickCount;
             SetButtonsInteractable(false);
             _sceneLoader.LoadAsync(SceneNames.Gameplay).Forget();
@@ -54,6 +67,7 @@ namespace BarracksAndBolts.UI.MainMenu
 
         private void SetButtonsInteractable(bool isInteractable)
         {
+            playButton.interactable = isInteractable;
             sandboxButton.interactable = isInteractable;
             quitButton.interactable = isInteractable;
         }

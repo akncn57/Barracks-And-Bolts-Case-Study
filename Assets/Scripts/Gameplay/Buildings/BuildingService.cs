@@ -26,6 +26,9 @@ namespace BarracksAndBolts.Gameplay.Buildings
 
         public int Count => _buildings.Count;
 
+        /// <summary>Every building. The concrete type lets a foreach run without allocating.</summary>
+        public Dictionary<GameEntityId, BuildingModel>.ValueCollection Buildings => _buildings.Values;
+
         /// <param name="origin">Bottom-left cell of the footprint.</param>
         /// <returns>False if any footprint cell is outside the map, blocked or taken.</returns>
         public bool TryPlace(BuildingDefinition definition, Vector2Int origin, Faction faction, out BuildingModel building)

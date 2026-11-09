@@ -17,5 +17,11 @@ MonoBehaviour:
   size: {x: 2, y: 2}
   visualHeight: 2.5
   maxHp: 50
+  cost:
+  - kind: 0
+    amount: 30
+  isDropOff: 0
+  populationCapacity: 5
   producibles: []
+  normalModeProducibles: []
   spawnOffset: {x: 0, y: -1}

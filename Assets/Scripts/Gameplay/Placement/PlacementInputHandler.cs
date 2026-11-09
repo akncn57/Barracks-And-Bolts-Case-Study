@@ -66,6 +66,8 @@ namespace BarracksAndBolts.Gameplay.Placement
                     return "Can't build outside the map";
                 case PlacementBlock.UnitInTheWay:
                     return "Units are in the way";
+                case PlacementBlock.NotEnoughResources:
+                    return "Not enough resources";
                 default:
                     return "Can't build here";
             }

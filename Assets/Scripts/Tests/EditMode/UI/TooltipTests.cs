@@ -66,6 +66,7 @@ namespace BarracksAndBolts.Tests.EditMode.UI
             var house = TestDefinitions.CreateBuilding("house", new Vector2Int(2, 2), maxHp: 50);
 
             Assert.AreEqual("Size: 2x2\nHP: 50", TooltipText.ForBuilding(house));
+            Assert.AreEqual("Size: 2x2\nHP: 50", TooltipText.ForBuilding(house, showCost: true), "No price, no cost line.");
             Object.DestroyImmediate(house);
         }
 

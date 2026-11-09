@@ -52,6 +52,15 @@ namespace BarracksAndBolts.Gameplay.Units
         public Vector2Int? ChasedCell { get; private set; }
         public float RepathDelayLeft { get; private set; }
 
+        /// <summary>What the unit is working on right now. Null when it isn't working.</summary>
+        public ResourceKind? HarvestingKind { get; private set; }
+
+        /// <summary>The unit has a job to go back to, even if it isn't working this very moment.</summary>
+        public bool IsOnJob { get; private set; }
+
+        /// <summary>Nothing to do: no job, no target and not going anywhere.</summary>
+        public bool IsIdle => !IsOnJob && !IsMoving && !HasAttackTarget;
+
         public bool IsMoving => _nextWaypoint < _waypoints.Count;
         public bool IsFacingLeft { get; private set; }
 
@@ -73,6 +82,23 @@ namespace BarracksAndBolts.Gameplay.Units
         public void ClearAttackTarget()
         {
             SetAttackTarget(GameEntityId.None);
+        }
+
+        public void SetHarvesting(ResourceKind? kind)
+        {
+            HarvestingKind = kind;
+        }
+
+        public void SetOnJob(bool isOnJob)
+        {
+            IsOnJob = isOnJob;
+        }
+
+        /// <summary>Puts the unit down at the point, with no walking.</summary>
+        public void PlaceAt(Vector2 position)
+        {
+            Stop();
+            Position = position;
         }
 
         public void TickCombatTimers(float deltaTime)

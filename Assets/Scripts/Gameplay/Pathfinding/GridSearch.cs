@@ -70,6 +70,37 @@ namespace BarracksAndBolts.Gameplay.Pathfinding
         }
 
         /// <summary>
+        /// Finds the walkable cell touching the area that is closest to the point, on the same level as the area.
+        /// Used to stand next to something that fills its own cells.
+        /// </summary>
+        /// <returns>False if the area is walled in on all sides.</returns>
+        public bool TryFindCellBeside(RectInt area, Vector2 from, out Vector2Int result)
+        {
+            var level = _grid.GetLevel(area.position);
+            var bestDistance = float.MaxValue;
+            result = default;
+
+            for (var x = area.xMin - 1; x <= area.xMax; x++)
+            {
+                for (var y = area.yMin - 1; y <= area.yMax; y++)
+                {
+                    var cell = new Vector2Int(x, y);
+                    if (area.Contains(cell) || !_grid.IsWalkable(cell) || _grid.GetLevel(cell) != level)
+                        continue;
+
+                    var distance = (_grid.CellToWorldCenter(cell) - from).sqrMagnitude;
+                    if (distance < bestDistance)
+                    {
+                        bestDistance = distance;
+                        result = cell;
+                    }
+                }
+            }
+
+            return bestDistance < float.MaxValue;
+        }
+
+        /// <summary>
         /// Picks up to <paramref name="count"/> different walkable cells around the target, nearest first.
         /// Cells are collected by flooding outward through walkable cells only, so a group never gets split
         /// across a lake, a wall or a cliff. Returns fewer cells if the reachable area is smaller than the group.

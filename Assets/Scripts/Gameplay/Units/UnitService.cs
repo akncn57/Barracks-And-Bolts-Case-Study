@@ -21,6 +21,7 @@ namespace BarracksAndBolts.Gameplay.Units
         private readonly GameEntityIdGenerator _idGenerator;
         private readonly IEventBus _eventBus;
         private readonly Dictionary<GameEntityId, UnitModel> _units = new();
+        private readonly Dictionary<GameEntityId, UnitModel> _sheltered = new();
 
         // Kept in a field so a spawn search doesn't allocate a new delegate.
         private readonly Predicate<Vector2Int> _hasNoUnit;
@@ -39,6 +40,9 @@ namespace BarracksAndBolts.Gameplay.Units
         /// <summary>Every unit. The concrete type lets a foreach run without allocating.</summary>
         public Dictionary<GameEntityId, UnitModel>.ValueCollection Units => _units.Values;
 
+        /// <summary>Units inside a building. They aren't in <see cref="Units"/>: nothing can see, select or hit them.</summary>
+        public Dictionary<GameEntityId, UnitModel>.ValueCollection Sheltered => _sheltered.Values;
+
         public bool TryGet(GameEntityId id, out UnitModel unit)
         {
             return _units.TryGetValue(id, out unit);
@@ -52,6 +56,31 @@ namespace BarracksAndBolts.Gameplay.Units
 
             _eventBus.Publish(new UnitDiedEvent(unit));
             return true;
+        }
+
+        /// <summary>Takes the unit off the map. It stays alive and keeps its place in the population.</summary>
+        public void Shelter(UnitModel unit)
+        {
+            if (!_units.Remove(unit.Id))
+                return;
+
+            unit.Stop();
+            unit.ClearAttackTarget();
+            _sheltered.Add(unit.Id, unit);
+            _eventBus.Publish(new UnitShelteredEvent(unit));
+        }
+
+        /// <summary>Puts a sheltered unit back on the map, on the cell or the nearest one without a unit.</summary>
+        public void BringOut(UnitModel unit, Vector2Int cell)
+        {
+            if (!_sheltered.Remove(unit.Id))
+                return;
+
+            if (_gridSearch.TryFindNearestWalkable(cell, _hasNoUnit, out var freeCell))
+                unit.PlaceAt(_gridMap.CellToWorldCenter(freeCell));
+
+            _units.Add(unit.Id, unit);
+            _eventBus.Publish(new UnitLeftShelterEvent(unit));
         }
 
         public bool HasUnitAt(Vector2Int cell)

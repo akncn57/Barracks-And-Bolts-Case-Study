@@ -53,6 +53,7 @@
 - **PDF uyumu:** Seviye 1 askerler PDF'teki değerlerde olacak (10 HP, 10 / 5 / 2 hasar). Daha yüksek seviyeler bu değerlerin üstüne çıkar.
 - **Karar:** Barakanın ayrı bir asker kapasitesi yok. Birlik sayısını yalnızca nüfus limiti sınırlar.
 - **Karar:** Baraka yükseltmesi sadece bundan sonra üretilen askerleri etkiler. Seviye her askerin kendi özelliğidir ve askerin üzerinde gösterilir (ör. rütbe simgesi). Farklı seviyelerdeki barakalar farklı seviyede asker üretir.
+- **Şu anki hali:** Köylüler 3 kişi başlıyor, Castle sadece Normal modda köylü üretiyor. Sağ tıkla kaynağa gönderiliyor. Bırakma noktası sadece Castle. Castle ve House 5'er nüfus veriyor. Sayılar geçici: `Data_Config_NormalMode`, `Data_Config_Raids` ve tanım asset'lerinde.
 - **Kaynak toplama (köylü):**
   1. Oyuncu köylüyü sol tıkla seçer.
   2. İmleç bir kaynağın (ağaç, taş, yemek) üstüne gelince toplama imlecine dönüşür.
@@ -148,6 +149,8 @@ Bu değerler ScriptableObject üzerinden ayarlanabilir olacak, ileride değişti
 - Açlık nüfusu 0'a düşürebilir. Kaybetme koşulu için "Takvim ve Dalgalar" bölümüne bakın.
 - UI'da yemek yetersizse uyarı gösterilir.
 
+> **Şu anki hali:** Düşmanlar kıyıdan çıkıyor. Sonraki baskınlar daha kalabalık ve daha çok şövalyeli; can ve hasar çarpanı yok, PDF değerleri korunuyor. Yemek tüketimi ve açlık, zorluk seçimi, sonsuz mod, ses ve mini harita yapılmadı.
+
 ### Düşman AI
 - Düşmanlar baskın başladığında haritanın kenarındaki spawn noktalarında dalgalar halinde belirir.
 - A* ile Castle'a doğru yürürler. Yolda menzillerine giren oyuncu birimine veya binasına saldırırlar.
@@ -157,6 +160,7 @@ Bu değerler ScriptableObject üzerinden ayarlanabilir olacak, ileride değişti
 ### Kaynak Tükenmesi
 - Ağaç, taş kayalığı ve altın madeninin sınırlı miktarda kaynağı vardır. Biten kaynak haritadan kaldırılır ve grid'deki hücreleri yürünebilir hale gelir (A* güncellenir).
 - Koyunlar her sabah belirli bir sayıda yeniden doğar. Haritada maksimum koyun sayısı sınırı vardır.
+- Koyun kendi hücresinin içinde küçük adımlarla gezer. Tek kesimde ölür ve bütün yemeği (40) tek seferde taşınır, köylünün taşıma kapasitesine bakılmaz.
 - Kaynağı biten köylü, yakındaki aynı tipte bir kaynağa otomatik geçer. Yakında yoksa boşta bekler.
 
 ## Harita (Procedural Generation)
@@ -204,6 +208,8 @@ Bu değerler ScriptableObject üzerinden ayarlanabilir olacak, ileride değişti
 - Bina seçiliyken sağ tıklanırsa bir toplanma noktası (rally point) belirlenir. Yeni doğan birimler oraya kendiliğinden yürür.
 
 ### Köylü Kaçışı
+> **Şu anki hali:** Köylü baskında işine devam ediyor, düşman 7 hücre yaklaşınca Castle'a koşup içeri giriyor. Taşıdığı yük o an sayılıyor. Haritada düşman kalmayınca çıkıp işine dönüyor. Oyuncunun verdiği emir 10 saniye kaçıştan önce geliyor. House'a sığınma ve bina kapasitesi yok; Castle yıkılınca oyun bittiği için içeridekilerin çıkması da gerekmiyor.
+
 - Saldırıya uğrayan köylü işini bırakır ve en yakın House'a ya da Castle'a kaçar.
 - İçeri giren köylü gizlenir ve saldırıya uğramaz. Tehlike geçince (baskın bittiğinde ya da yakında düşman kalmadığında) dışarı çıkar ve önceki işine kendiliğinden döner.
 - Sığınılan bina yıkılırsa içindeki köylüler dışarı çıkar.

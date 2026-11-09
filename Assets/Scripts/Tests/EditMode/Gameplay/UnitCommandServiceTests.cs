@@ -1,3 +1,5 @@
+using BarracksAndBolts.Gameplay.ResourceNodes;
+using BarracksAndBolts.Gameplay.Gathering;
 using System.Collections.Generic;
 using BarracksAndBolts.Core.Events;
 using BarracksAndBolts.Gameplay.Buildings;
@@ -35,7 +37,10 @@ namespace BarracksAndBolts.Tests.EditMode.Gameplay
             _buildings = new BuildingService(_map, ids, _eventBus);
             _units = new UnitService(_map, search, ids, _eventBus);
             _movement = new UnitMovementSystem(_units, _map, new AStarPathfinder(_map), _eventBus);
-            _commands = new UnitCommandService(_units, _movement, new BarracksAndBolts.Gameplay.Combat.CombatService(_units, _buildings, _map, _eventBus), search, _map, _eventBus);
+            var nodes = new ResourceNodeService(_map, ids, _eventBus);
+            var gathering = new GatheringSystem(_units, _movement, nodes, _buildings, TestDefinitions.CreateFreeResources(_eventBus), search, _map,
+                ScriptableObject.CreateInstance<NormalModeSettings>(), _eventBus);
+            _commands = new UnitCommandService(_units, _movement, new BarracksAndBolts.Gameplay.Combat.CombatService(_units, _buildings, _map, _eventBus), search, _map, gathering, nodes, _eventBus);
             _knight = TestDefinitions.CreateUnit("knight");
             _house = TestDefinitions.CreateBuilding("house", new Vector2Int(2, 2));
         }

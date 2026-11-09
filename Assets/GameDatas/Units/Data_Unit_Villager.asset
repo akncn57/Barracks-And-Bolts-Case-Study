@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 118c0d159f3ab38439f8810da5a85c25, type: 3}
+  m_Name: Data_Unit_Villager
+  m_EditorClassIdentifier: BarracksAndBolts.Gameplay::BarracksAndBolts.Gameplay.Data.UnitDefinition
+  id: villager
+  displayName: Villager
+  portrait: {fileID: 8826315335589716350, guid: 08133151994788b4884777ec1c45864b, type: 3}
+  maxHp: 10
+  damage: 1
+  attackRange: 1
+  attackCooldown: 1
+  moveSpeed: 2.5
+  populationCost: 1
+  cost:
+  - kind: 2
+    amount: 30
+  canGather: 1

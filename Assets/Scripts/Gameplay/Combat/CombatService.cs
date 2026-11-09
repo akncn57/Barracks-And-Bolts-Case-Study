@@ -79,6 +79,36 @@ namespace BarracksAndBolts.Gameplay.Combat
             return _buildings.TryGet(buildingId, out var building) && building.Faction != faction ? buildingId : GameEntityId.None;
         }
 
+        /// <summary>The closest enemy of the faction within the range, unit or building. None if nothing is that close.</summary>
+        public GameEntityId FindNearestHostile(Vector2 from, Faction faction, float range)
+        {
+            var nearest = GameEntityId.None;
+            var nearestDistance = range;
+            foreach (var unit in _units.Units)
+            {
+                if (unit.Faction == faction || unit.IsDead)
+                    continue;
+
+                var distance = Vector2.Distance(from, unit.Position);
+                if (distance <= nearestDistance)
+                {
+                    nearestDistance = distance;
+                    nearest = unit.Id;
+                }
+            }
+
+            foreach (var building in _buildings.Buildings)
+            {
+                if (building.Faction != faction && TryGetTarget(building.Id, from, out var target) && target.Distance <= nearestDistance)
+                {
+                    nearestDistance = target.Distance;
+                    nearest = building.Id;
+                }
+            }
+
+            return nearest;
+        }
+
         /// <summary>
         /// Lowers the target's health. A unit that has nothing else to do turns on its attacker.
         /// Reaching zero queues the removal; hitting something already dead does nothing.

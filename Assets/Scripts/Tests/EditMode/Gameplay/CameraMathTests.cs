@@ -104,6 +104,20 @@ namespace BarracksAndBolts.Tests.EditMode.Gameplay
         }
 
         [Test]
+        public void WorldToScreen_IsTheWayBackFromScreenToWorld()
+        {
+            var screen = new Vector2(1600f, 900f);
+            var center = new Vector2(10f, 20f);
+            var point = new Vector2(300f, 700f);
+
+            var world = CameraMath.ScreenToWorld(point, screen, center, 5f);
+            var back = CameraMath.WorldToScreen(world, screen, center, 5f);
+
+            Assert.AreEqual(point.x, back.x, 0.01f);
+            Assert.AreEqual(point.y, back.y, 0.01f);
+        }
+
+        [Test]
         public void ScreenToWorld_ZeroScreenSize_ReturnsViewCenter()
         {
             var center = new Vector2(3f, 4f);

@@ -21,3 +21,9 @@ MonoBehaviour:
   attackCooldown: 1
   moveSpeed: 2.5
   populationCost: 1
+  cost:
+  - kind: 2
+    amount: 20
+  - kind: 0
+    amount: 10
+  canGather: 0

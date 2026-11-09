@@ -32,7 +32,7 @@ namespace BarracksAndBolts.Tests.EditMode.Gameplay
             var ids = new GameEntityIdGenerator();
             _buildings = new BuildingService(_map, ids, eventBus);
             _units = new UnitService(_map, new GridSearch(_map), ids, eventBus);
-            _production = new UnitProductionService(_units);
+            _production = new UnitProductionService(_units, TestDefinitions.CreateFreeResources(eventBus), TestDefinitions.CreateFreePopulation(_units, _buildings, eventBus));
             _knight = TestDefinitions.CreateUnit("knight");
             _monk = TestDefinitions.CreateUnit("monk");
             _barracks = TestDefinitions.CreateProducer("barracks", new Vector2Int(3, 3), new Vector2Int(1, -1), _knight);

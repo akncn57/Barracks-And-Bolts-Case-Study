@@ -17,6 +17,7 @@ namespace BarracksAndBolts.Gameplay.ResourceNodes
         [SerializeField] private ResourceNodeView nodePrefab;
         [SerializeField, Min(1f)] private float framesPerSecond = 10f;
 
+        private readonly Dictionary<ResourceNodeModel, ResourceNodeView> _views = new();
         private readonly List<ResourceNodeView> _animatedViews = new();
         private readonly CompositeDisposable _subscriptions = new();
         private GridMap _gridMap;
@@ -28,6 +29,7 @@ namespace BarracksAndBolts.Gameplay.ResourceNodes
             _gridMap = gridMap;
             _clock = clock;
             eventBus.Subscribe<ResourceNodePlacedEvent>(OnNodePlaced).AddTo(_subscriptions);
+            eventBus.Subscribe<ResourceNodeRemovedEvent>(OnNodeRemoved).AddTo(_subscriptions);
         }
 
         private void OnDestroy()
@@ -40,9 +42,19 @@ namespace BarracksAndBolts.Gameplay.ResourceNodes
             var node = placedEvent.Node;
             var view = Instantiate(nodePrefab, transform);
             view.Bind(node, _gridMap.AreaToWorldBottomCenter(node.Area));
+            _views.Add(node, view);
 
             if (view.IsAnimated)
                 _animatedViews.Add(view);
+        }
+
+        private void OnNodeRemoved(ResourceNodeRemovedEvent removedEvent)
+        {
+            if (!_views.Remove(removedEvent.Node, out var view))
+                return;
+
+            _animatedViews.Remove(view);
+            Destroy(view.gameObject);
         }
 
         private void LateUpdate()

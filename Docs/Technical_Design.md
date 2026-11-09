@@ -101,10 +101,11 @@ Gameplay/
 ├── Commands/       UnitCommandService, CommandInputHandler, MoveMarkerView (AttackMove vb. gelince: IUnitCommand)
 ├── Sandbox/        SandboxService (minimal: taraf seçimi; tam palet P2)
 ├── Teams/          Faction, TeamService (TeamColor, menüden taşındığı için Core.Session içinde)
-├── ResourceNodes/  ResourceNodeService, ResourceDistributor, ResourceMapInitializer, ResourceNodeView, ResourceNodeViewSpawner
-├── Economy/        ResourceService, PopulationService, StorageService     (P1)
-├── Calendar/       CalendarService, DayNightView                          (P1)
-├── Waves/          WaveService, EnemyAI                                    (P1)
+├── ResourceNodes/  ResourceNodeService, ResourceDistributor, ResourceMapInitializer, ResourceRoamSystem, ResourceNodeView, ResourceNodeViewSpawner
+├── Economy/        ResourceService, PopulationService, NormalModeStarter, ResourceRespawnService, GameOutcomeService (StorageService sonra)
+├── Gathering/      GatheringSystem
+├── Calendar/       CalendarService (görünüm: UI/Hud/DayNightOverlayView, CalendarLabelView)
+├── Raids/          RaidService, BattleAiSystem, ShelterSystem
 ├── Map/            MapGenerator, MapGenerationSettings                     (P2)
 ├── Input/          GameplayInputService, InputModeController
 └── CameraControl/  CameraController

@@ -2,6 +2,7 @@ using System;
 using BarracksAndBolts.Core.Events;
 using BarracksAndBolts.Gameplay.Buildings;
 using BarracksAndBolts.Gameplay.Data;
+using BarracksAndBolts.Gameplay.Economy;
 using BarracksAndBolts.Gameplay.Grid;
 using BarracksAndBolts.Gameplay.Teams;
 using BarracksAndBolts.Gameplay.Units;
@@ -21,7 +22,9 @@ namespace BarracksAndBolts.Gameplay.Placement
         /// <summary>A building or unwalkable terrain is in the way.</summary>
         Occupied,
 
-        UnitInTheWay
+        UnitInTheWay,
+
+        NotEnoughResources
     }
 
     /// <summary>
@@ -33,13 +36,15 @@ namespace BarracksAndBolts.Gameplay.Placement
         private readonly GridMap _gridMap;
         private readonly BuildingService _buildingService;
         private readonly UnitService _units;
+        private readonly ResourceService _resources;
         private readonly IEventBus _eventBus;
 
-        public PlacementService(GridMap gridMap, BuildingService buildingService, UnitService units, IEventBus eventBus)
+        public PlacementService(GridMap gridMap, BuildingService buildingService, UnitService units, ResourceService resources, IEventBus eventBus)
         {
             _gridMap = gridMap;
             _buildingService = buildingService;
             _units = units;
+            _resources = resources;
             _eventBus = eventBus;
         }
 
@@ -69,7 +74,10 @@ namespace BarracksAndBolts.Gameplay.Placement
                     return PlacementBlock.Occupied;
 
                 // Units don't block the grid, but a building placed on one would trap it.
-                return _units.HasUnitIn(Area) ? PlacementBlock.UnitInTheWay : PlacementBlock.None;
+                if (_units.HasUnitIn(Area))
+                    return PlacementBlock.UnitInTheWay;
+
+                return _resources.CanAfford(Definition.Cost) ? PlacementBlock.None : PlacementBlock.NotEnoughResources;
             }
         }
 
@@ -115,6 +123,8 @@ namespace BarracksAndBolts.Gameplay.Placement
         {
             if (!IsAreaValid || !_buildingService.TryPlace(Definition, Area.position, Faction, out _))
                 return false;
+
+            _resources.TrySpend(Definition.Cost);
 
             if (!keepPlacing)
                 End();

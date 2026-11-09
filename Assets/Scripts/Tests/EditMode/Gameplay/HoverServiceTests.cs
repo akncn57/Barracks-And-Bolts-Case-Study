@@ -1,3 +1,4 @@
+using BarracksAndBolts.Gameplay.ResourceNodes;
 using BarracksAndBolts.Core.Events;
 using BarracksAndBolts.Gameplay.Buildings;
 using BarracksAndBolts.Gameplay.Data;
@@ -32,7 +33,7 @@ namespace BarracksAndBolts.Tests.EditMode.Gameplay
             var ids = new GameEntityIdGenerator();
             _buildings = new BuildingService(_map, ids, _eventBus);
             _units = new UnitService(_map, new GridSearch(_map), ids, _eventBus);
-            _hover = new HoverService(_units, _buildings, _eventBus);
+            _hover = new HoverService(_units, _buildings, new ResourceNodeService(_map, ids, _eventBus), _eventBus);
             _house = TestDefinitions.CreateBuilding("house", new Vector2Int(2, 2), visualHeight: 2.5f);
             _knight = TestDefinitions.CreateUnit("knight");
             _changed = 0;

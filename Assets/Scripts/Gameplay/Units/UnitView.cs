@@ -17,6 +17,10 @@ namespace BarracksAndBolts.Gameplay.Units
         // Spreads units over the animation by id, so a group doesn't breathe in perfect sync. A fraction of a loop per id.
         private const float PhasePerId = 0.37f;
 
+        // The idle icon bobs a little, so it catches the eye.
+        private const float IconBobHeight = 0.05f;
+        private const float IconBobSpeed = 4f;
+
         [SerializeField] private SpriteRenderer spriteRenderer;
         [SerializeField, Min(1f)] private float framesPerSecond = 10f;
 
@@ -26,6 +30,10 @@ namespace BarracksAndBolts.Gameplay.Units
         [SerializeField] private Color playerMarkerColor = Color.green;
         [SerializeField] private Color enemyMarkerColor = Color.red;
 
+        [Header("Idle")]
+        [Tooltip("Over the head of a player's villager with nothing to do.")]
+        [SerializeField] private SpriteRenderer idleIcon;
+
         private readonly DamageFlash _damageFlash = new();
         private UnitModel _unit;
         private TeamColorDefinition.UnitSpriteSet _sprites;
@@ -34,6 +42,8 @@ namespace BarracksAndBolts.Gameplay.Units
         private IReadOnlyList<Sprite> _shownFrames;
         private int _shownFrame = -1;
         private float _attackStartedAt = -1f;
+        private bool _canBeIdle;
+        private Vector3 _iconRestPosition;
 
         public GameEntityId UnitId => _unit.Id;
 
@@ -47,6 +57,10 @@ namespace BarracksAndBolts.Gameplay.Units
 
             selectionMarker.color = unit.Faction == Faction.Player ? playerMarkerColor : enemyMarkerColor;
             SetSelected(false);
+
+            _canBeIdle = unit.Definition.CanGather && unit.Faction == Faction.Player;
+            _iconRestPosition = idleIcon.transform.localPosition;
+            idleIcon.enabled = false;
         }
 
         public void SetSelected(bool isSelected)
@@ -73,9 +87,23 @@ namespace BarracksAndBolts.Gameplay.Units
             transform.position = _unit.Position;
             spriteRenderer.flipX = _unit.IsFacingLeft;
             _damageFlash.Update(spriteRenderer, Time.deltaTime);
+            UpdateIdleIcon();
 
-            if (!TryShowAttackFrame())
+            if (TryShowAttackFrame())
+                return;
+
+            if (_unit.HarvestingKind.HasValue)
+                ShowLoopingFrame(_sprites.GetWorkFrames(_unit.HarvestingKind.Value));
+            else
                 ShowLoopingFrame(_unit.IsMoving ? _sprites.RunFrames : _sprites.IdleFrames);
+        }
+
+        private void UpdateIdleIcon()
+        {
+            var isShown = _canBeIdle && _unit.IsIdle;
+            idleIcon.enabled = isShown;
+            if (isShown)
+                idleIcon.transform.localPosition = _iconRestPosition + Vector3.up * (Mathf.Sin(_clock.ElapsedTime * IconBobSpeed) * IconBobHeight);
         }
 
         private bool TryShowAttackFrame()

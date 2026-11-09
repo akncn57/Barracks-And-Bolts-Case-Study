@@ -32,6 +32,17 @@ namespace BarracksAndBolts.Gameplay.CameraControl
             return viewCenter + Vector2.Scale(fromCenter, halfExtents);
         }
 
+        /// <summary>The way back from <see cref="ScreenToWorld"/>: world point to screen pixel.</summary>
+        public static Vector2 WorldToScreen(Vector2 worldPoint, Vector2 screenSize, Vector2 viewCenter, float orthographicSize)
+        {
+            if (screenSize.x <= 0f || screenSize.y <= 0f)
+                return Vector2.zero;
+
+            var halfExtents = GetViewHalfExtents(orthographicSize, screenSize.x / screenSize.y);
+            var fromCenter = (worldPoint - viewCenter) / halfExtents;
+            return Vector2.Scale((fromCenter + Vector2.one) * 0.5f, screenSize);
+        }
+
         /// <summary>Keeps the view inside the bounds. On an axis where the view is larger than the bounds, centers it.</summary>
         public static Vector2 ClampCenter(Vector2 center, Vector2 viewHalfExtents, Rect bounds)
         {

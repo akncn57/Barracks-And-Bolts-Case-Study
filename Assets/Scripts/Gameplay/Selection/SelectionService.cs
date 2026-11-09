@@ -29,6 +29,7 @@ namespace BarracksAndBolts.Gameplay.Selection
             _buildings = buildings;
             _eventBus = eventBus;
             eventBus.Subscribe<UnitDiedEvent>(e => Deselect(e.Unit.Id)).AddTo(_subscriptions);
+            eventBus.Subscribe<UnitShelteredEvent>(e => Deselect(e.Unit.Id)).AddTo(_subscriptions);
             eventBus.Subscribe<BuildingDestroyedEvent>(e => Deselect(e.Building.Id)).AddTo(_subscriptions);
         }
 

@@ -48,6 +48,12 @@ namespace BarracksAndBolts.Gameplay.CameraControl
             return CameraMath.ScreenToWorld(screenPosition, ScreenSize, transform.position, Zoom);
         }
 
+        /// <summary>Screen position of a world point, with the same values as <see cref="ScreenToWorld"/>.</summary>
+        public Vector2 WorldToScreen(Vector2 worldPosition)
+        {
+            return CameraMath.WorldToScreen(worldPosition, ScreenSize, transform.position, Zoom);
+        }
+
         private void Start()
         {
             var padding = Vector2.one * config.BoundsPadding;

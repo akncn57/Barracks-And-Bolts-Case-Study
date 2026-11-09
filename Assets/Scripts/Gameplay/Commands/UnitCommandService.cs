@@ -3,15 +3,17 @@ using System.Collections.Generic;
 using BarracksAndBolts.Core.Events;
 using BarracksAndBolts.Gameplay.Combat;
 using BarracksAndBolts.Gameplay.Entities;
+using BarracksAndBolts.Gameplay.Gathering;
 using BarracksAndBolts.Gameplay.Grid;
 using BarracksAndBolts.Gameplay.Pathfinding;
+using BarracksAndBolts.Gameplay.ResourceNodes;
 using BarracksAndBolts.Gameplay.Teams;
 using BarracksAndBolts.Gameplay.Units;
 using UnityEngine;
 
 namespace BarracksAndBolts.Gameplay.Commands
 {
-    /// <summary>Turns the player's orders into unit actions: attack an enemy, or move.</summary>
+    /// <summary>Turns the player's orders into unit actions: attack an enemy, gather a resource, or move.</summary>
     public sealed class UnitCommandService
     {
         private readonly UnitService _units;
@@ -19,32 +21,67 @@ namespace BarracksAndBolts.Gameplay.Commands
         private readonly CombatService _combat;
         private readonly GridSearch _gridSearch;
         private readonly GridMap _gridMap;
+        private readonly GatheringSystem _gathering;
+        private readonly ResourceNodeService _nodes;
         private readonly IEventBus _eventBus;
 
         private readonly List<UnitModel> _group = new();
         private readonly HashSet<GameEntityId> _groupIds = new();
         private readonly List<Vector2Int> _destinations = new();
+        private readonly List<GameEntityId> _nonGatherers = new();
 
         // Kept in a field so a command doesn't allocate a new delegate.
         private readonly Predicate<Vector2Int> _isDestinationFree;
 
-        public UnitCommandService(UnitService units, UnitMovementSystem movement, CombatService combat, GridSearch gridSearch, GridMap gridMap, IEventBus eventBus)
+        public UnitCommandService(UnitService units, UnitMovementSystem movement, CombatService combat, GridSearch gridSearch, GridMap gridMap,
+            GatheringSystem gathering, ResourceNodeService nodes, IEventBus eventBus)
         {
             _units = units;
             _movement = movement;
             _combat = combat;
             _gridSearch = gridSearch;
             _gridMap = gridMap;
+            _gathering = gathering;
+            _nodes = nodes;
             _eventBus = eventBus;
             _isDestinationFree = cell => !_units.IsDestinationTaken(cell, _groupIds);
         }
 
-        /// <summary>The right click order: attack the enemy under the point, or move there if there is none.</summary>
+        /// <summary>The right click order: attack the enemy under the point, gather the resource under it, or move there.</summary>
         /// <returns>False if the list holds no unit that can take the order.</returns>
         public bool CommandAt(IReadOnlyList<GameEntityId> ids, Vector2 worldPosition)
         {
             var enemy = _combat.GetHostileAt(worldPosition, Faction.Player);
-            return enemy.IsValid ? Attack(ids, enemy, worldPosition) : MoveTo(ids, worldPosition);
+            if (enemy.IsValid)
+                return Attack(ids, enemy, worldPosition);
+
+            var node = _nodes.GetNodeAt(worldPosition);
+            return node != null ? Gather(ids, node, worldPosition) : MoveTo(ids, worldPosition);
+        }
+
+        /// <summary>Villagers among the ids start gathering the node. Everyone else just walks there.</summary>
+        /// <returns>False if the list holds no unit that can take the order.</returns>
+        public bool Gather(IReadOnlyList<GameEntityId> ids, ResourceNodeModel node, Vector2 worldPosition)
+        {
+            CollectGroup(ids);
+            AnnounceOrder();
+            _nonGatherers.Clear();
+            var hasGatherer = false;
+            foreach (var unit in _group)
+            {
+                if (_gathering.TryOrder(unit, node))
+                    hasGatherer = true;
+                else
+                    _nonGatherers.Add(unit.Id);
+            }
+
+            if (_nonGatherers.Count > 0)
+                return MoveTo(_nonGatherers, worldPosition) || hasGatherer;
+
+            if (hasGatherer)
+                _eventBus.Publish(new MoveCommandIssuedEvent(worldPosition));
+
+            return hasGatherer;
         }
 
         /// <summary>Orders the player's units among the ids to attack the target. There is no friendly fire.</summary>
@@ -58,8 +95,12 @@ namespace BarracksAndBolts.Gameplay.Commands
             if (_group.Count == 0)
                 return false;
 
+            AnnounceOrder();
             foreach (var unit in _group)
+            {
+                _gathering.Cancel(unit.Id);
                 unit.SetAttackTarget(targetId);
+            }
 
             _eventBus.Publish(new AttackCommandIssuedEvent(markerPosition));
             return true;
@@ -86,6 +127,10 @@ namespace BarracksAndBolts.Gameplay.Commands
             if (_destinations.Count == 0)
                 return false;
 
+            AnnounceOrder();
+            foreach (var unit in _group)
+                _gathering.Cancel(unit.Id);
+
             AssignDestinations();
             _eventBus.Publish(new MoveCommandIssuedEvent(worldPosition));
             return true;
@@ -109,6 +154,12 @@ namespace BarracksAndBolts.Gameplay.Commands
                 _group.Add(unit);
                 _groupIds.Add(id);
             }
+        }
+
+        private void AnnounceOrder()
+        {
+            foreach (var unit in _group)
+                _eventBus.Publish(new UnitOrderedEvent(unit.Id));
         }
 
         private void AssignDestinations()
@@ -146,5 +197,16 @@ namespace BarracksAndBolts.Gameplay.Commands
 
             return closest;
         }
+    }
+
+    /// <summary>The player gave this unit an order.</summary>
+    public readonly struct UnitOrderedEvent : IGameEvent
+    {
+        public UnitOrderedEvent(GameEntityId unitId)
+        {
+            UnitId = unitId;
+        }
+
+        public GameEntityId UnitId { get; }
     }
 }

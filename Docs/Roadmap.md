@@ -47,16 +47,17 @@ Oyunu deneyince çıkan kullanılabilirlik istekleri. Sandbox'ta da olmalı, bui
 **Hedef: 11 Kasım Çarşamba akşamı.**
 
 - [x] **Haritada rastgele kaynak dağılımı:** seed'li; orman, taş ocağı, altın madeni, koyun sürüsü
-- [ ] Kaynak miktarı, tükenme ve koyunların çoğalması
-- [ ] Köylü: Castle'dan üretim, kaynak toplama, Castle'a taşıma
-- [ ] Bina ve birim maliyetleri (Production Menu hücresinde ve tooltip'te gösterilir)
-- [ ] Üstteki kaynak barının gerçek miktarlara bağlanması (bar P0+'ta geldi; Normal modda şimdilik 0 yazıyor)
-- [ ] Nüfus sistemi (House ile kapasite artışı)
-- [ ] Takvim: gündüz/gece döngüsü, saldırı günleri, baskın sırasında zamanın durması
-- [ ] Düşman AI: Castle'a yürür, yolundakine saldırır, kapalı yolda engel yıkar
-- [ ] Dalga sistemi ve baskın bildirimleri
+- [x] **Normal modun ilk dilimi:** menüde Play; Castle, 3 köylü ve başlangıç kaynağıyla başlangıç; sayaçlar; bina ve asker maliyetleri, yetmezse uyarı; köylüyle toplama, Castle'a taşıma, kaynağın tükenmesi
+- [x] **Oyun döngüsü (aşağıdaki maddeler):** kuruldu ve oynandı; dengesi henüz ayarlanmadı
+- [ ] Koyunların çoğalması: her sabah yeni koyun, üst sınırla
+- [x] **İlk oyun notları:** köylü kaynağın dibinde çalışıyor, düşman yaklaşınca Castle'a sığınıyor, boştayken ikon, koyunlar geziyor ve tek kesimde ölüyor, isim etiketi hedefin üstünde
+- [ ] Köylü: Castle'dan üretim, sadece Normal modda
+- [ ] Bina ve birim maliyetlerinin Production Menu hücresinde görünmesi (tooltip'te var)
+- [ ] Nüfus sistemi: Castle ve House kapasite verir, barda `kullanılan/kapasite`
+- [ ] Takvim: gündüz/gece döngüsü, gece kararması, saldırı günleri, baskın sırasında zamanın durması
+- [ ] Düşman AI: Castle'a yürür, yolundakine saldırır, kapalı yolda binayı yıkar. Boştaki askerler de yakındaki düşmana saldırır
+- [ ] Dalga sistemi ve baskın bildirimleri (ses ve mini harita yok; yön yazıyla söyleniyor)
 - [ ] Kazanma ve kaybetme koşulları ve oyun sonu ekranı
-- [ ] Ana menüde Normal / Sandbox mod seçimi
 
 ## P2 – Derinlik (zaman kaldıkça, aşağıdaki sırayla)
 **Hedef: 12 Kasım Perşembe.**
@@ -70,7 +71,7 @@ Oyunu deneyince çıkan kullanılabilirlik istekleri. Sandbox'ta da olmalı, bui
 7. [ ] Depo binaları ve kapasite sistemi
 8. [ ] Açlık
 9. [ ] Bölge sistemi ve Karakol
-10. [ ] Köylülerin kaçıp saklanması
+10. [ ] Köylülerin House'a da sığınması ve bina başına sığınma kapasitesi (Castle'a sığınma yapıldı)
 11. [ ] Toplanma noktası (rally point)
 12. [ ] Tam Creative Sandbox (her şeyi yerleştirme, silme aracı, zaman kontrolü)
 

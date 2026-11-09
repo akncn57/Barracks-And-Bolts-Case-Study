@@ -16,6 +16,9 @@ MonoBehaviour:
   displayName: Sheep
   kind: 2
   size: {x: 1, y: 1}
+  visualHeight: 1
+  amount: 40
+  workDistance: 0.75
   frames:
   - {fileID: -6879290243380990860, guid: 3456eff5277dbd64c9f3e12e1acbd7ec, type: 3}
   - {fileID: 6416055995298698269, guid: 3456eff5277dbd64c9f3e12e1acbd7ec, type: 3}
@@ -23,3 +26,10 @@ MonoBehaviour:
   - {fileID: -6629803274111058658, guid: 3456eff5277dbd64c9f3e12e1acbd7ec, type: 3}
   - {fileID: -8493763510348472219, guid: 3456eff5277dbd64c9f3e12e1acbd7ec, type: 3}
   - {fileID: 6094259631630437551, guid: 3456eff5277dbd64c9f3e12e1acbd7ec, type: 3}
+  roamRadius: 0.35
+  walkFrames:
+  - {fileID: 4671501159646219437, guid: d3457faa185e3594391d673447d5cf2b, type: 3}
+  - {fileID: -6465609930013442711, guid: d3457faa185e3594391d673447d5cf2b, type: 3}
+  - {fileID: 8883252912783768555, guid: d3457faa185e3594391d673447d5cf2b, type: 3}
+  - {fileID: -6556170278312625396, guid: d3457faa185e3594391d673447d5cf2b, type: 3}
+  isOneCut: 1

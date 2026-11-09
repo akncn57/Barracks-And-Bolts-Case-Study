@@ -47,5 +47,58 @@ namespace BarracksAndBolts.Gameplay.ResourceNodes
             _eventBus.Publish(new GridChangedEvent(area));
             return true;
         }
+
+        /// <summary>Takes the node off the map and frees its cells.</summary>
+        public void Remove(ResourceNodeModel node)
+        {
+            if (!_nodes.Remove(node))
+                return;
+
+            _gridMap.Release(node.Area, node.Id);
+            _eventBus.Publish(new ResourceNodeRemovedEvent(node));
+            _eventBus.Publish(new GridChangedEvent(node.Area));
+        }
+
+        /// <summary>The node whose visible area covers the point. If several do, the one drawn in front: the lowest on screen.</summary>
+        public ResourceNodeModel GetNodeAt(Vector2 worldPosition)
+        {
+            ResourceNodeModel result = null;
+            foreach (var node in _nodes)
+            {
+                if ((result == null || node.Area.yMin < result.Area.yMin) && GetVisibleArea(node).Contains(worldPosition))
+                    result = node;
+            }
+
+            return result;
+        }
+
+        /// <summary>The nearest node of that kind which still has something left.</summary>
+        /// <param name="ignored">Left out of the search. Null means none.</param>
+        public ResourceNodeModel FindNearest(ResourceKind kind, Vector2 from, ResourceNodeModel ignored)
+        {
+            ResourceNodeModel nearest = null;
+            var nearestDistance = float.MaxValue;
+            foreach (var node in _nodes)
+            {
+                if (node == ignored || node.IsDepleted || node.Definition.Kind != kind)
+                    continue;
+
+                var distance = (node.Area.center + _gridMap.Origin - from).sqrMagnitude;
+                if (distance < nearestDistance)
+                {
+                    nearestDistance = distance;
+                    nearest = node;
+                }
+            }
+
+            return nearest;
+        }
+
+        /// <summary>The footprint plus what rises above it, in world space.</summary>
+        public Rect GetVisibleArea(ResourceNodeModel node)
+        {
+            var corner = _gridMap.Origin + node.Area.min + node.Offset;
+            return new Rect(corner.x, corner.y, node.Area.width, node.Definition.VisualHeight);
+        }
     }
 }
