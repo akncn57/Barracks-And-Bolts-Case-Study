@@ -71,7 +71,7 @@ Oyunu deneyince çıkan kullanılabilirlik istekleri. Sandbox'ta da olmalı, bui
 6. [ ] Köylünün inşa etmesi ve manuel tamir
 7. [ ] Depo binaları ve kapasite sistemi
 8. [ ] Açlık
-9. [ ] Bölge sistemi ve Karakol
+9. [x] Bölge sistemi ve Karakol (yarıçap yükseltmesi, yükseltme sistemiyle gelecek). Seçili binada menzil ve bölge halkası
 10. [ ] Köylülerin House'a da sığınması ve bina başına sığınma kapasitesi (Castle'a sığınma yapıldı)
 11. [ ] Toplanma noktası (rally point)
 12. [ ] Tam Creative Sandbox (her şeyi yerleştirme, silme aracı, zaman kontrolü)

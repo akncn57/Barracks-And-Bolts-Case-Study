@@ -5,6 +5,7 @@ using BarracksAndBolts.Gameplay.Data;
 using BarracksAndBolts.Gameplay.Economy;
 using BarracksAndBolts.Gameplay.Grid;
 using BarracksAndBolts.Gameplay.Teams;
+using BarracksAndBolts.Gameplay.Territory;
 using BarracksAndBolts.Gameplay.Units;
 using UnityEngine;
 
@@ -18,6 +19,8 @@ namespace BarracksAndBolts.Gameplay.Placement
         NoArea,
 
         OutsideMap,
+
+        OutsideTerritory,
 
         /// <summary>A building or unwalkable terrain is in the way.</summary>
         Occupied,
@@ -37,14 +40,17 @@ namespace BarracksAndBolts.Gameplay.Placement
         private readonly BuildingService _buildingService;
         private readonly UnitService _units;
         private readonly ResourceService _resources;
+        private readonly TerritoryService _territory;
         private readonly IEventBus _eventBus;
 
-        public PlacementService(GridMap gridMap, BuildingService buildingService, UnitService units, ResourceService resources, IEventBus eventBus)
+        public PlacementService(GridMap gridMap, BuildingService buildingService, UnitService units, ResourceService resources,
+            TerritoryService territory, IEventBus eventBus)
         {
             _gridMap = gridMap;
             _buildingService = buildingService;
             _units = units;
             _resources = resources;
+            _territory = territory;
             _eventBus = eventBus;
         }
 
@@ -59,6 +65,12 @@ namespace BarracksAndBolts.Gameplay.Placement
 
         public bool IsAreaValid => Block == PlacementBlock.None;
 
+        /// <summary>
+        /// The building being placed opens territory and could stand here as far as territory goes,
+        /// so the player should see what it would open. Price and obstacles don't matter for that.
+        /// </summary>
+        public bool ShowsTerritoryPreview => HasArea && Definition.TerritoryRadius > 0f && _territory.IsInside(Area);
+
         /// <summary>Why the building can't go where the footprint is now.</summary>
         public PlacementBlock Block
         {
@@ -69,6 +81,9 @@ namespace BarracksAndBolts.Gameplay.Placement
 
                 if (!_gridMap.IsInBounds(Area))
                     return PlacementBlock.OutsideMap;
+
+                if (!_territory.IsInside(Area))
+                    return PlacementBlock.OutsideTerritory;
 
                 if (!_gridMap.IsAreaFree(Area))
                     return PlacementBlock.Occupied;
@@ -86,7 +101,7 @@ namespace BarracksAndBolts.Gameplay.Placement
         {
             // On uneven ground the footprint's center decides which level is the right one.
             var center = new Vector2Int(Area.x + Area.width / 2, Area.y + Area.height / 2);
-            return _gridMap.IsWalkable(cell) && !_gridMap.IsRamp(cell) &&
+            return _gridMap.IsWalkable(cell) && !_gridMap.IsRamp(cell) && _territory.IsInside(cell) &&
                    _gridMap.GetLevel(cell) == _gridMap.GetLevel(center) && !_units.HasUnitAt(cell);
         }
 

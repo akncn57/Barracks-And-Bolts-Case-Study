@@ -189,7 +189,7 @@ namespace BarracksAndBolts.Tests.EditMode.Gameplay
         {
             var house = Track(TestDefinitions.CreateBuilding("house", new Vector2Int(2, 2)));
             SetCost(house, ResourceKind.Wood, 30);
-            var placement = new PlacementService(_map, _buildings, _units, _resources, _eventBus);
+            var placement = new PlacementService(_map, _buildings, _units, _resources, TestDefinitions.CreateFreeTerritory(_map, _buildings, _eventBus), _eventBus);
             placement.Begin(house, Faction.Player);
             placement.MoveTo(new Vector2(5f, 5f));
 
@@ -204,7 +204,7 @@ namespace BarracksAndBolts.Tests.EditMode.Gameplay
             var house = Track(TestDefinitions.CreateBuilding("house", new Vector2Int(2, 2)));
             SetCost(house, ResourceKind.Wood, 30);
             _resources.Add(ResourceKind.Wood, 50);
-            var placement = new PlacementService(_map, _buildings, _units, _resources, _eventBus);
+            var placement = new PlacementService(_map, _buildings, _units, _resources, TestDefinitions.CreateFreeTerritory(_map, _buildings, _eventBus), _eventBus);
             placement.Begin(house, Faction.Player);
             placement.MoveTo(new Vector2(5f, 5f));
 
@@ -219,7 +219,7 @@ namespace BarracksAndBolts.Tests.EditMode.Gameplay
             SetCost(house, ResourceKind.Wood, 30);
             _resources.Add(ResourceKind.Wood, 50);
             _map.SetTerrainWalkable(new Vector2Int(5, 5), false);
-            var placement = new PlacementService(_map, _buildings, _units, _resources, _eventBus);
+            var placement = new PlacementService(_map, _buildings, _units, _resources, TestDefinitions.CreateFreeTerritory(_map, _buildings, _eventBus), _eventBus);
             placement.Begin(house, Faction.Player);
             placement.MoveTo(new Vector2(5f, 5f));
 

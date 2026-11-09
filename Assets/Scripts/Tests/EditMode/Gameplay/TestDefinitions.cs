@@ -3,7 +3,9 @@ using BarracksAndBolts.Core.Session;
 using BarracksAndBolts.Gameplay.Buildings;
 using BarracksAndBolts.Gameplay.Data;
 using BarracksAndBolts.Gameplay.Economy;
+using BarracksAndBolts.Gameplay.Grid;
 using BarracksAndBolts.Gameplay.Sandbox;
+using BarracksAndBolts.Gameplay.Territory;
 using BarracksAndBolts.Gameplay.Units;
 using UnityEditor;
 using UnityEngine;
@@ -22,6 +24,24 @@ namespace BarracksAndBolts.Tests.EditMode.Gameplay
         public static PopulationService CreateFreePopulation(UnitService units, BuildingService buildings, IEventBus eventBus)
         {
             return new PopulationService(new SandboxService(new GameSessionSettings { Mode = GameMode.Sandbox }, eventBus), units, buildings);
+        }
+
+        /// <summary>Sandbox territory: every cell counts as inside, for tests that aren't about territory.</summary>
+        public static TerritoryService CreateFreeTerritory(GridMap map, BuildingService buildings, IEventBus eventBus)
+        {
+            return new TerritoryService(map, buildings, new SandboxService(new GameSessionSettings { Mode = GameMode.Sandbox }, eventBus), eventBus);
+        }
+
+        /// <summary>A building that opens territory around itself. Destroy it in TearDown.</summary>
+        public static BuildingDefinition CreateTerritorySource(string id, float radius)
+        {
+            var definition = CreateBuilding(id, new Vector2Int(2, 2));
+
+            var serialized = new SerializedObject(definition);
+            serialized.FindProperty("territoryRadius").floatValue = radius;
+            serialized.ApplyModifiedPropertiesWithoutUndo();
+
+            return definition;
         }
 
         /// <summary>Destroy the result in TearDown; ScriptableObjects are not garbage collected.</summary>

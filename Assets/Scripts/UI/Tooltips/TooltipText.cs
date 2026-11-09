@@ -8,8 +8,8 @@ namespace BarracksAndBolts.UI.Tooltips
     /// <summary>The text shown in tooltips, built from design data.</summary>
     public static class TooltipText
     {
-        /// <param name="showCost">False in sandbox mode, where everything is free.</param>
-        public static string ForBuilding(BuildingDefinition building, bool showCost = false)
+        /// <param name="isNormalMode">False in sandbox mode, where everything is free and there is no territory.</param>
+        public static string ForBuilding(BuildingDefinition building, bool isNormalMode = false)
         {
             var text = new StringBuilder();
             text.Append("Size: ").Append(building.Size.x).Append('x').Append(building.Size.y).Append('\n');
@@ -30,7 +30,10 @@ namespace BarracksAndBolts.UI.Tooltips
                 }
             }
 
-            if (showCost)
+            if (isNormalMode && building.TerritoryRadius > 0f)
+                text.Append(FormattableString.Invariant($"\nTerritory: {building.TerritoryRadius:0.#}"));
+
+            if (isNormalMode)
                 AppendCost(text, building.Cost);
 
             return text.ToString();

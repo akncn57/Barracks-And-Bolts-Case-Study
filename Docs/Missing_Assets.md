@@ -54,7 +54,7 @@
 | 19 | İnşa halindeki bina (iskele) | Köylünün inşa etmesi | 🔍 Tiny Swords'ta "Construction" varyantları var. Alternatif: 💻 yarı saydam bina ve alttan dolan maske |
 | 20 | ~~Hasarlı bina efekti~~ | ✅ `Texture_VFX_Fire_*` | – |
 | 21 | Rütbe / seviye simgesi (asker ve bina seviyesi) | Yükseltme sistemi | 🛠 / 💻 Küçük yıldız veya çizgiler |
-| 22 | Bölge sınırı görseli | Bölge sistemi | 💻 Tilemap overlay veya shader |
+| 22 | ~~Bölge sınırı görseli~~ | ✅ Kodla: haritanın üstünde tek doku, `TerritoryOverlayView` | – |
 | 23 | Mini harita çerçevesi | Mini harita | 🛠 `Papers_*` / `WoodTable_*` 9-slice |
 | 24 | ~~Kuledeki okçu~~ | ✅ `Archer` kareleri kulenin platformunda, takım rengine göre | – |
 | 25 | ~~Toplanma noktası bayrağı~~ | ✅ Kurdeleden üretildi: `Textures/Markers/<Renk>/Texture_Markers_<Renk>_RallyFlag` (atlas'a eklendi) | – |

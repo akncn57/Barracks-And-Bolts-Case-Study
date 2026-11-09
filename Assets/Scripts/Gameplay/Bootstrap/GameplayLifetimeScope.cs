@@ -16,6 +16,7 @@ using BarracksAndBolts.Gameplay.Hover;
 using BarracksAndBolts.Gameplay.Input;
 using BarracksAndBolts.Gameplay.Pathfinding;
 using BarracksAndBolts.Gameplay.Placement;
+using BarracksAndBolts.Gameplay.Territory;
 using BarracksAndBolts.Gameplay.Raids;
 using BarracksAndBolts.Gameplay.ResourceNodes;
 using BarracksAndBolts.Gameplay.Sandbox;
@@ -140,6 +141,7 @@ namespace BarracksAndBolts.Gameplay.Bootstrap
             builder.RegisterComponentInHierarchy<BuildingViewSpawner>();
             builder.Register<UnitProductionService>(Lifetime.Singleton);
 
+            builder.Register<TerritoryService>(Lifetime.Singleton);
             builder.Register<PlacementService>(Lifetime.Singleton);
             builder.RegisterEntryPoint<PlacementInputHandler>();
             builder.RegisterComponentInHierarchy<PlacementPreviewView>();

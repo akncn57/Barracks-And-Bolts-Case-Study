@@ -52,10 +52,11 @@ namespace BarracksAndBolts.UI.Production
 
         private void CollectBuildings()
         {
-            // A normal game starts with the one Castle it will ever have.
             foreach (var building in _database.Buildings)
             {
-                if (_sandbox.IsEnabled || building != _database.NormalMode.Castle)
+                // A normal game starts with the one Castle it will ever have.
+                var isShown = _sandbox.IsEnabled ? !building.IsNormalModeOnly : building != _database.NormalMode.Castle;
+                if (isShown)
                     _buildings.Add(building);
             }
         }
@@ -83,7 +84,7 @@ namespace BarracksAndBolts.UI.Production
 
         private void OnCellHoverStarted(ProductionMenuCell cell)
         {
-            _tooltip.Show(cell.Definition.DisplayName, TooltipText.ForBuilding(cell.Definition, showCost: !_sandbox.IsEnabled), cell.RectTransform);
+            _tooltip.Show(cell.Definition.DisplayName, TooltipText.ForBuilding(cell.Definition, isNormalMode: !_sandbox.IsEnabled), cell.RectTransform);
         }
 
         private void OnBuildingClicked(BuildingDefinition building)

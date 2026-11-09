@@ -44,6 +44,12 @@ namespace BarracksAndBolts.Gameplay.Data
         [Tooltip("Seconds between shots.")]
         [SerializeField, Min(0.1f)] private float defenseCooldown = 1f;
 
+        [Header("Territory")]
+        [Tooltip("The player can build this far around the building in a normal game, in cells from the middle of the footprint. 0 for none.")]
+        [SerializeField, Min(0f)] private float territoryRadius;
+        [Tooltip("Left out of the production menu in sandbox mode, where it would do nothing.")]
+        [SerializeField] private bool isNormalModeOnly;
+
         public string Id => id;
         public string DisplayName => displayName;
         public Vector2Int Size => size;
@@ -62,6 +68,8 @@ namespace BarracksAndBolts.Gameplay.Data
         public float DefenseRange => defenseRange;
         public int DefenseDamage => defenseDamage;
         public float DefenseCooldown => defenseCooldown;
+        public float TerritoryRadius => territoryRadius;
+        public bool IsNormalModeOnly => isNormalModeOnly;
 
         private void OnValidate()
         {

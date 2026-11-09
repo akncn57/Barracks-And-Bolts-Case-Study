@@ -24,3 +24,4 @@ MonoBehaviour:
   normalModeProducibles:
   - {fileID: 11400000, guid: 92cce3bd224c0284d995a6d960508313, type: 2}
   spawnOffset: {x: 2, y: -1}
+  territoryRadius: 12

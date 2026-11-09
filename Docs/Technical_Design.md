@@ -49,7 +49,8 @@ Assets/
 │   │   ├── Placement/
 │   │   ├── Selection/
 │   │   ├── Commands/
-│   │   └── Hover/
+│   │   ├── Hover/
+│   │   └── Territory/
 │   └── UI/                     Prefab_UI_<Kategori>_<İsim>
 ├── Resources/                  Sadece kütüphanelerin zorunlu tuttuğu dosyalar (ör. DOTweenSettings). Bu isimdeki klasör build'e komple girer, başka yerde kullanılmaz
 ├── Scenes/                     Bootstrap, MainMenu, Gameplay
@@ -99,6 +100,7 @@ Gameplay/
 ├── Placement/      PlacementService, PlacementInputHandler, PlacementPreviewView (bölge kuralı gelince: PlacementValidator)
 ├── Buildings/      BuildingService, BuildingModel, BuildingView, BuildingViewSpawner, Production/ (UnitProductionService)
 ├── Units/          UnitService, UnitModel, UnitMovementSystem, UnitView, UnitViewSpawner, States/
+├── Territory/      TerritoryService, TerritoryOverlayView
 ├── Combat/         CombatService, CombatSystem, BuildingDefenseSystem, DeathCleanupSystem, DamageFlash, ProjectileSpawner, ProjectileView
 ├── Hover/          HoverService, HoverInputHandler, HoverHighlightView
 ├── Feedback/       FloatingTextRequestedEvent (çizen: UI/Feedback/FloatingTextSpawner)

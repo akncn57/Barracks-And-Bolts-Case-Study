@@ -22,6 +22,8 @@ MonoBehaviour:
     sprite: {fileID: 21300000, guid: 221acd6528a29d440a96e86756ea2cd2, type: 3}
   - building: {fileID: 11400000, guid: b58af5da5df14d3eb4fb3bfbc613f8df, type: 2}
     sprite: {fileID: 21300000, guid: 6d1e6df942396724cbb3715096205df5, type: 3}
+  - building: {fileID: 11400000, guid: a82d5c1f7e3946b0bd14f06c92e7a351, type: 2}
+    sprite: {fileID: 21300000, guid: fe8c1505b00b4a92b3161a7704b295ce, type: 3}
   unitSprites:
   - unit: {fileID: 11400000, guid: 5ed1c31b43ef4510b9d5c8966a56d71a, type: 2}
     idleFrames:

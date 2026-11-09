@@ -224,6 +224,9 @@ Bu değerler ScriptableObject üzerinden ayarlanabilir olacak, ileride değişti
 - Karakol ya da kule yıkılırsa bölge küçülür. Bölge dışında kalan binalar yerinde kalır ve çalışmaya devam eder, ama oraya yeni bina konamaz.
 - Kaynak toplama ve birim hareketi bölgeyle sınırlı değildir, harita her yerde gezilebilir.
 - Bölge hesabı grid üzerinde yapılır: her hücre için "bölge içinde mi?" bilgisi tutulur. Bu bilgi sadece bölge kaynağı (Castle, Karakol, Kule) eklenince ya da kaldırılınca yeniden hesaplanır.
+- **Açılacak alan:** Karakol ya da Kule yerleştirilirken, koymadan önce açacağı alan zeminde yeşil görünür. Bölge dışındayken görünmez, çünkü oraya konamaz.
+- **Kapsama halkası:** Bina seçilince ve Kule yerleştirilirken ulaştığı alan halka olarak görünür: turuncu saldırı menzili, krem bölge alanı. Düşman binasında sadece menzil görünür; Sandbox'ta bölge halkası yoktur.
+- **Şu anki hali:** Yarıçap Castle 12, Karakol 12, Kule 4 (geçici, `territoryRadius` ile tanım asset'inden değişir). Binanın tamamı bölge içinde olmalı. Sandbox'ta bölge yok ve Karakol menüde çıkmaz. Karakol yükseltmesi, yükseltme sistemiyle gelecek.
 
 ### Mini Harita
 - Ekranın bir köşesinde mini harita olur. Haritada zemin, kaynaklar, binalar, birimler (oyuncu ve düşman ayrı renkte), bölge sınırları ve kameranın gördüğü alan gösterilir.

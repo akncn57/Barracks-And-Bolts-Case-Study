@@ -30,3 +30,4 @@ MonoBehaviour:
   defenseRange: 7
   defenseDamage: 3
   defenseCooldown: 1
+  territoryRadius: 4
