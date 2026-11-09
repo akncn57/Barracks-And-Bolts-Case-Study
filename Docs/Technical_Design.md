@@ -44,7 +44,12 @@ Assets/
 │   ├── Gameplay/               Prefab_Gameplay_<İsim>
 │   │   ├── Buildings/
 │   │   ├── Units/
-│   │   └── ResourceNodes/
+│   │   ├── ResourceNodes/
+│   │   ├── Combat/
+│   │   ├── Placement/
+│   │   ├── Selection/
+│   │   ├── Commands/
+│   │   └── Hover/
 │   └── UI/                     Prefab_UI_<Kategori>_<İsim>
 ├── Resources/                  Sadece kütüphanelerin zorunlu tuttuğu dosyalar (ör. DOTweenSettings). Bu isimdeki klasör build'e komple girer, başka yerde kullanılmaz
 ├── Scenes/                     Bootstrap, MainMenu, Gameplay
@@ -308,14 +313,15 @@ GameplayLifetimeScope
         Tilemap_Stairs     (order -2, merdiven; dolu hücre rampa)
         Tilemap_Blocking   (çizilmez; dolu hücre yürünemez)
 ----- WORLD -----
-    Buildings          (runtime'da üretilenlerin parent'ı, BuildingViewSpawner)
-    PlacementPreview   (yerleştirme önizlemesi)
-    Units              (runtime'da üretilenlerin parent'ı, UnitViewSpawner)
-    SelectionBox       (kutu seçimi çerçevesi, BoxSelectionView)
-    MoveMarker         (sağ tık geri bildirimi, MoveMarkerView)
-    Projectiles        (havuzdan gelen oklar, ProjectileSpawner)
-    HoverHighlight     (mouse'un altındakinin çerçevesi, HoverHighlightView)
-    FloatingTexts      (havuzdan gelen uçan yazılar, FloatingTextSpawner)
+    Prefab_Gameplay_Building_Spawner      (runtime'da üretilenlerin parent'ı, BuildingViewSpawner)
+    Prefab_Gameplay_Placement_Preview     (yerleştirme önizlemesi)
+    Prefab_Gameplay_Unit_Spawner          (runtime'da üretilenlerin parent'ı, UnitViewSpawner)
+    Prefab_Gameplay_ResourceNode_Spawner  (kaynakların parent'ı, ResourceNodeViewSpawner)
+    Prefab_Gameplay_Selection_Box         (kutu seçimi çerçevesi, BoxSelectionView)
+    Prefab_Gameplay_Move_Marker           (sağ tık geri bildirimi, MoveMarkerView)
+    Prefab_Gameplay_Projectile_Spawner    (havuzdan gelen oklar, ProjectileSpawner)
+    Prefab_Gameplay_Hover_Highlight       (mouse'un altındakinin çerçevesi, HoverHighlightView)
+    Prefab_UI_FloatingText_Spawner        (havuzdan gelen uçan yazılar, FloatingTextSpawner)
     Resources
     Effects
 ----- MANAGERS -----
