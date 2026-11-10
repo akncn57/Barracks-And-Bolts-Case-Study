@@ -400,6 +400,67 @@ namespace BarracksAndBolts.Tests.EditMode.Gameplay
             Assert.AreEqual(0, _units.Count);
         }
 
+        private RaidService CreateSandboxRaids(SandboxService sandbox)
+        {
+            var calendar = new CalendarService(_raids, sandbox, _eventBus);
+            return new RaidService(_raids, _normal, calendar, _units, _buildings, _search, _map, sandbox, new GameSessionSettings { Seed = 3 }, _eventBus);
+        }
+
+        private void KillEnemiesExcept(GameEntityId keep)
+        {
+            foreach (var unit in _units.Units.Where(u => u.Faction == Faction.Enemy && u.Id != keep).ToList())
+                _units.Remove(unit.Id);
+        }
+
+        [Test]
+        public void Raid_Sandbox_StartsByHand_AndEndsWithoutWinningTheGame()
+        {
+            var sandbox = CreateSandbox(GameMode.Sandbox);
+            var raids = CreateSandboxRaids(sandbox);
+            var hasEnded = false;
+            _eventBus.Subscribe<RaidEndedEvent>(_ => hasEnded = true);
+            _units.TrySpawn(_knight, new Vector2Int(5, 5), Faction.Enemy, out var placedByTester);
+
+            Assert.IsTrue(raids.TryStartRaidNow());
+            Assert.IsTrue(sandbox.IsBattleAiOn, "Raiders need the AI to march.");
+            Assert.IsFalse(raids.TryStartRaidNow(), "One raid at a time.");
+
+            raids.Tick(0.1f);
+            Assert.AreEqual(2, _units.Units.Count(u => u.Faction == Faction.Enemy), "The first wave came.");
+            StringAssert.Contains("wave 1 of 2", raids.Progress);
+
+            KillEnemiesExcept(placedByTester.Id);
+            RunRaid(raids, 1.5f);
+            Assert.AreEqual(2, _units.Units.Count(u => u.Faction == Faction.Enemy), "The tester's enemy doesn't hold the next wave back.");
+
+            KillEnemiesExcept(placedByTester.Id);
+            RunRaid(raids, 0.5f);
+            Assert.IsFalse(raids.IsRaidActive);
+            Assert.IsFalse(hasEnded, "A sandbox raid doesn't count toward winning.");
+            Assert.IsTrue(raids.CanStartRaidNow);
+        }
+
+        [Test]
+        public void Raid_Sandbox_StopsWhenTheMapIsCleared()
+        {
+            var raids = CreateSandboxRaids(CreateSandbox(GameMode.Sandbox));
+            raids.TryStartRaidNow();
+            raids.Tick(0.1f);
+
+            KillEnemies();
+            _eventBus.Publish(new SandboxMapClearedEvent());
+            RunRaid(raids, 2f);
+
+            Assert.IsFalse(raids.IsRaidActive);
+            Assert.AreEqual(0, _units.Count, "No next wave.");
+        }
+
+        [Test]
+        public void Raid_NormalGame_CantStartByHand()
+        {
+            Assert.IsFalse(CreateRaidService().TryStartRaidNow());
+        }
+
         // ---- AI
 
         [Test]

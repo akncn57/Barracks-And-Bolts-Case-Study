@@ -227,19 +227,19 @@ namespace BarracksAndBolts.UI.Production
             if (_tab == Tab.Units)
             {
                 var unit = _units[cell.Index];
-                _tooltip.Show(unit.DisplayName, TooltipText.ForUnit(unit), cell.RectTransform);
+                _tooltip.Show(unit.DisplayName, TooltipText.ForUnit(unit) + TooltipText.PlaceSeveralHint, cell.RectTransform);
                 return;
             }
 
             if (_tab == Tab.Resources)
             {
                 var node = _nodes[cell.Index];
-                _tooltip.Show(node.DisplayName, TooltipText.ForResource(node), cell.RectTransform);
+                _tooltip.Show(node.DisplayName, TooltipText.ForResource(node) + TooltipText.PlaceSeveralHint, cell.RectTransform);
                 return;
             }
 
             var building = _buildings[cell.Index];
-            _tooltip.Show(building.DisplayName, TooltipText.ForBuilding(building, isNormalMode: !_sandbox.IsEnabled), cell.RectTransform);
+            _tooltip.Show(building.DisplayName, TooltipText.ForBuilding(building, isNormalMode: !_sandbox.IsEnabled) + TooltipText.PlaceSeveralHint, cell.RectTransform);
         }
 
         private void OnCellClicked(ProductionMenuCell cell)

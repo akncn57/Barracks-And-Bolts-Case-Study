@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using BarracksAndBolts.Core.Events;
 using BarracksAndBolts.Gameplay.Buildings;
 using BarracksAndBolts.Gameplay.Data;
 using BarracksAndBolts.Gameplay.Entities;
@@ -12,7 +13,8 @@ namespace BarracksAndBolts.Gameplay.Selection
 {
     /// <summary>
     /// Takes selected things off the map at once, with no death or refund. Sandbox mode deletes anything, also a resource
-    /// under the mouse. A normal game deletes only the player's own units and buildings, and never the Castle.
+    /// under the mouse, or the whole map at once. A normal game deletes only the player's own units and buildings,
+    /// and never the Castle.
     /// </summary>
     public sealed class DeletionService
     {
@@ -23,12 +25,13 @@ namespace BarracksAndBolts.Gameplay.Selection
         private readonly HoverService _hover;
         private readonly SandboxService _sandbox;
         private readonly NormalModeSettings _normalMode;
+        private readonly IEventBus _eventBus;
 
         // Deleting changes the selection, so the ids are copied first.
         private readonly List<GameEntityId> _toDelete = new();
 
         public DeletionService(SelectionService selection, UnitService units, BuildingService buildings, ResourceNodeService nodes,
-            HoverService hover, SandboxService sandbox, NormalModeSettings normalMode)
+            HoverService hover, SandboxService sandbox, NormalModeSettings normalMode, IEventBus eventBus)
         {
             _selection = selection;
             _units = units;
@@ -37,6 +40,7 @@ namespace BarracksAndBolts.Gameplay.Selection
             _hover = hover;
             _sandbox = sandbox;
             _normalMode = normalMode;
+            _eventBus = eventBus;
         }
 
         public bool CanDelete(GameEntityId id)
@@ -71,6 +75,39 @@ namespace BarracksAndBolts.Gameplay.Selection
                     deleted++;
             }
 
+            return deleted;
+        }
+
+        /// <summary>Sandbox mode: takes every unit, building and resource off the map, for a clean start.</summary>
+        /// <returns>How many things were deleted. 0 in a normal game.</returns>
+        public int ClearMap()
+        {
+            if (!_sandbox.IsEnabled)
+                return 0;
+
+            _toDelete.Clear();
+            foreach (var unit in _units.Units)
+                _toDelete.Add(unit.Id);
+
+            foreach (var building in _buildings.Buildings)
+                _toDelete.Add(building.Id);
+
+            var deleted = 0;
+            foreach (var id in _toDelete)
+            {
+                if (_units.Remove(id) || _buildings.Remove(id))
+                    deleted++;
+            }
+
+            // Backwards, since removing takes the node out of the list.
+            var nodes = _nodes.Nodes;
+            for (var i = nodes.Count - 1; i >= 0; i--)
+            {
+                _nodes.Remove(nodes[i]);
+                deleted++;
+            }
+
+            _eventBus.Publish(new SandboxMapClearedEvent());
             return deleted;
         }
 

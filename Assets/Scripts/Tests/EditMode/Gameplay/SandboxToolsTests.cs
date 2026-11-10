@@ -90,7 +90,7 @@ namespace BarracksAndBolts.Tests.EditMode.Gameplay
 
         private DeletionService CreateDeletion(SandboxService mode)
         {
-            return new DeletionService(_selection, _units, _buildings, _nodes, new HoverService(_units, _buildings, _nodes, _eventBus), mode, _normalMode);
+            return new DeletionService(_selection, _units, _buildings, _nodes, new HoverService(_units, _buildings, _nodes, _eventBus), mode, _normalMode, _eventBus);
         }
 
         private UnitModel Spawn(int x, int y, Faction faction)
@@ -199,7 +199,7 @@ namespace BarracksAndBolts.Tests.EditMode.Gameplay
         {
             var mode = CreateMode(GameMode.Sandbox);
             var hover = new HoverService(_units, _buildings, _nodes, _eventBus);
-            var deletion = new DeletionService(_selection, _units, _buildings, _nodes, hover, mode, _normalMode);
+            var deletion = new DeletionService(_selection, _units, _buildings, _nodes, hover, mode, _normalMode, _eventBus);
             _nodes.TryPlace(_tree, new Vector2Int(5, 5), out var node);
             hover.UpdateAt(new Vector2(5.5f, 5.5f));
 
@@ -241,6 +241,116 @@ namespace BarracksAndBolts.Tests.EditMode.Gameplay
 
             Assert.IsFalse(mode.IsBattleAiOn);
             Assert.IsFalse(mode.IsDebugViewOn);
+        }
+
+        [Test]
+        public void BattleAi_Sandbox_EnemiesMarchOnTheNearestPlayerThing_HoweverFar()
+        {
+            var mode = CreateMode(GameMode.Sandbox);
+            var raids = Track(ScriptableObject.CreateInstance<RaidSettings>());
+            var ai = new BattleAiSystem(_units, _buildings, new CombatService(_units, _buildings, _map, _eventBus), raids, _normalMode, mode);
+            var enemy = Spawn(1, 1, Faction.Enemy);
+            _buildings.TryPlace(_house, new Vector2Int(13, 13), Faction.Player, out var house);
+
+            mode.ToggleBattleAi();
+            ai.Tick(1f);
+
+            Assert.AreEqual(house.Id, enemy.AttackTarget, "No Castle in a sandbox: the enemy comes for what the player has.");
+        }
+
+        // ---- Clearing the map
+
+        [Test]
+        public void ClearMap_Sandbox_TakesEverythingOff()
+        {
+            var deletion = CreateDeletion(CreateMode(GameMode.Sandbox));
+            var isCleared = false;
+            _eventBus.Subscribe<SandboxMapClearedEvent>(_ => isCleared = true);
+            Spawn(2, 2, Faction.Player);
+            Spawn(4, 2, Faction.Enemy);
+            _buildings.TryPlace(_house, new Vector2Int(8, 8), Faction.Enemy, out _);
+            _nodes.TryPlace(_tree, new Vector2Int(12, 3), out _);
+
+            Assert.AreEqual(4, deletion.ClearMap());
+
+            Assert.AreEqual(0, _units.Count);
+            Assert.AreEqual(0, _buildings.Buildings.Count);
+            Assert.AreEqual(0, _nodes.Nodes.Count);
+            Assert.IsTrue(_map.IsWalkable(new Vector2Int(8, 8)) && _map.IsWalkable(new Vector2Int(12, 3)));
+            Assert.IsTrue(isCleared, "A running raid hears about it.");
+        }
+
+        [Test]
+        public void ClearMap_NormalGame_DoesNothing()
+        {
+            Spawn(2, 2, Faction.Player);
+
+            Assert.AreEqual(0, CreateDeletion(CreateMode(GameMode.Normal)).ClearMap());
+            Assert.AreEqual(1, _units.Count);
+        }
+
+        // ---- Test battle and stats
+
+        private SandboxBattleSpawner CreateBattleSpawner(SandboxService mode)
+        {
+            var villager = Track(TestDefinitions.CreateUnit("villager"));
+            var serializedVillager = new SerializedObject(villager);
+            serializedVillager.FindProperty("canGather").boolValue = true;
+            serializedVillager.ApplyModifiedPropertiesWithoutUndo();
+
+            var database = Track(ScriptableObject.CreateInstance<GameDatabase>());
+            var serialized = new SerializedObject(database);
+            var units = serialized.FindProperty("units");
+            units.arraySize = 2;
+            units.GetArrayElementAtIndex(0).objectReferenceValue = _knight;
+            units.GetArrayElementAtIndex(1).objectReferenceValue = villager;
+            serialized.ApplyModifiedPropertiesWithoutUndo();
+            return new SandboxBattleSpawner(database, _units, _map, mode);
+        }
+
+        [Test]
+        public void TestBattle_Sandbox_PlacesTwoArmiesOfSoldiers_AndTurnsTheAiOn()
+        {
+            var mode = CreateMode(GameMode.Sandbox);
+
+            Assert.AreEqual(10, CreateBattleSpawner(mode).SpawnBattle(new Vector2(8f, 8f), 5));
+
+            var players = 0;
+            foreach (var unit in _units.Units)
+            {
+                Assert.AreSame(_knight, unit.Definition, "Soldiers only, no villagers.");
+                if (unit.Faction == Faction.Player)
+                {
+                    players++;
+                    Assert.Less(unit.Position.x, 8f, "The player's army is on the left.");
+                }
+            }
+
+            Assert.AreEqual(5, players);
+            Assert.IsTrue(mode.IsBattleAiOn);
+        }
+
+        [Test]
+        public void TestBattle_NormalGame_PlacesNothing()
+        {
+            Assert.AreEqual(0, CreateBattleSpawner(CreateMode(GameMode.Normal)).SpawnBattle(new Vector2(8f, 8f), 5));
+            Assert.AreEqual(0, _units.Count);
+        }
+
+        [Test]
+        public void Pathfinder_CountsItsSearches_AndStartsOverWhenRead()
+        {
+            var pathfinder = new AStarPathfinder(_map);
+            var path = new List<Vector2Int>();
+            pathfinder.FindPath(new Vector2Int(1, 1), new Vector2Int(10, 10), path);
+            pathfinder.FindPath(new Vector2Int(10, 10), new Vector2Int(1, 1), path);
+
+            pathfinder.TakeStats(out var searches, out var total, out var longest);
+            Assert.AreEqual(2, searches);
+            Assert.GreaterOrEqual(total, longest);
+
+            pathfinder.TakeStats(out searches, out _, out _);
+            Assert.AreEqual(0, searches);
         }
 
         // ---- Placing resources

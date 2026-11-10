@@ -47,6 +47,16 @@ namespace BarracksAndBolts.Gameplay.Sandbox
             _eventBus.Publish(new SandboxSwitchesChangedEvent());
         }
 
+        /// <summary>For tools that start a fight: a raid or a test battle is no use with nobody picking targets.</summary>
+        public void TurnBattleAiOn()
+        {
+            if (!IsEnabled || IsBattleAiOn)
+                return;
+
+            IsBattleAiOn = true;
+            _eventBus.Publish(new SandboxSwitchesChangedEvent());
+        }
+
         public void ToggleDebugView()
         {
             if (!IsEnabled)
@@ -64,6 +74,11 @@ namespace BarracksAndBolts.Gameplay.Sandbox
 
     /// <summary>The battle AI or the debug view was switched. Read them from <see cref="SandboxService"/>.</summary>
     public readonly struct SandboxSwitchesChangedEvent : IGameEvent
+    {
+    }
+
+    /// <summary>Everything was taken off the sandbox map. A running raid stops with it.</summary>
+    public readonly struct SandboxMapClearedEvent : IGameEvent
     {
     }
 }

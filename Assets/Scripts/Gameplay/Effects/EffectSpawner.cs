@@ -20,6 +20,9 @@ namespace BarracksAndBolts.Gameplay.Effects
         private const float ExplosionScalePerCell = 0.45f;
         private const float BuildingDustScalePerCell = 0.9f;
 
+        // Clearing a full sandbox map would start hundreds at once. Past this many, new ones are skipped.
+        private const int MaxPlaying = 48;
+
         [Tooltip("Hidden template copied for each effect.")]
         [SerializeField] private SpriteRenderer effectTemplate;
         [SerializeField, Min(1f)] private float framesPerSecond = 14f;
@@ -78,7 +81,7 @@ namespace BarracksAndBolts.Gameplay.Effects
 
         private void Play(Sprite[] frames, Vector2 position, float scale, int sortingOrder)
         {
-            if (frames == null || frames.Length == 0)
+            if (frames == null || frames.Length == 0 || _playing.Count >= MaxPlaying)
                 return;
 
             var effectRenderer = _free.Count > 0 ? _free.Pop() : Instantiate(effectTemplate, transform);

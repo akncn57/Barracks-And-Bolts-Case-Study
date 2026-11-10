@@ -3,7 +3,7 @@
 > Oyundaki her sistemin kodda **nasıl** yapıldığını anlatır: yapılanlar ve planlananlar.
 > Kurallar ve mimari: [Technical_Design.md](Technical_Design.md) · Oyun tasarımı: [GDD_Decisions.md](GDD_Decisions.md) · Öncelikler: [Roadmap.md](Roadmap.md) · Assetler: [Missing_Assets.md](Missing_Assets.md)
 >
-> **Son güncelleme:** 10 Kasım 2026 · vuruş zamanlaması, efektler, can barları, tarla (köylü çitin içinde), açlık, toplanma noktası · 479 EditMode testi
+> **Son güncelleme:** 10 Kasım 2026 · vuruş zamanlaması, efektler, can barları, tarla (köylü çitin içinde), açlık, toplanma noktası, Sandbox araçları (baskın, temizleme, test savaşı, istatistik) · 489 EditMode testi
 >
 > **Durum işaretleri:** ✅ yapıldı · 🟡 kısmen · ⏳ planlandı
 
@@ -161,6 +161,7 @@ Gameplay ─► GameplayLifetimeScope (servisler, sistemler, dünya view'ları)
 | `FloatingTextRequestedEvent` | `PlacementInputHandler`, `InformationPanelView`, `GatheringSystem` | `FloatingTextSpawner` |
 | `SandboxFactionChangedEvent` | `SandboxService` | `ProductionMenuView`, `InformationPanelView` |
 | `SandboxSwitchesChangedEvent` | `SandboxService` | `SandboxSwitchesView` (`DebugOverlayView` ve `BattleAiSystem` her karede okur) |
+| `SandboxMapClearedEvent` | `DeletionService.ClearMap` | `RaidService` (Sandbox baskınını durdurur) |
 | `GameSpeedChangedEvent` | `TimeControlService` | `TimeControlView` |
 
 ## 5. Veri ve Oyun Modları
@@ -185,7 +186,8 @@ Gameplay ─► GameplayLifetimeScope (servisler, sistemler, dünya view'ları)
 | Production Menu | Buildings, Units, Resources sekmeleri | Sadece binalar |
 | `BuildingDefinition.GetProducibles` | `producibles` | `normalModeProducibles` (Castle köylü üretir) |
 | `BuildingDefinition.IsNormalModeOnly` | Menüde yok (Karakol) | Menüde var |
-| Takvim, baskın, AI, sığınma, oyun sonu | Çalışmaz | Çalışır |
+| Takvim, sığınma, oyun sonu | Çalışmaz | Çalışır |
+| Baskın, savaş yapay zekâsı | Sadece elle ("Start Raid", "Enemy AI") | Takvimle, her zaman açık |
 | `SandboxService.ActiveFaction` | Side düğmesiyle değişir | Hep oyuncu |
 
 ---
@@ -254,7 +256,7 @@ LateUpdate: PlacementPreviewView servisi okur, çizer
 - **`Block`** alanın neden geçersiz olduğunu söyler: `NoArea`, `OutsideMap`, `Occupied`, `UnitInTheWay`, `OutsideTerritory`, `NotEnoughResources`. Uyarı metnini `PlacementInputHandler` seçer.
 - **`IsCellFree(hücre)`** önizlemedeki her kareyi yeşil ya da kırmızı yapar: yürünebilir, üzerinde birim yok, bölge içinde.
 - Footprint fareye ortalanır (`GridMap.GetAreaCenteredAt`); çift boyutta grid çizgisine oturur. `RoundToInt` yerine `Floor(x + 0.5)`, sınırda zıplamasın diye.
-- Fiyat bina konduktan sonra alınır; konamazsa para gitmez. Shift basılıysa mod açık kalır.
+- Fiyat bina konduktan sonra alınır; konamazsa para gitmez. Shift basılıysa mod açık kalır. Bunu Production Menu tooltip'lerinin altındaki "Hold Shift to place several" satırı söyler (`TooltipText.PlaceSeveralHint`).
 - **Birim modu (Sandbox):** `BeginUnit(birim, taraf)` aynı modu birim için açar: footprint tek hücre, kural "hücre yürünebilir mi". Hücrede başka birim olması sorun değil, yeni birim en yakın boş hücreye çıkar (`UnitService.TrySpawn`). Bölge ve inşaat yok. Input haritaları, Esc, sağ tık iptali ve Shift ile arka arkaya koyma bina ile aynı. Önizlemede birimin ilk bekleme karesi ve tek hücrelik yeşil/kırmızı kare görünür. `Definition` ve `Unit`'ten aynı anda sadece biri dolu.
 - Önizleme kareleri gizli bir şablondan kopyalanır; büyük bina için açılanlar silinmez, kapatılır.
 
@@ -484,9 +486,10 @@ Dalga doğar ─► hepsi ölür ─► 8 sn ─► sonraki dalga ... ─► "Ra
 - **Doğma noktası (`PickSpawnCell`):** Castle'dan yürünerek ulaşılan, kıyıda, en az 20 hücre uzak rastgele hücre. O anda hesaplanır, çünkü binalar haritayı değiştirmiş olabilir. Yön yazıyla söylenir ("from the north-east").
 - Zamanlar seed'den; aynı seed aynı baskın zamanları.
 - **`BattleAiSystem`** saniyede 4 kez hedef seçer; yürüme ve vurma `CombatSystem`'de:
-  - Düşman: hedefi Castle. Yakınında (`aggroRange` 5) oyuncu birimi ya da binası varsa ona döner; 10 hücreden uzaklaşırsa bırakır. Binalar da hedef olduğu için yolu kapatan binayı yıkar; ayrı "engel yıkma" kodu yok.
+  - Düşman: hedefi Castle (Sandbox'ta Castle yoksa oyuncunun en yakın binası ya da birimi, uzaklık sınırı olmadan). Yakınında (`aggroRange` 5) oyuncu birimi ya da binası varsa ona döner; 10 hücreden uzaklaşırsa bırakır. Binalar da hedef olduğu için yolu kapatan binayı yıkar; ayrı "engel yıkma" kodu yok.
   - Oyuncunun boştaki askeri yakındaki düşmana saldırır; hareket emri alanı rahatsız etmez.
-- Sandbox'ta varsayılan kapalı; "Enemy AI" düğmesiyle açılır (Bölüm 33).
+- Bir dalganın bitmesi o dalganın kendi birimlerinin ölmesidir (`_waveUnits`); Sandbox'ta elle konan düşmanlar sonraki dalgayı bekletmez.
+- Sandbox'ta varsayılan kapalı; "Enemy AI" düğmesiyle açılır (Bölüm 33). **Sandbox baskını:** "Start Raid" `RaidService.TryStartRaidNow` ile listedeki sıradaki baskını hemen başlatır (sonuncudan sonra başa döner) ve yapay zekâyı açar. Takvim yok, bitince `RaidEndedEvent` yayınlanmaz (oyun kazanılmaz). Harita temizlenince durur.
 
 ## 25. Sığınma
 **Durum:** 🟡 (sadece Castle) · **Dosyalar:** `Gameplay/Raids/ShelterSystem.cs`, `UnitService.Shelter/BringOut` · **Test:** `VillagerBehaviourTests`
@@ -564,14 +567,18 @@ Haritada düşman kalmadı ─► Castle'ın yanında belirir ─► işine dön
 Her Esc en üstteki tek katmanı kapatır: yerleştirme (Placement map'inde, `PlacementInputHandler`) → seçim → Production Menu. Sıra tek yerde (`CloseTopLayer`) okunur. Oyun içi menü gelince en alt katman o olacak.
 
 ## 33. Sandbox
-**Durum:** ✅ (baskını elle başlatma yok) · **Dosyalar:** `Gameplay/Sandbox/SandboxService.cs`, `UI/Sandbox/SandboxFactionToggleView.cs`, `SandboxSwitchesView.cs`, `Gameplay/DebugView/DebugOverlayView.cs` · **Test:** `SandboxServiceTests`, `SandboxToolsTests`
+**Durum:** ✅ · **Dosyalar:** `Gameplay/Sandbox/SandboxService.cs`, `SandboxBattleSpawner.cs`, `UI/Sandbox/SandboxFactionToggleView.cs`, `SandboxSwitchesView.cs`, `Gameplay/DebugView/DebugOverlayView.cs` · **Test:** `SandboxServiceTests`, `SandboxToolsTests`, `GameLoopTests`
 
 - `SandboxService.ActiveFaction`: yeni bina ve birimlerin tarafı. Side düğmesi değiştirir; menü o tarafın renginde gösterir. Düşman Barracks'ından düşman askeri üretmek için Side: Enemy olmalı.
-- Kaynak sınırsız, nüfus ve bölge yok, takvim ve baskın kapalı, bina anında hazır.
+- Kaynak sınırsız, nüfus ve bölge yok, takvim kapalı, baskın sadece elle, bina anında hazır.
 - **Production Menu sekmeleri:** *Buildings*, *Units*, *Resources*. Birimler ve kaynaklar (ağaç, kaya, altın madeni, koyun) doğrudan haritaya konur (Bölüm 10 ve 28). Barracks'tan üretim (PDF yolu) aynen duruyor. Kaynak listesi `ResourceDistribution` gruplarından toplanır, her tanım bir kez.
 - **Düğmeler** (`SandboxSwitchesView`, "Production >" butonunun altında, menü kapalıyken de görünür):
-  - **Enemy AI:** `SandboxService.IsBattleAiOn`. Açıkken `BattleAiSystem` çalışır: düşman yakındaki oyuncu birim ve binasına, oyuncunun boştaki askeri yakındaki düşmana saldırır. Castle olmadığı için düşmanın yürüyeceği bir ana hedef yok. Varsayılan kapalı; test edenin emirleri olduğu gibi kalsın.
+  - **Enemy AI:** `SandboxService.IsBattleAiOn`. Açıkken `BattleAiSystem` çalışır: düşman oyuncunun en yakın binasına ya da birimine yürür, yolda yakınına geleni vurur; oyuncunun boştaki askeri yakındaki düşmana saldırır. Varsayılan kapalı; test edenin emirleri olduğu gibi kalsın. Baskın ve test savaşı onu kendiliğinden açar (`TurnBattleAiOn`).
   - **Debug:** `SandboxService.IsDebugViewOn`. `DebugOverlayView` grid'i ve seçili birimlerin yolunu çizer (aşağıda).
+  - **Start Raid:** Listedeki sıradaki baskın hemen gelir (Bölüm 24). Baskın sürerken düğme kilitli ve "Raid 3: wave 2 of 4" yazar.
+  - **Clear Map:** Bütün birim, bina ve kaynakları siler (`DeletionService.ClearMap`). Yanlış tıklamaya karşı ikinci tıklama ister ("Sure? Click again", 3 sn). Silme ölüm event'leriyle olduğu için efektler aynı anda en fazla 48 tane oynar (`EffectSpawner`). Süren baskın durur.
+  - **+100 Units:** `SandboxBattleSpawner` ekranın ortasının solunda oyuncunun, sağında düşmanın 50'şer karışık askerini (Knight, Spearman, Archer) koyar ve yapay zekâyı açar. Yol bulma, savaş ve çizimi kalabalıkta denemek için.
+  - **İstatistik paneli:** Yarım saniyede bir FPS, birim ve bina sayısı, saniyede yol araması, ortalama ve en uzun arama süresi (ms). Editörde ve development build'de SetPass ve draw call da (`ProfilerRecorder`). Arama süresini `AStarPathfinder` tutar (`Stopwatch`, arama başına iki okuma, `TakeStats`).
 - **Silme:** Delete tuşu seçili her şeyi siler (iki taraf). Hiçbir şey seçili değilse farenin altındaki kaynak silinir (Bölüm 33b).
 - **Debug görünümü (`DebugOverlayView`):**
   - Haritanın tamamını kaplayan tek doku, hücre başına 8 piksel: hücre çizgileri, zemin yüzünden yürünemeyen hücre (su, uçurum) koyu, bina ya da kaynağın tuttuğu hücre kırmızı, merdiven mavi. `GridChangedEvent` gelince bir sonraki gösterimde yeniden çizilir.
@@ -611,10 +618,6 @@ Her biri mevcut yapıya şöyle oturacak. Yapılınca kendi bölümüne taşın�
 
 ### Mini Harita ⏳
 - **Nasıl:** UI'da `MinimapView`: `GridMap` ve kaynaklardan tek `Texture2D` (zemin bir kez, binalar ve kaynaklar event'le), birimler 0,25 sn'de bir nokta. Kameranın gördüğü alan çerçeve. Tıklama `CameraController`'a odak verir, sağ tık `UnitCommandService.MoveTo`. İkinci kamera kullanılmaz (SetPass).
-
-### Tam Sandbox 🟡
-- **Yapıldı:** Bina, birim ve kaynak yerleştirme, iki taraf, silme, zaman kontrolü, yapay zekâ ve debug düğmeleri (Bölüm 33, 33b).
-- **Kalan:** Baskını elle başlatma (`RaidService`'e bir metot ve Sandbox'ta takvimi açma).
 
 ### Rastgele Zemin Üretimi ⏳
 - **Nasıl:** `Map/MapGenerator` seed'le tilemap'leri doldurur, `TilemapGridSource` ondan sonra grid'i kurar; geri kalan her şey değişmeden çalışır. Ada şekli, platolar ve merdivenler noise ile; yol doğrulaması `ResourceDistributor`'daki flood fill ile aynı yöntem. Ayarlar `MapGenerationSettings`'te.

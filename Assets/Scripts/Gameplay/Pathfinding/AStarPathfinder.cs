@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using BarracksAndBolts.Gameplay.Grid;
 using BarracksAndBolts.Utils.Collections;
 using UnityEngine;
@@ -32,6 +33,11 @@ namespace BarracksAndBolts.Gameplay.Pathfinding
         private readonly int[] _closedStamp;
         private int _searchId;
 
+        // Timing for the sandbox stats, in stopwatch ticks. Reading the clock twice per search costs next to nothing.
+        private int _timedSearches;
+        private long _timedTicks;
+        private long _longestTicks;
+
         public AStarPathfinder(GridMap grid)
         {
             _grid = grid ?? throw new ArgumentNullException(nameof(grid));
@@ -53,6 +59,29 @@ namespace BarracksAndBolts.Gameplay.Pathfinding
             if (path == null)
                 throw new ArgumentNullException(nameof(path));
 
+            var startedAt = Stopwatch.GetTimestamp();
+            var status = Search(start, goal, path);
+            var ticks = Stopwatch.GetTimestamp() - startedAt;
+            _timedSearches++;
+            _timedTicks += ticks;
+            _longestTicks = Math.Max(_longestTicks, ticks);
+            return status;
+        }
+
+        /// <summary>How many searches ran since the last call, their total and longest time. Starts counting again.</summary>
+        public void TakeStats(out int searches, out double totalMilliseconds, out double longestMilliseconds)
+        {
+            var ticksToMilliseconds = 1000.0 / Stopwatch.Frequency;
+            searches = _timedSearches;
+            totalMilliseconds = _timedTicks * ticksToMilliseconds;
+            longestMilliseconds = _longestTicks * ticksToMilliseconds;
+            _timedSearches = 0;
+            _timedTicks = 0;
+            _longestTicks = 0;
+        }
+
+        private PathStatus Search(Vector2Int start, Vector2Int goal, List<Vector2Int> path)
+        {
             path.Clear();
             if (!_grid.IsInBounds(start))
                 return PathStatus.NotFound;

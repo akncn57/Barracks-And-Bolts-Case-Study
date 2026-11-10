@@ -180,6 +180,7 @@ namespace BarracksAndBolts.Gameplay.Bootstrap
             builder.RegisterComponentInHierarchy<BoxSelectionView>();
             builder.Register<DeletionService>(Lifetime.Singleton);
             builder.RegisterEntryPoint<DeleteInputHandler>();
+            builder.Register<SandboxBattleSpawner>(Lifetime.Singleton);
 
             builder.Register<HoverService>(Lifetime.Singleton);
             builder.RegisterEntryPoint<HoverInputHandler>();

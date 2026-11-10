@@ -13,7 +13,7 @@ namespace BarracksAndBolts.Gameplay.Raids
     /// Picks targets in a normal game. Enemies march on the Castle and turn on whatever comes near; since buildings
     /// count too, a wall in their way gets knocked down. Idle soldiers of the player attack what comes near them.
     /// CombatSystem does the walking and the hitting. In sandbox mode it runs only while the tester has switched it on;
-    /// with no Castle there, enemies only turn on what comes near.
+    /// with no Castle there, enemies march on the nearest thing of the player instead.
     /// </summary>
     public sealed class BattleAiSystem : ISimulationSystem
     {
@@ -69,7 +69,9 @@ namespace BarracksAndBolts.Gameplay.Raids
 
         private void UpdateEnemy(UnitModel unit, GameEntityId castle)
         {
-            var isChasingOther = unit.HasAttackTarget && unit.AttackTarget != castle;
+            // No Castle (sandbox mode): the nearest building or unit of the player, however far, so raiders come.
+            var march = castle.IsValid ? castle : _combat.FindNearestHostile(unit.Position, Faction.Enemy, float.MaxValue);
+            var isChasingOther = unit.HasAttackTarget && unit.AttackTarget != march;
             if (isChasingOther)
             {
                 if (_combat.TryGetTarget(unit.AttackTarget, unit.Position, out var target) && target.Distance > _settings.AggroRange * LeashFactor)
@@ -79,7 +81,7 @@ namespace BarracksAndBolts.Gameplay.Raids
             }
 
             var near = _combat.FindNearestHostile(unit.Position, Faction.Enemy, _settings.AggroRange);
-            var next = near.IsValid ? near : castle;
+            var next = near.IsValid ? near : march;
             if (next.IsValid && unit.AttackTarget != next)
                 unit.SetAttackTarget(next);
         }
