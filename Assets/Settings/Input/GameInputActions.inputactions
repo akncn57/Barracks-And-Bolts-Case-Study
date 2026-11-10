@@ -472,7 +472,18 @@
                 {
                     "name": "",
                     "id": "d228fa98-8119-4a99-a9b0-e0fac51c8041",
-                    "path": "<Keyboard>/period",
+                    "path": "<Keyboard>/#(.)",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard&Mouse",
+                    "action": "IdleVillager",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "04620e42-bb96-4101-9822-697dca5e9635",
+                    "path": "<Keyboard>/numpadPeriod",
                     "interactions": "",
                     "processors": "",
                     "groups": "Keyboard&Mouse",
