@@ -61,7 +61,7 @@ Oyunu deneyince çıkan kullanılabilirlik istekleri. Sandbox'ta da olmalı, bui
 - [x] Dalga sistemi ve baskın bildirimleri (ses ve mini harita yok; yön yazıyla söyleniyor, dalga ekran dışındayken kenarda tıklanabilir ok)
 - [x] Kazanma ve kaybetme koşulları ve oyun sonu ekranı
 - [ ] Oyun döngüsünün dengesi (süreler, maliyetler, dalga büyüklükleri)
-- [ ] Test Runner sonucu (494 test) ve son SetPass ölçümü
+- [ ] Test Runner sonucu (520 test; ilk koşuda 8 hata düzeltildi, tekrar koşulacak) ve son SetPass ölçümü
 
 ## P2 – Derinlik (zaman kaldıkça, aşağıdaki sırayla)
 **Hedef: 12 Kasım Perşembe.**

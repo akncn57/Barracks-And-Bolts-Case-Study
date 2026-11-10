@@ -238,9 +238,23 @@ namespace BarracksAndBolts.Tests.EditMode.Gameplay
 
             _gathering.TryOrder(first, node);
             _gathering.TryOrder(second, node);
-            RunUntil(() => first.HarvestingKind != null && second.HarvestingKind != null);
 
-            Assert.AreNotEqual(_map.WorldToCell(first.Position), _map.WorldToCell(second.Position));
+            // Each cell is read when its villager starts work. With no drop-off the first one is done before the second
+            // arrives, so they are never at work at the same moment.
+            Vector2Int? firstCell = null;
+            Vector2Int? secondCell = null;
+            RunUntil(() =>
+            {
+                if (firstCell == null && first.HarvestingKind != null)
+                    firstCell = _map.WorldToCell(first.Position);
+
+                if (secondCell == null && second.HarvestingKind != null)
+                    secondCell = _map.WorldToCell(second.Position);
+
+                return firstCell.HasValue && secondCell.HasValue;
+            });
+
+            Assert.AreNotEqual(firstCell, secondCell);
         }
 
         [Test]

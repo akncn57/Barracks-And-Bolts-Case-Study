@@ -76,7 +76,8 @@ namespace BarracksAndBolts.Tests.EditMode.UI
         [TearDown]
         public void TearDown()
         {
-            _inputActions.Dispose();
+            // The generated Dispose calls Object.Destroy, which edit mode refuses with an error.
+            Object.DestroyImmediate(_inputActions.asset);
             Object.DestroyImmediate(_knight);
         }
 

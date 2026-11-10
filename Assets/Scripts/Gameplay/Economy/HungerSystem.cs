@@ -84,13 +84,19 @@ namespace BarracksAndBolts.Gameplay.Economy
             if (day <= 1)
                 return;
 
+            // Read before the new debt, or starving that begins this morning would look like it was already going on.
+            var wasStarving = IsStarving;
             FoodOwed += _population.Used * _level.FoodPerUnitPerDay;
-            Pay();
+            Pay(wasStarving);
         }
 
         private void Pay()
         {
-            var wasStarving = IsStarving;
+            Pay(IsStarving);
+        }
+
+        private void Pay(bool wasStarving)
+        {
             FoodOwed -= _resources.TakeUpTo(ResourceKind.Food, FoodOwed);
             if (wasStarving == IsStarving)
                 return;
