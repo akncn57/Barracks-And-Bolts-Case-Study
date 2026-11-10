@@ -29,4 +29,4 @@ MonoBehaviour:
   farmYield: 5
   farmHarvestDuration: 6
   farmWorkers: 1
-  isNormalModeOnly: 1
+  isNormalModeOnly: 0

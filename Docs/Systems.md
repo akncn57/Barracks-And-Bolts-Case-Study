@@ -454,7 +454,7 @@ Köylüyle kendi bitmiş tarlana sağ tık ─► UnitCommandService.Farm ─►
    WalkingToFarm (yanındaki hücre, son adım çitin içine) ─► Working (balta kareleri, farmHarvestDuration)
    ─► WalkingToDropOff (en yakın bırakma noktası) ─► +farmYield yemek ─► WalkingToFarm ...
 ```
-- **Kurallar:** 3x3, 40 odun, inşa 15 sn, 60 HP. Bir köylü çalışır, tarla hiç bitmez, her 6 saniyede 5 yemek (koyundan yavaş ama sürekli). Sadece Normal modda; menüde House'un yanında.
+- **Kurallar:** 3x3, 40 odun, inşa 15 sn, 60 HP. Bir köylü çalışır, tarla hiç bitmez, her 6 saniyede 5 yemek (koyundan yavaş ama sürekli). Menüde House'un yanında. Sandbox'ta da var (test için): anında hazır gelir, köylü çalışır; yemek ∞ olduğu için sayılmaz, tarlayı çalıştırmak için bir bırakma noktası (Castle) da konmalı.
 - Önce inşa edilir: inşaat alanına sağ tık köylüyü inşaata, bitmiş tarlaya sağ tık tarlaya gönderir. Dolu tarlaya gönderilen köylü yanına yürür ve "The farm has all the workers it can take" yazar.
 - `GatheringSystem` kaynağın kendisine bağlı (miktar, tükenme, koyunun gezmesi); tarla bir bina olduğu için ayrı ve küçük bir sistem yazıldı. Yanındaki hücrenin seçimi `ConstructionSystem` ile aynı.
 - **Çitin içinde çalışma:** Köylü yanındaki hücreden çitin üstünden tarlaya girer, bitişik kenar hücresinde rastgele bir noktada ekinlerin arasında durur (çitten yanlarda 0,45, altta 0,55 içeride). Her seferinde yeni bir nokta seçilir. Sadece kenar hücresi: çıkış tek adım, A* içeride sıkışmaz.
