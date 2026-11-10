@@ -52,7 +52,8 @@
 | 17 | ~~Depo binaları (4 adet)~~ | ✅ Üretildi: Archery sundurması (hedefler silindi) + avluda tek kaynak yığını. `Texture_Buildings_<Renk>_Storage_Wood/Food/Gold/Stone` | – |
 | 18 | ~~Karakol~~ | ✅ Tower + takım renginde bayrak: `Texture_Buildings_<Renk>_Outpost` | – |
 | 19 | ~~İnşa halindeki bina~~ | ✅ Binaların gri kopyaları üretildi: `Texture_Buildings_<Renk>_<Bina>_Site` (House, Barracks, Tower, Outpost). Yarı saydam başlar, işlendikçe koyulaşır. Üstünde ilerleme çubuğu: paketin küçük bar çerçevesi Gameplay atlas'ına kopyalandı, altın dolgu üretildi (`Texture_Markers_ProgressBar_Frame/Fill`) | – |
-| 20 | ~~Hasarlı bina efekti~~ | ✅ `Texture_VFX_Fire_*` | – |
+| 20 | ~~Hasarlı bina efekti~~ | ✅ `Texture_VFX_Fire_*` (henüz kullanılmıyor). Ölüm ve yıkılmada `Texture_VFX_Dust_01/02`, `_Explosion_02` kullanılıyor | – |
+| 20a | ~~Can barı~~ | ✅ Kodla üretildi: `Textures/Markers/Texture_Markers_HealthBar_Frame` (24x8, sliced) ve `_Fill` (beyaz, renk kodla) | – |
 | 21 | Rütbe / seviye simgesi (asker ve bina seviyesi) | Yükseltme sistemi | 🛠 / 💻 Küçük yıldız veya çizgiler |
 | 22 | ~~Bölge sınırı görseli~~ | ✅ Kodla: haritanın üstünde tek doku, `TerritoryOverlayView` | – |
 | 22a | ~~Menzil ve bölge halkası~~ | ✅ Kodla: `CoverageRingView` halka dokusunu kendisi çiziyor | – |

@@ -3,7 +3,7 @@
 > Oyundaki her sistemin kodda **nasıl** yapıldığını anlatır: yapılanlar ve planlananlar.
 > Kurallar ve mimari: [Technical_Design.md](Technical_Design.md) · Oyun tasarımı: [GDD_Decisions.md](GDD_Decisions.md) · Öncelikler: [Roadmap.md](Roadmap.md) · Assetler: [Missing_Assets.md](Missing_Assets.md)
 >
-> **Son güncelleme:** 9 Kasım 2026 · zaman kontrolü, silme, Sandbox araçları ve debug görünümü · 459 EditMode testi
+> **Son güncelleme:** 10 Kasım 2026 · vuruş zamanlaması, efektler, can barları, tarla (köylü çitin içinde), açlık, toplanma noktası · 479 EditMode testi
 >
 > **Durum işaretleri:** ✅ yapıldı · 🟡 kısmen · ⏳ planlandı
 
@@ -48,6 +48,8 @@
 21. [Nüfus](#21-nüfus)
 22. [Kaynak Toplama](#22-kaynak-toplama)
 22b. [İnşaat](#22b-inşaat)
+22c. [Tarla](#22c-tarla)
+22d. [Açlık](#22d-açlık)
 23. [Takvim ve Gece](#23-takvim-ve-gece)
 24. [Baskınlar ve Savaş Yapay Zekası](#24-baskınlar-ve-savaş-yapay-zekası)
 25. [Sığınma](#25-sığınma)
@@ -143,7 +145,8 @@ Gameplay ─► GameplayLifetimeScope (servisler, sistemler, dünya view'ları)
 | `UnitDiedEvent` | `UnitService` | `UnitViewSpawner`, `SelectionService`, `GameOutcomeService`, `ResourceBarView` |
 | `UnitShelteredEvent` / `UnitLeftShelterEvent` | `UnitService` | `UnitViewSpawner`, `SelectionService` (sadece girişte) |
 | `UnitOrderedEvent` | `UnitCommandService` | `ShelterSystem` (oyuncu emri 10 sn kaçışı erteler) |
-| `UnitAttackedEvent` | `CombatSystem` | `UnitViewSpawner` (saldırı karesi), `ProjectileSpawner` |
+| `UnitAttackedEvent` | `CombatSystem` | `UnitViewSpawner` (saldırı karesi), `ProjectileSpawner` (ok, `ReleaseDelay` ve `FlightTime` ile) |
+| `HungerChangedEvent` | `HungerSystem` | `ResourceBarView` (yemek kırmızı) |
 | `EntityDamagedEvent` | `CombatService` | Bina ve birim spawner'ları (kırmızı flaş), `InformationPanelView`, `UnitSelectionCardView` |
 | `MoveCommandIssuedEvent` / `AttackCommandIssuedEvent` | `UnitCommandService` | `MoveMarkerView` |
 | `SelectionChangedEvent` | `SelectionService` | Bina ve birim spawner'ları, `InformationPanelView`, `UnitSelectionCardView` |
@@ -153,7 +156,7 @@ Gameplay ─► GameplayLifetimeScope (servisler, sistemler, dünya view'ları)
 | `ResourcesChangedEvent` | `ResourceService` | `ResourceBarView` |
 | `DayStartedEvent` | `CalendarService` | `RaidService`, `ResourceRespawnService`, `CalendarLabelView` |
 | `RaidEndedEvent` | `RaidService` | `GameOutcomeService`, `CalendarLabelView` |
-| `GameNoticeEvent` | `RaidService`, `ShelterSystem` | `NoticeBannerView` |
+| `GameNoticeEvent` | `RaidService`, `ShelterSystem`, `HungerSystem` | `NoticeBannerView` |
 | `GameEndedEvent` | `GameOutcomeService` | `GameEndView` |
 | `FloatingTextRequestedEvent` | `PlacementInputHandler`, `InformationPanelView`, `GatheringSystem` | `FloatingTextSpawner` |
 | `SandboxFactionChangedEvent` | `SandboxService` | `ProductionMenuView`, `InformationPanelView` |
@@ -294,7 +297,7 @@ Combat fazı: BuildingDefenseSystem ─► HasDefense olan her bina
 - Okçu bir birim değil, binanın parçası: seçilmez, nüfus tutmaz, ölmez. Durum `BuildingModel`'de, sayılar tanımda. Yeni bir savunma binası sadece veriyle eklenir.
 - Hedef ölene ya da menzilden çıkana kadar tutulur. Sürekli en yakına geçseydi hasar birimlere dağılırdı.
 - Kimse yoksa saniyede 4 kez bakar (`ScanInterval`). Sadece birimleri vurur. Her modda ve iki tarafta da çalışır.
-- Hasar atış anında işler; ok sadece görüntüdür.
+- Kuledeki okçunun zamanlaması `Defender` biriminin verisinden gelir: ok bırakış karesinde çıkar, hasar ok varınca işler (Bölüm 18).
 
 ## 14. Kapsama Halkaları
 **Durum:** ✅ · **Dosyalar:** `Gameplay/Buildings/CoverageRingView.cs` · **Test:** `CoverageRingTests`
@@ -318,6 +321,8 @@ Panelde asker butonu ─► InformationPanelView ─► UnitProductionService.Tr
     ─► UnitSpawnedEvent ─► UnitViewSpawner
 ```
 - Süre yok, PDF öyle istiyor. Birim binanın tarafını alır.
+- **Toplanma noktası (`RallyPointService`):** Sadece bir üretim binası seçiliyken sağ tık noktayı yazar (`CommandInputHandler`: birim emri geçmezse bina dener). Oyuncunun, bitmiş ve bu modda birim üreten binası olmalı. Üretilen her birim `UnitProductionService.UnitProduced` ile o noktaya, sağ tıkla aynı emirle gönderilir (`UnitCommandService.CommandAt`): zemin yürüme, düşman saldırı, kaynak toplama, inşaat yapma. Bina seçiliyken noktada takım renginde bayrak görünür (`BuildingView.rallyFlag`, kendi Sorting Group'u).
+
 - "Bu hücrede birim var mı?" sorusu `UnitService.HasUnitAt` ile konumlardan cevaplanır (O(n), şu sayılar için yeterli).
 - `UnitModel.Body`: ayakların çevresinde görünen karakter kadar bir dikdörtgen. Tıklama ve kutu seçimi buna bakar.
 
@@ -358,7 +363,8 @@ Movement fazı: UnitMovementSystem ─► UnitModel.MoveAlongPath(hız * dt)
 ```
 Combat fazı: CombatSystem, hedefi olan her birim için
    hedef yok/öldü ─► bırak, dur
-   menzilde       ─► dur, dön, bekleme bittiyse vur: UnitAttackedEvent + CombatService.ApplyDamage
+   menzilde       ─► dur, dön, bekleme bittiyse: UnitAttackedEvent (animasyon) + CombatService.ScheduleHit
+                      vuruş karesinde (hitDelay) hasar; okçuda ok çıkar, hasar ok varınca (+ mesafe / projectileSpeed)
    değil          ─► hedefin yanına yürü (en fazla 0,25 sn'de bir yeni yol)
 Cleanup fazı: DeathCleanupSystem ─► CombatService.RemoveDead ─► UnitService.Remove / BuildingService.Remove
               ─► UnitDiedEvent / BuildingDestroyedEvent + GridChangedEvent
@@ -366,7 +372,12 @@ Cleanup fazı: DeathCleanupSystem ─► CombatService.RemoveDead ─► UnitSer
 - `CombatService.TryGetTarget` birim ve bina hedefini tek yerde toplar: mesafe, nişan noktası, yürünecek hücre. Binaya mesafe en yakın kenara ölçülür; Castle'a yandan vurulur.
 - `ApplyDamage`: HP 0'ın altına inmez, ölüm tek kez kuyruğa girer. **Karşılık verme:** boşta duran birim ona vurana döner; işi olan devam eder.
 - Bekleme süresi saldırı anında başlar, ilk vuruş beklemez; hedef değiştirerek hızlı vurulamaz.
-- Menzilli birim (`IsRanged`, menzil > 2) havuzdan ok atar. Ok sadece görüntü; hasar atışta işler.
+- **Vuruş zamanlaması:** `UnitDefinition.hitDelay` saldırı animasyonunun başından vuruş karesine kadar geçen süre (Şövalye 0,2, Mızrakçı 0,1, Okçu 0,5, Köylü 0,2). `projectileSpeed` olan birimin hasarı ok uçup varınca işler (Okçu 12 hücre/sn). İkisi de 0 ise hasar hemen işler; eski davranış ve testler böyle kalır.
+- `CombatService.ScheduleHit` zamanlanmış vuruşları tutar, `CombatSystem` her tick önce onları ilerletir. Bırakıştan önce saldıran ölürse vuruş iptal; havadaki ok yine de varır.
+- Menzilli birim (`IsRanged`, menzil > 2) havuzdan ok atar. Ok oyun saatiyle uçar (`ProjectileView`), bırakışa kadar gizli bekler; duraklatma ve hız değişince hasarla eş zamanlı kalır.
+- **Ölüm ve yıkılma efekti (`EffectSpawner`):** Birim ölünce (ya da silinince) küçük toz, bina yıkılınca boyuna göre patlama ve tabanında büyük toz. Kareler `Textures/VFX` (Effects atlas'ı), oyun saatiyle oynar, renderer'lar havuzdan. Sahnede obje yok: `GameplayLifetimeScope` `Prefab_Gameplay_Effect_Spawner`'ı `RegisterComponentInNewPrefab` ile kurar.
+- **Can barı (`HealthBarView`):** İnce çerçeve ve tarafın renginde dolgu (oyuncu yeşil, düşman kırmızı), birimde başın üstünde, binada çatının üstünde. Sadece hasarlıyken ya da seçiliyken görünür; inşaat alanında onun yerine ilerleme çubuğu durur. Dolgu tam piksel, can kaldıkça en az bir piksel (`GetFillWidth`, testli). Sorting Group sırası 158.
+
 - Yok olunca: grid boşalır, seçimden çıkar, saldıranlar hedefi bırakır, view silinir.
 
 ## 19. Birim Görünümü ve Durum İkonları
@@ -421,13 +432,39 @@ Köylü seçili, inşaata sağ tık ─► UnitCommandService.Build ─► Const
    İlerleme 1 ─► BuildingCompletedEvent ─► köylü boşta kalır
 ```
 - **Süre:** `buildTime` tek köylünün süresi (House 20, Barracks 35, Kule 30, Karakol 30 sn). Her köylü kendi payını ekler, yani iki köylü iki kat hızlı. Castle başlangıçta hazır gelir; `buildTime` 0 olan bina hep anında biter.
-- **HP:** İnşaat %10 HP ile başlar, kalan HP işle birlikte dolar. Alınan hasar geri gelmez. İnşaat saldırıya açık; düşman normal bina gibi vurur.
+- **HP:** İnşaat %10 HP ile başlar, kalan HP işle birlikte dolar ve bitince tam olur (son kesir yuvarlanır, yoksa kayan nokta toplamı binayı 1 HP eksik bırakıp can barını gösteriyordu). Alınan hasar geri gelmez. İnşaat saldırıya açık; düşman normal bina gibi vurur.
 - **Bitmeden çalışmayanlar:** Üretim (`ProductionBlock.UnderConstruction`), nüfus kapasitesi, kule atışı, bölge, bırakma noktası. Hepsi `BuildingModel.IsBuilt`'e bakar; kuralı her sistem kendisi uygular.
 - **Nerede durur:** Yanlar ve alt tercih edilir (üstte çatı köylüyü kapatırdı). Başka köylünün tuttuğu hücre cezalı, iki köylü aynı yerde durmaz. Ayak duvardan 0,4 birim uzakta; çekiç binaya değer. Yer değiştirirken seçime küçük bir rastgelelik eklenir, köylü hep aynı iki hücre arasında gidip gelmez.
 - **İş bölümü:** Toplama ve inşaat ayrı sistemler. Birini başlatan emir öbürünü iptal eder (`UnitCommandService.CancelJobs`). Sığınmada ikisi de askıya alınır, düşman gidince hangisi varsa ona dönülür.
 - **Görünüm:** Gri sprite yarı saydam başlar, işlendikçe koyulaşır, bitince renkli sprite gelir (`BuildingView.UpdateLook`). Gri sprite'lar atlas'taki `Buildings` klasöründe, ayrı çizim maliyeti yok. Panel adın altında `Under construction 40%` yazar, HP'yi canlı gösterir.
 - **İlerleme çubuğu (`BuildProgressBarView`):** İnşaatın çatısının 0,3 birim üstünde, paketin küçük bar çerçevesi (Sliced, binanın genişliğine göre 1-2 birim) ve altın dolgu. Dolgu tek piksel genişliğinde bir sütun, `localScale.x` ile uzuyor ve tam piksele yuvarlanıyor (`GetFillWidth`, testli). Dokular Gameplay atlas'ında (`Texture_Markers_ProgressBar_Frame/Fill`); UI atlas'ındaki orijinali dünyada kullanılsaydı ayrı çizim gerekirdi. Kendi Sorting Group'u var (`Sort At Root`, 155), ağaç ve birimlerin arkasında kalmıyor. Bina prefab'ında kapalı duruyor; sadece inşaatta açılıyor, bitince kapanıyor.
 - **Sandbox:** İnşaat alanı yok, bina anında hazır (PDF'in "üretim süresi yok" maddesi).
+
+## 22c. Tarla
+**Durum:** ✅ · **Dosyalar:** `Gameplay/Gathering/FarmingSystem.cs` · **Veri:** `Data_Building_Farm` (`farmYield`, `farmHarvestDuration`, `farmWorkers`) · **Test:** `FarmHungerRallyTests`
+
+```
+Köylüyle kendi bitmiş tarlana sağ tık ─► UnitCommandService.Farm ─► FarmingSystem.TryOrder
+   WalkingToFarm (yanındaki hücre, son adım çitin içine) ─► Working (balta kareleri, farmHarvestDuration)
+   ─► WalkingToDropOff (en yakın bırakma noktası) ─► +farmYield yemek ─► WalkingToFarm ...
+```
+- **Kurallar:** 3x3, 40 odun, inşa 15 sn, 60 HP. Bir köylü çalışır, tarla hiç bitmez, her 6 saniyede 5 yemek (koyundan yavaş ama sürekli). Sadece Normal modda; menüde House'un yanında.
+- Önce inşa edilir: inşaat alanına sağ tık köylüyü inşaata, bitmiş tarlaya sağ tık tarlaya gönderir. Dolu tarlaya gönderilen köylü yanına yürür ve "The farm has all the workers it can take" yazar.
+- `GatheringSystem` kaynağın kendisine bağlı (miktar, tükenme, koyunun gezmesi); tarla bir bina olduğu için ayrı ve küçük bir sistem yazıldı. Yanındaki hücrenin seçimi `ConstructionSystem` ile aynı.
+- **Çitin içinde çalışma:** Köylü yanındaki hücreden çitin üstünden tarlaya girer, bitişik kenar hücresinde rastgele bir noktada ekinlerin arasında durur (çitten yanlarda 0,45, altta 0,55 içeride). Her seferinde yeni bir nokta seçilir. Sadece kenar hücresi: çıkış tek adım, A* içeride sıkışmaz.
+- Ayakları tarlanın alt kenarından yukarıda kaldığı için yükseklik sıralamasında ekinlerin arkasına düşerdi. Bu yüzden içerideyken `UnitModel.IsInField` açık ve `UnitView` kök Sorting Group'u 1 yapar; çitten çıkınca 0'a döner.
+- Düşman çitin dışından vurur: `CombatService` içerideki köylüye mesafeyi en yakın çitten sayar ve kovalayanı o çitin dışındaki hücreye yollar. Şövalye (menzil 1) çitin dibinden yetişir.
+- İş bölümü: toplama, inşaat ve tarla aynı anda olmaz; bir emir diğerlerini iptal eder. Sığınmada tarla işi de askıya alınır, taşınan yük Castle'da sayılır.
+- İmleç kendi bitmiş tarlanda balta. Görsel renksiz (`Texture_Buildings_Neutral_Farm`), iki renk setinde aynı; gri inşaat kopyası `_Site`.
+
+## 22d. Açlık
+**Durum:** ✅ · **Dosyalar:** `Gameplay/Economy/HungerSystem.cs` · **Veri:** `Data_Config_NormalMode` > Hunger (Easy / Normal / Hard) · **Test:** `FarmHungerRallyTests`
+
+- Her sabah (ilk sabah hariç) oyuncunun her birimi yemek yer: Kolay 1, Normal 2, Zor 4. Yetmeyen kısım borç olur; olan yemek yine yenir.
+- Borç varken her birim belli aralıkla 1 HP kaybeder: Kolay 15, Normal 10, Zor 5 saniye. Gelen yemek önce borcu öder, ödenince kayıp durur.
+- Başlarken "Not enough food! Your people are starving", bitince "There is food again" bildirimi; kaynak barında yemek sayısı kırmızı (`HungerChangedEvent`).
+- Hasar saldırgansız verilir (`CombatService.ApplyDamage(..., GameEntityId.None)`); birim bu yüzden kimseye dönmez, "!" çıkmaz. Ölüm normal ölüm event'leriyle olur, yani son birim de ölürse mevcut kaybetme koşulu çalışır.
+- Zorluk `GameSessionSettings.Difficulty`'den okunur. Ana menüde henüz zorluk seçimi yok, oyun Normal ile başlar. Sandbox'ta açlık yok.
 
 ## 23. Takvim ve Gece
 **Durum:** ✅ · **Dosyalar:** `Gameplay/Calendar/CalendarService.cs`, `UI/Hud/DayNightOverlayView.cs`, `CalendarLabelView.cs` · **Veri:** `Data_Config_Raids`
@@ -554,15 +591,6 @@ Her Esc en üstteki tek katmanı kapatır: yerleştirme (Placement map'inde, `Pl
 # G. Planlanan Sistemler
 Her biri mevcut yapıya şöyle oturacak. Yapılınca kendi bölümüne taşınır.
 
-### Tarla ⏳ (sıradaki)
-- **Öneri (onay bekliyor):** 3x3 bina, 40 odun, bir köylü çalıştırır, hiç bitmez, koyundan yavaş yemek verir. Asset hazır: `Texture_Buildings_Neutral_Farm`.
-- **Nasıl:** `BuildingDefinition`'a toplama alanları (`gatherKind`, `harvestDuration`, `maxWorkers`). `UnitCommandService.CommandAt` kendi tarlasına sağ tıkta köylüyü `GatheringSystem`'e verir (`TryOrder`'ın bina alan bir eşi). Sipariş kaynağı bina olabilir; miktar düşmez, işçi sayısı binada tutulur. Görsel renksiz olduğu için iki renk setine aynı sprite.
-- **Test:** Toplama döngüsü, tükenmeme, işçi sınırı, Sandbox'ta yok.
-
-### Yemek Tüketimi ve Açlık ⏳
-- **Nasıl:** `HungerService` `DayStartedEvent`'te `PopulationService.Used × yemek` kadar `ResourceService.TrySpend`. Yetmezse `IsStarving`; Time fazında bir sistem aralıklarla birimlere `CombatService.ApplyDamage` (saldırgansız) uygular. `GameNoticeEvent` ile uyarı, barda yemek kırmızı.
-- **Etkisi:** `GameOutcomeService`'in "nüfus 0" koşulu açlıkla da tetiklenir; ek kod gerekmez.
-
 ### Depolar ve Kapasite ⏳
 - **Nasıl:** `StorageService`, `PopulationService` gibi her sorguda kapasiteyi binalardan toplar (`BuildingDefinition.storage`: tür + miktar; Castle küçük başlangıç kapasitesi). `ResourceService.Add` kapasiteye kısar; doluysa `GatheringSystem` köylüyü bekletir ve "Storage full" yazar. Bırakma noktası "o türü kabul eden en yakın bina" olur. Yıkılınca fazla kaynak silinir.
 - Görseller hazır: `Texture_Buildings_<Renk>_Storage_*`.
@@ -577,9 +605,6 @@ Her biri mevcut yapıya şöyle oturacak. Yapılınca kendi bölümüne taşın�
 ### Tamir ve İnşaat İptali ⏳
 - **Tamir:** `ConstructionSystem` aynı döngüyle hasarlı bitmiş binada çalışır: ilerleme yerine HP ekler, her puan için az kaynak harcar. Sağ tık kuralı aynı: kendi hasarlı binana köylüyle sağ tık, imleç yine çekiç.
 - **İptal:** Panelde inşaat alanına iptal butonu; maliyetin yarısını geri verir, `BuildingService.Remove` çağırır.
-
-### Toplanma Noktası ⏳
-- **Nasıl:** `BuildingModel.RallyPoint`. Üretim binası seçiliyken sağ tık bunu yazar (`CommandInputHandler`). `UnitProductionService` doğan birimi `UnitMovementSystem.SendTo` ile oraya yollar. Bayrak hazır: `Texture_Markers_<Renk>_RallyFlag`.
 
 ### House'a Sığınma ve Kapasite ⏳
 - **Nasıl:** `BuildingDefinition.shelterCapacity`. `ShelterSystem` doluluğu bina başına tutar ve en yakın boş binayı seçer. Bina yıkılınca içindekileri `BringOut` ile çıkarır.
@@ -598,7 +623,7 @@ Her biri mevcut yapıya şöyle oturacak. Yapılınca kendi bölümüne taşın�
 - **Nasıl:** Core'da `SaveService`, JSON, `Application.persistentDataPath`, birden fazla slot. Seed + değişiklikler: binalar, birimler (emirleriyle), kaynak miktarları, gün, kaynaklar. Tanımlar `Id` alanıyla yazılır. Yükleme: harita seed'den kurulur, üstüne kayıt uygulanır.
 
 ### Zorluk ve Sonsuz Mod ⏳
-- **Zorluk:** `DifficultySettings` asset'i (dalga çarpanı, başlangıç kaynağı). `GameSessionSettings.Difficulty` zaten var; `RaidService` ve `NormalModeStarter` okur.
+- **Zorluk:** Ana menüde Kolay / Normal / Zor seçimi, `GameSessionSettings.Difficulty`'ye yazar. Açlık bunu zaten okuyor (Bölüm 22d); dalga çarpanı ve başlangıç kaynağı `RaidService` ve `NormalModeStarter`'a eklenecek.
 - **Sonsuz mod:** Son baskından sonra `RaidService` formülle yeni baskın üretir. `GameEndView`'e *Continue*; hayatta kalınan gün HUD'da.
 
 ### Oyun İçi Menü ve Ayarlar ⏳
@@ -609,11 +634,6 @@ Her biri mevcut yapıya şöyle oturacak. Yapılınca kendi bölümüne taşın�
 
 ### Komut Kısayolları ⏳
 - Kontrol grupları (Ctrl+1-9), AttackMove (A), Stop (S), HoldPosition (X), boştaki köylü (.). (Oyun hızı, duraklatma ve Delete yapıldı, Bölüm 33b.) Hepsi Gameplay action map'ine eylem ve `UnitCommandService`'e metot. Duruş (`HoldPosition`) `UnitModel`'de bir alan; `BattleAiSystem` ona bakar.
-
-### Efekt Turu ⏳
-- Hasar saldırı animasyonunun vuruş karesinde işlesin: `UnitDefinition.hitFrame`, `CombatSystem` vuruşu bekletir.
-- Ölüm ve yıkılma efekti havuzdan (`Textures/VFX`), birim view'ı silinmeden önce oynar.
-- Dünya üzerinde can barı (SpriteRenderer, atlas'tan), hasar sayıları uçan yazıyla.
 
 ### Diğerleri ⏳
 - Yürürken ayırma (separation) kuvveti, tutorial, düşman yerleşkeleri, Production Menu hücresinde maliyet.
@@ -658,8 +678,8 @@ Kuralı servisin içinde `IsEnabled` / `IsUnlimited` gibi tek bir bayrakla kapat
 # I. Bilinen Sınırlar
 - Birimler yürürken birbirinin içinden geçer; sadece hedeflerde ayrılırlar.
 - Yakın dövüşçü plato kenarının altından üstteki hedefe vurabilir; menzil seviyeye bakmaz.
-- Hasar saldırı animasyonunun ilk karesinde işler, ölen hemen silinir (efekt turunda düzelecek).
-- Dünya üzerinde can barı yok; HP panelde ve kartta.
+- Ana menüde zorluk seçimi yok; açlık değerleri zorluğa göre hazır ama oyun Normal ile başlar.
+- Hasar sayıları (ör. "-4") yok; vuruş kırmızı flaş ve can barıyla görünür.
 - Bölge halkası gerçek daire, bölge katmanı hücre hücre; aralarında en fazla bir hücrelik fark olabilir.
 - Bölge katmanı footprint her hücre değiştirdiğinde baştan çizilir; büyük haritada takılma olursa sadece değişen bölge çizilecek.
 - En uzak zoom'da haritanın en üst sırası kaynak barının altında kalabilir.

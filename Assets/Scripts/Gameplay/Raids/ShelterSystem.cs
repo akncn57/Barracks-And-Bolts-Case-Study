@@ -35,6 +35,7 @@ namespace BarracksAndBolts.Gameplay.Raids
         private readonly UnitMovementSystem _movement;
         private readonly GatheringSystem _gathering;
         private readonly ConstructionSystem _construction;
+        private readonly FarmingSystem _farming;
         private readonly GridSearch _search;
         private readonly GridMap _gridMap;
         private readonly RaidSettings _settings;
@@ -50,7 +51,7 @@ namespace BarracksAndBolts.Gameplay.Raids
         private float _time;
         private float _scanDelayLeft;
 
-        public ShelterSystem(UnitService units, BuildingService buildings, UnitMovementSystem movement, GatheringSystem gathering, ConstructionSystem construction, GridSearch search,
+        public ShelterSystem(UnitService units, BuildingService buildings, UnitMovementSystem movement, GatheringSystem gathering, ConstructionSystem construction, FarmingSystem farming, GridSearch search,
             GridMap gridMap, RaidSettings settings, NormalModeSettings normalMode, SandboxService sandbox, IEventBus eventBus)
         {
             _units = units;
@@ -58,6 +59,7 @@ namespace BarracksAndBolts.Gameplay.Raids
             _movement = movement;
             _gathering = gathering;
             _construction = construction;
+            _farming = farming;
             _search = search;
             _gridMap = gridMap;
             _settings = settings;
@@ -159,6 +161,7 @@ namespace BarracksAndBolts.Gameplay.Raids
                 _eventBus.Publish(new GameNoticeEvent("Villagers are hiding in the Castle", isAlert: false));
 
             _gathering.DeliverLoad(unit.Id);
+            _farming.DeliverLoad(unit.Id);
             _units.Shelter(unit);
             _inside.Add(unit);
         }
@@ -193,13 +196,14 @@ namespace BarracksAndBolts.Gameplay.Raids
         {
             _gathering.Cancel(unitId);
             _construction.Cancel(unitId);
+            _farming.Cancel(unitId);
         }
 
-        // A villager has at most one of the two jobs suspended.
+        // A villager has at most one job suspended.
         private void ResumeWork(UnitModel unit)
         {
-            if (!_gathering.Resume(unit))
-                _construction.Resume(unit);
+            if (!_gathering.Resume(unit) && !_construction.Resume(unit))
+                _farming.Resume(unit);
         }
 
         private void CollectEnemies()
@@ -237,6 +241,7 @@ namespace BarracksAndBolts.Gameplay.Raids
 
             _gathering.Suspend(unit.Id);
             _construction.Suspend(unit.Id);
+            _farming.Suspend(unit.Id);
             unit.ClearAttackTarget();
             _movement.SendTo(unit, door);
             _fleeing.Add(unit);

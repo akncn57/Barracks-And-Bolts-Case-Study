@@ -1,4 +1,5 @@
 using System;
+using BarracksAndBolts.Core.Session;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -30,6 +31,12 @@ namespace BarracksAndBolts.Gameplay.Data
         [SerializeField, Min(0)] private int sheepPerMorning = 3;
         [SerializeField, Min(0)] private int maxSheep = 30;
 
+        [Header("Hunger, by difficulty")]
+        [Tooltip("Food each unit eats every morning, and how fast units lose health while there isn't enough.")]
+        [SerializeField] private HungerLevel easyHunger = new(1, 15f);
+        [SerializeField] private HungerLevel normalHunger = new(2, 10f);
+        [SerializeField] private HungerLevel hardHunger = new(4, 5f);
+
         public BuildingDefinition Castle => castle;
         public UnitDefinition Villager => villager;
         public int StartingVillagers => startingVillagers;
@@ -40,5 +47,35 @@ namespace BarracksAndBolts.Gameplay.Data
         public float NextNodeRadius => nextNodeRadius;
         public int SheepPerMorning => sheepPerMorning;
         public int MaxSheep => maxSheep;
+
+        public HungerLevel GetHunger(Difficulty difficulty)
+        {
+            switch (difficulty)
+            {
+                case Difficulty.Easy:
+                    return easyHunger;
+                case Difficulty.Hard:
+                    return hardHunger;
+                default:
+                    return normalHunger;
+            }
+        }
+
+        [Serializable]
+        public struct HungerLevel
+        {
+            [SerializeField, Min(0)] private int foodPerUnitPerDay;
+            [Tooltip("Seconds between losing one health point while starving.")]
+            [SerializeField, Min(0.5f)] private float secondsPerHpLost;
+
+            public HungerLevel(int foodPerUnitPerDay, float secondsPerHpLost)
+            {
+                this.foodPerUnitPerDay = foodPerUnitPerDay;
+                this.secondsPerHpLost = secondsPerHpLost;
+            }
+
+            public int FoodPerUnitPerDay => foodPerUnitPerDay;
+            public float SecondsPerHpLost => secondsPerHpLost;
+        }
     }
 }

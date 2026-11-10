@@ -37,6 +37,9 @@ namespace BarracksAndBolts.Gameplay.Buildings
         public float BuildProgress { get; private set; } = 1f;
         public bool IsBuilt => BuildProgress >= 1f;
 
+        /// <summary>Where units made here walk to, in world space. Null when they stay at the door.</summary>
+        public Vector2? RallyPoint { get; private set; }
+
         /// <summary>The enemy this building is shooting at. None when it has no target.</summary>
         public GameEntityId DefenseTarget { get; private set; }
 
@@ -66,9 +69,15 @@ namespace BarracksAndBolts.Gameplay.Buildings
             BuildProgress = Mathf.Min(BuildProgress + share, 1f);
 
             _hpToGain += Definition.MaxHp * (1f - SiteHpShare) * share;
-            var whole = Mathf.FloorToInt(_hpToGain);
+            // Many small float shares don't add up to exactly one, so the last bit is rounded or the building ends 1 HP short.
+            var whole = IsBuilt ? Mathf.RoundToInt(_hpToGain) : Mathf.FloorToInt(_hpToGain);
             _hpToGain -= whole;
             CurrentHp = Mathf.Min(CurrentHp + whole, Definition.MaxHp);
+        }
+
+        public void SetRallyPoint(Vector2 point)
+        {
+            RallyPoint = point;
         }
 
         public void SetDefenseTarget(GameEntityId target)

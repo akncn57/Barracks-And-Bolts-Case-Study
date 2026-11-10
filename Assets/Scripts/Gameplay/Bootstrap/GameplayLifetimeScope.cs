@@ -11,6 +11,7 @@ using BarracksAndBolts.Gameplay.Commands;
 using BarracksAndBolts.Gameplay.Data;
 using BarracksAndBolts.Gameplay.DebugView;
 using BarracksAndBolts.Gameplay.Economy;
+using BarracksAndBolts.Gameplay.Effects;
 using BarracksAndBolts.Gameplay.Entities;
 using BarracksAndBolts.Gameplay.Gathering;
 using BarracksAndBolts.Gameplay.Grid;
@@ -40,6 +41,8 @@ namespace BarracksAndBolts.Gameplay.Bootstrap
         [SerializeField] private GameDatabase gameDatabase;
         [Tooltip("Sandbox debug view. Created under this object when the scene starts.")]
         [SerializeField] private DebugOverlayView debugOverlayPrefab;
+        [Tooltip("Death and destroy effects. Created under this object when the scene starts.")]
+        [SerializeField] private EffectSpawner effectSpawnerPrefab;
 
         protected override void Configure(IContainerBuilder builder)
         {
@@ -70,6 +73,12 @@ namespace BarracksAndBolts.Gameplay.Bootstrap
 
             builder.Register<TimeControlService>(Lifetime.Singleton);
             builder.RegisterEntryPoint<TimeControlInputHandler>();
+
+            if (effectSpawnerPrefab != null)
+            {
+                builder.RegisterComponentInNewPrefab(effectSpawnerPrefab, Lifetime.Singleton).UnderTransform(transform);
+                builder.RegisterBuildCallback(container => container.Resolve<EffectSpawner>());
+            }
 
             if (debugOverlayPrefab != null)
             {
@@ -109,6 +118,8 @@ namespace BarracksAndBolts.Gameplay.Bootstrap
             builder.Register<GameOutcomeService>(Lifetime.Singleton);
             builder.RegisterSimulationSystem<GatheringSystem>();
             builder.RegisterSimulationSystem<ConstructionSystem>();
+            builder.RegisterSimulationSystem<FarmingSystem>();
+            builder.RegisterSimulationSystem<HungerSystem>();
             builder.RegisterSimulationSystem<CalendarService>();
             builder.RegisterSimulationSystem<RaidService>();
             builder.RegisterSimulationSystem<BattleAiSystem>();
@@ -157,6 +168,7 @@ namespace BarracksAndBolts.Gameplay.Bootstrap
             builder.Register<BuildingService>(Lifetime.Singleton);
             builder.RegisterComponentInHierarchy<BuildingViewSpawner>();
             builder.Register<UnitProductionService>(Lifetime.Singleton);
+            builder.Register<RallyPointService>(Lifetime.Singleton);
 
             builder.Register<TerritoryService>(Lifetime.Singleton);
             builder.Register<PlacementService>(Lifetime.Singleton);

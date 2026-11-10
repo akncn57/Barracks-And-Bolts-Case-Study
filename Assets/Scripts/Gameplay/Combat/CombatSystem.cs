@@ -33,6 +33,7 @@ namespace BarracksAndBolts.Gameplay.Combat
 
         public void Tick(float deltaTime)
         {
+            _combat.TickScheduledHits(deltaTime);
             foreach (var unit in _units.Units)
             {
                 unit.TickCombatTimers(deltaTime);
@@ -64,8 +65,12 @@ namespace BarracksAndBolts.Gameplay.Combat
                 return;
 
             unit.StartAttackCooldown();
-            _eventBus.Publish(new UnitAttackedEvent(unit, target.AimPoint));
-            _combat.ApplyDamage(unit.AttackTarget, unit.Definition.Damage, unit.Id);
+
+            // The animation starts now; the blow lands on its strike frame, an arrow when it arrives.
+            var definition = unit.Definition;
+            var flightTime = definition.GetFlightTime(target.Distance);
+            _eventBus.Publish(new UnitAttackedEvent(unit, target.AimPoint, definition.HitDelay, flightTime));
+            _combat.ScheduleHit(unit.AttackTarget, definition.Damage, unit.Id, definition.HitDelay, definition.HitDelay + flightTime);
         }
 
         private void Chase(UnitModel unit, in CombatTarget target)

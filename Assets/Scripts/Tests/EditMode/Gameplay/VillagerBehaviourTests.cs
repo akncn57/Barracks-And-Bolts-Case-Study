@@ -42,6 +42,7 @@ namespace BarracksAndBolts.Tests.EditMode.Gameplay
         private UnitMovementSystem _movement;
         private GatheringSystem _gathering;
         private ConstructionSystem _construction;
+        private FarmingSystem _farming;
         private CombatService _combat;
         private ShelterSystem _shelter;
         private ResourceRoamSystem _roam;
@@ -96,6 +97,7 @@ namespace BarracksAndBolts.Tests.EditMode.Gameplay
 
             _gathering = new GatheringSystem(_units, _movement, _nodes, _buildings, _resources, _search, _map, _normal, _eventBus);
             _construction = new ConstructionSystem(_units, _movement, _buildings, _map, _eventBus);
+            _farming = new FarmingSystem(_units, _movement, _buildings, _resources, _search, _map, _eventBus);
             _shelter = CreateShelter(_sandbox);
             _roam = new ResourceRoamSystem(_nodes, new GameSessionSettings { Seed = 4 });
         }
@@ -112,7 +114,7 @@ namespace BarracksAndBolts.Tests.EditMode.Gameplay
 
         private ShelterSystem CreateShelter(SandboxService sandbox)
         {
-            return new ShelterSystem(_units, _buildings, _movement, _gathering, _construction, _search, _map, _raids, _normal, sandbox, _eventBus);
+            return new ShelterSystem(_units, _buildings, _movement, _gathering, _construction, _farming, _search, _map, _raids, _normal, sandbox, _eventBus);
         }
 
         private T Track<T>(T asset) where T : Object
@@ -498,7 +500,7 @@ namespace BarracksAndBolts.Tests.EditMode.Gameplay
         public void Shelter_PlayerOrder_BeatsTheFlight()
         {
             PlaceCastle();
-            var commands = new UnitCommandService(_units, _movement, _combat, _search, _map, _gathering, _construction, _buildings, _nodes, _eventBus);
+            var commands = new UnitCommandService(_units, _movement, _combat, _search, _map, _gathering, _construction, _farming, _buildings, _nodes, _eventBus);
             var villager = SpawnVillager(8, 31);
             SpawnEnemy(12, 31);
             Run(0.5f);

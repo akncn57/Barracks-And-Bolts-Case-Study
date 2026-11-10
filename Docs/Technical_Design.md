@@ -80,7 +80,7 @@ Scripts/
 ├── Popup/       BarracksAndBolts.Popup      Hazır popup sistemi (şu an kullanılmıyor)
 ├── Utils/       BarracksAndBolts.Utils      Unity'den bağımsız yardımcılar (MinHeap, CompositeDisposable)
 └── Tests/
-    └── EditMode/ BarracksAndBolts.Tests.EditMode   459 test
+    └── EditMode/ BarracksAndBolts.Tests.EditMode   479 test
 ```
 - Kayıt (save) ve ayarlar servisi henüz yok; geldiğinde Core'a girer.
 - Tek seferlik editör araçları `Assets/Editor/` altında asmdef'siz durur ve iş bitince silinir.
@@ -108,7 +108,8 @@ Gameplay/
 ├── Units/          UnitService, UnitModel, UnitMovementSystem, UnitView, UnitViewSpawner, Unit*Event
 ├── Territory/      TerritoryService, TerritoryOverlayView
 ├── Combat/         CombatService, CombatSystem, BuildingDefenseSystem, DeathCleanupSystem, DamageFlash,
-│                   ProjectileSpawner, ProjectileView, CombatEvents
+│                   ProjectileSpawner, ProjectileView, HealthBarView, CombatEvents
+├── Effects/        EffectSpawner (ölüm ve yıkılma efekti, scope prefab'dan kurar)
 ├── Hover/          HoverService, HoverInputHandler, HoverHighlightView, ToolCursor, ToolCursorPicker, ToolCursorView
 ├── Feedback/       FloatingTextRequestedEvent (çizen: UI/Feedback/FloatingTextSpawner)
 ├── Selection/      SelectionService, SelectionInputHandler, BoxSelectionView, DeletionService, DeleteInputHandler
@@ -119,8 +120,8 @@ Gameplay/
 ├── Teams/          Faction, TeamService (TeamColor, menüden taşındığı için Core.Session içinde)
 ├── ResourceNodes/  ResourceNodeService, ResourceNodeModel, ResourceDistributor, ResourceMapInitializer,
 │                   ResourceRoamSystem, ResourceNodeView, ResourceNodeViewSpawner
-├── Economy/        ResourceService, PopulationService, NormalModeStarter, ResourceRespawnService, GameOutcomeService
-├── Gathering/      GatheringSystem
+├── Economy/        ResourceService, PopulationService, NormalModeStarter, ResourceRespawnService, GameOutcomeService, HungerSystem
+├── Gathering/      GatheringSystem, FarmingSystem
 ├── Construction/   ConstructionSystem (inşaat alanı; durum BuildingModel'de, BuildingCompletedEvent)
 ├── Calendar/       CalendarService (görünüm: UI/Hud/DayNightOverlayView, CalendarLabelView)
 ├── Raids/          RaidService, BattleAiSystem, ShelterSystem
@@ -269,7 +270,7 @@ public interface IEventBus
 - **Mini harita (planlandı):** İkinci bir kamera kullanılmaz. Grid verisinden üretilen tek bir `Texture2D` kullanılır.
 - **UI:** Statik ve sık değişen elemanlar ayrı Canvas'lara bölünür (`StaticCanvas` / `DynamicCanvas`).
 - **Gece efekti:** Ekranı kaplayan tek bir yarı saydam UI görseli (`DayNightOverlayView`), alfası takvimden gelir. Işık sistemi kullanılmıyor.
-- **Çizim sırası (Order in Layer):** su -5, köpük -4, zemin -3, plato ve merdiven -2, bölge katmanı ve halkalar -1, bina, birim ve kaynak 0, yerleştirme önizlemesi 99-100, ok ve debug yol noktaları 150, inşaat çubuğu 155, durum ikonu 160, hover çerçevesi 190, seçim kutusu 200.
+- **Çizim sırası (Order in Layer):** su -5, köpük -4, zemin -3, plato ve merdiven -2, bölge katmanı ve halkalar -1, bina, birim ve kaynak 0, tarlanın içindeki köylü 1, yerleştirme önizlemesi 99-100, patlama efekti 145, ok ve debug yol noktaları 150, inşaat çubuğu 155, can barı 158, durum ikonu 160, hover çerçevesi 190, seçim kutusu 200.
 - Ölçüm Frame Debugger ve Game view Stats ile yapılır: savaş sırasında **10 SetPass**. Son özelliklerden sonra tekrar ölçülecek, sonuç README'ye yazılacak.
 
 ---
@@ -396,7 +397,7 @@ Prefab_Core_GameplayLifetimeScope
 ---
 
 ## 15. Testler (EditMode)
-Toplam **459 test**, 37 dosya (`TestDefinitions` ve `TestMaps` yardımcı). Her biri saf C# servislerini Unity sahnesi olmadan çalıştırır.
+Toplam **479 test**, 39 dosya (`TestDefinitions` ve `TestMaps` yardımcı). Her biri saf C# servislerini Unity sahnesi olmadan çalıştırır.
 
 | Alan | Dosyalar | Kapsadığı durumlar |
 |---|---|---|

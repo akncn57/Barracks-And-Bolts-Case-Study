@@ -11,6 +11,7 @@ namespace BarracksAndBolts.Gameplay.Combat
 {
     /// <summary>
     /// The rules of a fight: what counts as a target, how far away it is, and what damage does.
+    /// A blow lands a moment after the swing starts and an arrow when it arrives, so hits can be scheduled.
     /// Dead entities are removed in one go at the end of the tick, so nothing is deleted while a system loops over it.
     /// </summary>
     public sealed class CombatService
@@ -23,6 +24,18 @@ namespace BarracksAndBolts.Gameplay.Combat
         private readonly GridMap _gridMap;
         private readonly IEventBus _eventBus;
         private readonly List<GameEntityId> _pendingDeaths = new();
+        private readonly List<ScheduledHit> _scheduledHits = new();
+
+        private struct ScheduledHit
+        {
+            public GameEntityId Target;
+            public GameEntityId Attacker;
+            public int Damage;
+
+            // Until the blow is struck or the arrow leaves, the hit dies with the attacker.
+            public float ReleaseLeft;
+            public float TimeLeft;
+        }
 
         public CombatService(UnitService units, BuildingService buildings, GridMap gridMap, IEventBus eventBus)
         {
@@ -37,11 +50,12 @@ namespace BarracksAndBolts.Gameplay.Combat
         {
             if (_units.TryGet(id, out var unit) && !unit.IsDead)
             {
-                target = new CombatTarget(
-                    unit.Faction,
-                    Vector2.Distance(attackerPosition, unit.Position),
-                    unit.Position + UnitAimOffset,
-                    _gridMap.WorldToCell(unit.Position));
+                var distance = Vector2.Distance(attackerPosition, unit.Position);
+                var chaseCell = _gridMap.WorldToCell(unit.Position);
+                if (unit.IsInField && _buildings.TryGet(_buildings.GetBuildingAt(unit.Position), out var field))
+                    ReachOverFence(field.Area, unit.Position, ref distance, ref chaseCell);
+
+                target = new CombatTarget(unit.Faction, distance, unit.Position + UnitAimOffset, chaseCell);
                 return true;
             }
 
@@ -66,6 +80,31 @@ namespace BarracksAndBolts.Gameplay.Combat
 
             target = default;
             return false;
+        }
+
+        /// <summary>
+        /// A villager working inside a farm is hit over the fence: the way in from the nearest fence doesn't count,
+        /// and the attacker walks to the cell outside that fence.
+        /// </summary>
+        private void ReachOverFence(RectInt field, Vector2 position, ref float distance, ref Vector2Int chaseCell)
+        {
+            var min = _gridMap.Origin + field.min;
+            var max = _gridMap.Origin + field.max;
+            var toLeft = position.x - min.x;
+            var toRight = max.x - position.x;
+            var toBottom = position.y - min.y;
+            var toTop = max.y - position.y;
+            var depth = Mathf.Min(Mathf.Min(toLeft, toRight), Mathf.Min(toBottom, toTop));
+            distance = Mathf.Max(0f, distance - depth);
+
+            if (depth == toBottom)
+                chaseCell.y = field.yMin - 1;
+            else if (depth == toLeft)
+                chaseCell.x = field.xMin - 1;
+            else if (depth == toRight)
+                chaseCell.x = field.xMax;
+            else
+                chaseCell.y = field.yMax;
         }
 
         /// <summary>The enemy of the faction at the point: a unit first, then a building. None if there is no enemy there.</summary>
@@ -136,7 +175,7 @@ namespace BarracksAndBolts.Gameplay.Combat
                 unit.TakeDamage(amount);
                 if (unit.IsDead)
                     _pendingDeaths.Add(targetId);
-                else if (!unit.HasAttackTarget && !unit.IsMoving)
+                else if (attackerId.IsValid && !unit.HasAttackTarget && !unit.IsMoving)
                     unit.SpotEnemy(attackerId);
             }
             else if (_buildings.TryGet(targetId, out var building))
@@ -154,6 +193,65 @@ namespace BarracksAndBolts.Gameplay.Combat
             }
 
             _eventBus.Publish(new EntityDamagedEvent(targetId));
+        }
+
+        /// <summary>Damage that lands later: after the swing, or when an arrow arrives. With no delay it lands at once.</summary>
+        /// <param name="releaseDelay">Time until the blow is struck or the arrow leaves. An attacker gone by then cancels it.</param>
+        /// <param name="totalDelay">Time until the damage lands; the flight comes after the release.</param>
+        public void ScheduleHit(GameEntityId targetId, int damage, GameEntityId attackerId, float releaseDelay, float totalDelay)
+        {
+            if (totalDelay <= 0f)
+            {
+                ApplyDamage(targetId, damage, attackerId);
+                return;
+            }
+
+            _scheduledHits.Add(new ScheduledHit
+            {
+                Target = targetId,
+                Attacker = attackerId,
+                Damage = damage,
+                ReleaseLeft = releaseDelay,
+                TimeLeft = totalDelay
+            });
+        }
+
+        /// <summary>Moves scheduled hits on and lands the ones that are due.</summary>
+        public void TickScheduledHits(float deltaTime)
+        {
+            // Backwards, so landed hits can be removed on the way.
+            for (var i = _scheduledHits.Count - 1; i >= 0; i--)
+            {
+                var hit = _scheduledHits[i];
+                if (hit.ReleaseLeft > 0f)
+                {
+                    hit.ReleaseLeft -= deltaTime;
+                    if (!IsAttackerAlive(hit.Attacker))
+                    {
+                        _scheduledHits.RemoveAt(i);
+                        continue;
+                    }
+                }
+
+                hit.TimeLeft -= deltaTime;
+                if (hit.TimeLeft > 0f)
+                {
+                    _scheduledHits[i] = hit;
+                    continue;
+                }
+
+                _scheduledHits.RemoveAt(i);
+                ApplyDamage(hit.Target, hit.Damage, hit.Attacker);
+            }
+        }
+
+        // Buildings shoot too; a tower that falls still lets its last arrow land.
+        private bool IsAttackerAlive(GameEntityId attackerId)
+        {
+            if (_units.TryGet(attackerId, out var unit))
+                return !unit.IsDead;
+
+            return _buildings.TryGet(attackerId, out var building) && !building.IsDead;
         }
 
         /// <summary>Removes everything that died since the last call.</summary>

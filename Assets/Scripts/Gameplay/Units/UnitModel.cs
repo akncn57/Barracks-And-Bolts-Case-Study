@@ -65,6 +65,9 @@ namespace BarracksAndBolts.Gameplay.Units
         /// <summary>Hammering at a building site right now.</summary>
         public bool IsBuilding { get; private set; }
 
+        /// <summary>Standing inside a farm's fence. It draws over the field instead of behind it.</summary>
+        public bool IsInField { get; private set; }
+
         /// <summary>The unit has a job to go back to, even if it isn't working this very moment.</summary>
         public bool IsOnJob { get; private set; }
 
@@ -115,6 +118,11 @@ namespace BarracksAndBolts.Gameplay.Units
         public void SetOnJob(bool isOnJob)
         {
             IsOnJob = isOnJob;
+        }
+
+        public void SetInField(bool isInField)
+        {
+            IsInField = isInField;
         }
 
         /// <summary>Puts the unit down at the point, with no walking.</summary>

@@ -1,4 +1,5 @@
 using BarracksAndBolts.Core.Events;
+using BarracksAndBolts.Core.Simulation;
 using BarracksAndBolts.Utils.Disposables;
 using UnityEngine;
 using UnityEngine.Pool;
@@ -16,10 +17,12 @@ namespace BarracksAndBolts.Gameplay.Combat
 
         private readonly CompositeDisposable _subscriptions = new();
         private ObjectPool<ProjectileView> _pool;
+        private GameClock _clock;
 
         [Inject]
-        private void Construct(IEventBus eventBus)
+        private void Construct(IEventBus eventBus, GameClock clock)
         {
+            _clock = clock;
             eventBus.Subscribe<UnitAttackedEvent>(OnUnitAttacked).AddTo(_subscriptions);
             eventBus.Subscribe<BuildingFiredEvent>(OnBuildingFired).AddTo(_subscriptions);
         }
@@ -44,12 +47,13 @@ namespace BarracksAndBolts.Gameplay.Combat
             if (!attackedEvent.Attacker.Definition.IsRanged)
                 return;
 
-            _pool.Get().Launch(attackedEvent.Attacker.Position + MuzzleOffset, attackedEvent.AimPoint, _pool.Release);
+            _pool.Get().Launch(attackedEvent.Attacker.Position + MuzzleOffset, attackedEvent.AimPoint, _clock,
+                attackedEvent.ReleaseDelay, attackedEvent.FlightTime, _pool.Release);
         }
 
         private void OnBuildingFired(BuildingFiredEvent firedEvent)
         {
-            _pool.Get().Launch(firedEvent.Muzzle, firedEvent.AimPoint, _pool.Release);
+            _pool.Get().Launch(firedEvent.Muzzle, firedEvent.AimPoint, _clock, firedEvent.ReleaseDelay, firedEvent.FlightTime, _pool.Release);
         }
     }
 }

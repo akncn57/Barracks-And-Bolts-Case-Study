@@ -61,7 +61,7 @@ namespace BarracksAndBolts.Gameplay.Buildings
             var opensTerritory = _territory.IsEnabled && building.Faction == Faction.Player;
             var sprite = colorSet.GetBuildingSprite(definition);
             var siteSprite = building.IsBuilt ? sprite : colorSet.GetBuildingSiteSprite(definition);
-            view.Bind(building, sprite, siteSprite, _gridMap.AreaToWorldBottomCenter(building.Area), opensTerritory);
+            view.Bind(building, sprite, siteSprite, _gridMap.AreaToWorldBottomCenter(building.Area), opensTerritory, colorSet.RallyFlag);
             _views.Add(building.Id, view);
 
             // A site gets its defender when it is finished.

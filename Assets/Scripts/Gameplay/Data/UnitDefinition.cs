@@ -26,6 +26,10 @@ namespace BarracksAndBolts.Gameplay.Data
         [Tooltip("Cells per second.")]
         [SerializeField, Min(0.1f)] private float moveSpeed = 2.5f;
         [SerializeField, Min(0)] private int populationCost = 1;
+        [Tooltip("Seconds from the start of the attack animation to the frame where the blow lands or the arrow leaves.")]
+        [SerializeField, Min(0f)] private float hitDelay;
+        [Tooltip("Arrow speed in cells per second. 0 means the hit lands at once, with no flight.")]
+        [SerializeField, Min(0f)] private float projectileSpeed;
         [Tooltip("Price in a normal game. Sandbox mode ignores it.")]
         [SerializeField] private ResourceCost[] cost = Array.Empty<ResourceCost>();
         [Tooltip("Can collect resources from the map.")]
@@ -44,6 +48,14 @@ namespace BarracksAndBolts.Gameplay.Data
 
         public float MoveSpeed => moveSpeed;
         public int PopulationCost => populationCost;
+        public float HitDelay => hitDelay;
+        public float ProjectileSpeed => projectileSpeed;
+
+        /// <summary>Seconds an arrow of this unit flies over the distance. 0 for units that don't shoot, or shoot instantly.</summary>
+        public float GetFlightTime(float distance)
+        {
+            return IsRanged && projectileSpeed > 0f ? distance / projectileSpeed : 0f;
+        }
         public IReadOnlyList<ResourceCost> Cost => cost;
         public bool CanGather => canGather;
 

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using BarracksAndBolts.Gameplay.Data;
 using BarracksAndBolts.Gameplay.Economy;
@@ -29,6 +30,9 @@ namespace BarracksAndBolts.Gameplay.Buildings.Production
         private readonly UnitService _units;
         private readonly ResourceService _resources;
         private readonly PopulationService _population;
+
+        /// <summary>A unit was made at the building. Raised after it stands on the map.</summary>
+        public event Action<UnitModel, BuildingModel> UnitProduced;
 
         public UnitProductionService(UnitService units, ResourceService resources, PopulationService population)
         {
@@ -70,6 +74,7 @@ namespace BarracksAndBolts.Gameplay.Buildings.Production
                 return false;
 
             _resources.TrySpend(unit.Cost);
+            UnitProduced?.Invoke(produced, building);
             return true;
         }
 

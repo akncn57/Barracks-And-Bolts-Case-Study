@@ -46,6 +46,14 @@ namespace BarracksAndBolts.Gameplay.Data
         [Tooltip("Seconds between shots.")]
         [SerializeField, Min(0.1f)] private float defenseCooldown = 1f;
 
+        [Header("Farm")]
+        [Tooltip("Food a villager brings in per harvest. 0 for buildings that aren't farms.")]
+        [SerializeField, Min(0)] private int farmYield;
+        [Tooltip("Seconds of work for one harvest.")]
+        [SerializeField, Min(0.1f)] private float farmHarvestDuration = 6f;
+        [Tooltip("How many villagers can work the farm at once.")]
+        [SerializeField, Min(1)] private int farmWorkers = 1;
+
         [Header("Territory")]
         [Tooltip("The player can build this far around the building in a normal game, in cells from the middle of the footprint. 0 for none.")]
         [SerializeField, Min(0f)] private float territoryRadius;
@@ -71,6 +79,9 @@ namespace BarracksAndBolts.Gameplay.Data
         public float DefenseRange => defenseRange;
         public int DefenseDamage => defenseDamage;
         public float DefenseCooldown => defenseCooldown;
+        public int FarmYield => farmYield;
+        public float FarmHarvestDuration => farmHarvestDuration;
+        public int FarmWorkers => farmWorkers;
         public float TerritoryRadius => territoryRadius;
         public bool IsNormalModeOnly => isNormalModeOnly;
 

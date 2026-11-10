@@ -48,6 +48,22 @@ namespace BarracksAndBolts.Gameplay.Economy
             return true;
         }
 
+        /// <summary>Takes as much as there is, up to the amount. In sandbox mode the whole amount is always there.</summary>
+        /// <returns>How much was taken.</returns>
+        public int TakeUpTo(ResourceKind kind, int amount)
+        {
+            if (IsUnlimited)
+                return amount;
+
+            var taken = Math.Min(Math.Max(amount, 0), Get(kind));
+            if (taken <= 0)
+                return 0;
+
+            _amounts[(int)kind] -= taken;
+            _eventBus.Publish(new ResourcesChangedEvent());
+            return taken;
+        }
+
         /// <returns>False if the player can't afford it; nothing is taken then.</returns>
         public bool TrySpend(IReadOnlyList<ResourceCost> cost)
         {

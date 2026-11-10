@@ -151,8 +151,9 @@ Bu değerler ScriptableObject üzerinden ayarlanabilir olacak, ileride değişti
 - Yemek tekrar gelince HP kaybı durur.
 - Açlık nüfusu 0'a düşürebilir. Kaybetme koşulu için "Takvim ve Dalgalar" bölümüne bakın.
 - UI'da yemek yetersizse uyarı gösterilir.
+- **Şu anki hali:** Değerler zorluğa göre (`Data_Config_NormalMode` > Hunger): Kolay günde birim başına 1 yemek ve 15 saniyede 1 HP, Normal 2 ve 10 sn, Zor 4 ve 5 sn. İlk sabah yemek yenmez. Yetmeyen yemek borç olur, gelen yemek önce borcu öder ve kayıp durur. Ana menüde zorluk seçimi olmadığı için oyun Normal ile başlıyor.
 
-> **Şu anki hali:** Düşmanlar kıyıdan çıkıyor. Sonraki baskınlar daha kalabalık ve daha çok şövalyeli; can ve hasar çarpanı yok, PDF değerleri korunuyor. Yemek tüketimi ve açlık, zorluk seçimi, sonsuz mod, ses ve mini harita yapılmadı.
+> **Şu anki hali:** Düşmanlar kıyıdan çıkıyor. Sonraki baskınlar daha kalabalık ve daha çok şövalyeli; can ve hasar çarpanı yok, PDF değerleri korunuyor. Zorluk seçimi, sonsuz mod, ses ve mini harita yapılmadı.
 
 ### Düşman AI
 - Düşmanlar baskın başladığında haritanın kenarındaki spawn noktalarında dalgalar halinde belirir.
@@ -209,7 +210,7 @@ Bu değerler ScriptableObject üzerinden ayarlanabilir olacak, ileride değişti
 - Her üretim binasının (Castle, Barracks, Kilise) bir spawn point'i vardır.
 - Spawn hücresi doluysa ya da kapalıysa birim en yakın boş hücrede doğar.
 - Üzerinde birim duran alana bina konamaz; önizlemede o hücreler kırmızı görünür.
-- Bina seçiliyken sağ tıklanırsa bir toplanma noktası (rally point) belirlenir. Yeni doğan birimler oraya kendiliğinden yürür.
+- Bina seçiliyken sağ tıklanırsa bir toplanma noktası (rally point) belirlenir. Yeni doğan birimler oraya kendiliğinden yürür. **Şu anki hali:** Yapıldı. Nokta bir kaynağın ya da düşmanın üstündeyse yeni birim sağ tıktaki gibi davranır (köylü toplar, asker saldırır). Bina seçiliyken noktada takım renginde bayrak durur.
 
 ### Köylü Kaçışı
 > **Şu anki hali:** Köylü baskında işine devam ediyor, düşman 7 hücre yaklaşınca Castle'a koşup içeri giriyor. Taşıdığı yük o an sayılıyor. Haritada düşman kalmayınca çıkıp işine dönüyor. Oyuncunun verdiği emir 10 saniye kaçıştan önce geliyor. House'a sığınma ve bina kapasitesi yok; Castle yıkılınca oyun bittiği için içeridekilerin çıkması da gerekmiyor.

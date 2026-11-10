@@ -65,7 +65,8 @@ namespace BarracksAndBolts.Tests.EditMode.Gameplay
             var gathering = new GatheringSystem(_units, _movement, _nodes, _buildings, TestDefinitions.CreateFreeResources(_eventBus), search, _map,
                 Track(ScriptableObject.CreateInstance<NormalModeSettings>()), _eventBus);
             _commands = new UnitCommandService(_units, _movement, new CombatService(_units, _buildings, _map, _eventBus), search, _map,
-                gathering, _construction, _buildings, _nodes, _eventBus);
+                gathering, _construction, new FarmingSystem(_units, _movement, _buildings, TestDefinitions.CreateFreeResources(_eventBus), search, _map, _eventBus),
+                _buildings, _nodes, _eventBus);
 
             _villager = Track(TestDefinitions.CreateUnit("villager"));
             SetValue(_villager, "canGather", true);
@@ -218,6 +219,19 @@ namespace BarracksAndBolts.Tests.EditMode.Gameplay
 
             site.AddBuildProgress(0.5f);
             Assert.AreEqual(1f, site.BuildProgress, "Nothing more to do.");
+        }
+
+        [Test]
+        public void Model_ManyUnevenFrames_EndAtFullHp()
+        {
+            var site = PlaceSite(10, 10);
+            var random = new System.Random(5);
+
+            // Frame times as they come in play: a little different each frame.
+            while (!site.IsBuilt)
+                site.AddBuildProgress((0.005f + (float)random.NextDouble() * 0.035f) / 15f);
+
+            Assert.AreEqual(100, site.CurrentHp, "Float rounding must not cost the last HP.");
         }
 
         // ---- Building

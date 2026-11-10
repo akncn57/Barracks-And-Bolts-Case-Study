@@ -1,6 +1,6 @@
 # Barracks & Bolts – Öncelik ve Takvim
 
-> **Durum (9 Kasım):** P0 ve P0+ bitti, sadece README kaldı. P1 oyun döngüsü kuruldu ve oynandı: kaynaklar, köylüler, maliyet, nüfus, takvim, baskınlar, düşman AI, sığınma, oyun sonu. P2'den kule, bölge sistemi (Karakol, kapsama halkaları) ve köylünün inşaatı yapıldı; kaynakta ve inşaatta araç imleci var. SetPass 10 (son özelliklerden önce ölçüldü), Windows build 8 Kasım'da denendi. **Sıradaki adım:** Tarla (kullanıcı onayıyla), sonra denge, Test Runner sonucu, yeni build, README en son. Efekt turunda yapılacak: vuruş zamanlaması ve ölüm efekti.
+> **Durum (10 Kasım):** P0 ve P0+ bitti, sadece README kaldı. P1 oyun döngüsü kuruldu ve oynandı. P2'den kule, bölge sistemi, köylünün inşaatı, tam Sandbox, toplanma noktası ve açlık yapıldı; P3'ten tarla ve efekt turu (vuruş karesi, ölüm ve yıkılma efekti, can barları). SetPass 10 (son özelliklerden önce ölçüldü), Windows build 8 Kasım'da denendi. **Sıradaki adım:** Test Runner sonucu, SetPass ölçümü, yeni build, denge, README en son.
 > Sistemlerin kodda nasıl çalıştığı: [Systems.md](Systems.md)
 
 > **Teslim tarihi:** 13 Kasım 2026, Cuma
@@ -61,7 +61,7 @@ Oyunu deneyince çıkan kullanılabilirlik istekleri. Sandbox'ta da olmalı, bui
 - [x] Dalga sistemi ve baskın bildirimleri (ses ve mini harita yok; yön yazıyla söyleniyor)
 - [x] Kazanma ve kaybetme koşulları ve oyun sonu ekranı
 - [ ] Oyun döngüsünün dengesi (süreler, maliyetler, dalga büyüklükleri)
-- [ ] Test Runner sonucu (459 test) ve son SetPass ölçümü
+- [ ] Test Runner sonucu (479 test) ve son SetPass ölçümü
 
 ## P2 – Derinlik (zaman kaldıkça, aşağıdaki sırayla)
 **Hedef: 12 Kasım Perşembe.**
@@ -73,10 +73,10 @@ Oyunu deneyince çıkan kullanılabilirlik istekleri. Sandbox'ta da olmalı, bui
 5. [ ] Kilise ve Monk (kendiliğinden iyileştirme)
 6. [x] Köylünün inşa etmesi: Normal modda bina gri inşaat alanı olarak konur, köylüler bitirir, üstünde ilerleme çubuğu var. Kaynakta ve inşaatta araç imleci. (Tamir ve iptal sonra)
 7. [ ] Depo binaları ve kapasite sistemi
-8. [ ] Açlık
+8. [x] Açlık: her sabah birim başına yemek, yetmezse yavaş HP kaybı; değerler zorluğa göre (menüde zorluk seçimi henüz yok)
 9. [x] Bölge sistemi ve Karakol (yarıçap yükseltmesi, yükseltme sistemiyle gelecek). Seçili binada menzil ve bölge halkası
 10. [ ] Köylülerin House'a da sığınması ve bina başına sığınma kapasitesi (Castle'a sığınma yapıldı)
-11. [ ] Toplanma noktası (rally point)
+11. [x] Toplanma noktası (rally point): üretim binası seçiliyken sağ tık, yeni birimler oraya sağ tık emriyle gider
 12. [x] Tam Creative Sandbox: bina, birim ve kaynak sekmeleri, Delete ile silme, zaman kontrolü, Enemy AI ve Debug (grid + A* yolu) düğmeleri. Baskını elle başlatma yok
 
 ## P3 – Cila (yetişirse; yetişmezse README'de "Gelecek Planları" olarak listelenir)
@@ -87,9 +87,10 @@ Oyunu deneyince çıkan kullanılabilirlik istekleri. Sandbox'ta da olmalı, bui
 - [ ] Ses ve müzik
 - [ ] Tutorial
 - [ ] Kontrol grupları, AttackMove, HoldPosition (oyun hızı ve duraklatma yapıldı, iki modda da)
-- [ ] Tarla (asset hazır, kuralları onay bekliyor; sıradaki iş)
+- [x] Tarla: 3x3, 40 odun, bir köylü, bitmez, 6 saniyede 5 yemek
 - [ ] Düşman yerleşkeleri
-- [ ] Efekt turu: vuruşun animasyon karesine alınması, ölüm ve yıkılma efekti, dünya üzerinde can barı
+- [x] Efekt turu: vuruş animasyon karesinde, ok varınca hasar, ölüm ve yıkılma efekti, can barları (hasarlı ya da seçiliyken)
+- [ ] Ana menüde zorluk seçimi (açlık hazır, dalgalar ve başlangıç kaynağı da bağlanacak)
 
 ## Teslim Öncesi
 - [ ] Sahne ayırıcıları: `----- CAMERAS-----` adı ve `----- WORLD -----`'ın yeri

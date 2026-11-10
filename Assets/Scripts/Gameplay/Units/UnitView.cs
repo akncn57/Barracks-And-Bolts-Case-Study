@@ -5,6 +5,7 @@ using BarracksAndBolts.Gameplay.Data;
 using BarracksAndBolts.Gameplay.Entities;
 using BarracksAndBolts.Gameplay.Teams;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 namespace BarracksAndBolts.Gameplay.Units
 {
@@ -24,11 +25,22 @@ namespace BarracksAndBolts.Gameplay.Units
         [SerializeField] private SpriteRenderer spriteRenderer;
         [SerializeField, Min(1f)] private float framesPerSecond = 10f;
 
+        [Tooltip("The root Sorting Group. Inside a farm the feet are above the farm's bottom edge, so by height alone the crops would cover the villager.")]
+        [SerializeField] private SortingGroup sortingGroup;
+        [SerializeField] private int inFieldSortingOrder = 1;
+
         [Header("Selection")]
         [Tooltip("Ring under the feet. Hidden until the unit is selected.")]
         [SerializeField] private SpriteRenderer selectionMarker;
         [SerializeField] private Color playerMarkerColor = Color.green;
         [SerializeField] private Color enemyMarkerColor = Color.red;
+
+        [Header("Health")]
+        [Tooltip("Hidden child shown while the unit is hurt or selected.")]
+        [SerializeField] private HealthBarView healthBar;
+        [SerializeField] private float healthBarWidth = 0.75f;
+        [Tooltip("Middle of the bar, in world units above the feet. Under the status icon.")]
+        [SerializeField] private float healthBarHeight = 1.45f;
 
         [Header("Status icon")]
         [Tooltip("Over the head of the unit. Hidden when there is nothing to tell.")]
@@ -48,6 +60,7 @@ namespace BarracksAndBolts.Gameplay.Units
         private float _attackStartedAt = -1f;
         private bool _isPlayerVillager;
         private bool _isPlayerSoldier;
+        private bool _isSelected;
         private Vector3 _iconRestPosition;
 
         public GameEntityId UnitId => _unit.Id;
@@ -61,6 +74,7 @@ namespace BarracksAndBolts.Gameplay.Units
             name = $"{unit.Definition.DisplayName} ({unit.Id})";
 
             selectionMarker.color = unit.Faction == Faction.Player ? playerMarkerColor : enemyMarkerColor;
+            healthBar.Layout(healthBarWidth, healthBarHeight, unit.Faction == Faction.Player);
             SetSelected(false);
 
             _isPlayerVillager = unit.Faction == Faction.Player && unit.Definition.CanGather;
@@ -71,6 +85,7 @@ namespace BarracksAndBolts.Gameplay.Units
 
         public void SetSelected(bool isSelected)
         {
+            _isSelected = isSelected;
             selectionMarker.enabled = isSelected;
         }
 
@@ -92,7 +107,12 @@ namespace BarracksAndBolts.Gameplay.Units
 
             transform.position = _unit.Position;
             spriteRenderer.flipX = _unit.IsFacingLeft;
+            var sortingOrder = _unit.IsInField ? inFieldSortingOrder : 0;
+            if (sortingGroup.sortingOrder != sortingOrder)
+                sortingGroup.sortingOrder = sortingOrder;
+
             _damageFlash.Update(spriteRenderer, Time.deltaTime, Color.white);
+            UpdateHealthBar();
             UpdateStatusIcon();
 
             if (TryShowAttackFrame())
@@ -104,6 +124,15 @@ namespace BarracksAndBolts.Gameplay.Units
                 ShowLoopingFrame(_sprites.GetWorkFrames(_unit.HarvestingKind.Value));
             else
                 ShowLoopingFrame(_unit.IsMoving ? _sprites.RunFrames : _sprites.IdleFrames);
+        }
+
+        private void UpdateHealthBar()
+        {
+            var maxHp = _unit.Definition.MaxHp;
+            if (_isSelected || _unit.CurrentHp < maxHp)
+                healthBar.Show((float)_unit.CurrentHp / maxHp);
+            else
+                healthBar.Hide();
         }
 
         private void UpdateStatusIcon()

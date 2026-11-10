@@ -19,8 +19,15 @@ namespace BarracksAndBolts.Gameplay.Hover
                 return kind == ResourceKind.Stone || kind == ResourceKind.Gold ? ToolCursor.Pickaxe : ToolCursor.Axe;
             }
 
-            if (building != null && building.Faction == Faction.Player && !building.IsBuilt && !building.IsDead)
+            if (building == null || building.Faction != Faction.Player || building.IsDead)
+                return ToolCursor.None;
+
+            if (!building.IsBuilt)
                 return ToolCursor.Hammer;
+
+            // A finished farm is worked like sheep and trees.
+            if (building.Definition.FarmYield > 0)
+                return ToolCursor.Axe;
 
             return ToolCursor.None;
         }

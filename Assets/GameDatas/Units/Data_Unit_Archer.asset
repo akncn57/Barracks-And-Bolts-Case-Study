@@ -20,6 +20,8 @@ MonoBehaviour:
   attackRange: 5
   attackCooldown: 1
   moveSpeed: 2.5
+  hitDelay: 0.5
+  projectileSpeed: 12
   populationCost: 1
   cost:
   - kind: 2

@@ -33,6 +33,9 @@ namespace BarracksAndBolts.UI.Tooltips
             if (isNormalMode && building.TerritoryRadius > 0f)
                 text.Append(FormattableString.Invariant($"\nTerritory: {building.TerritoryRadius:0.#}"));
 
+            if (building.FarmYield > 0)
+                text.Append(FormattableString.Invariant($"\nFood: {building.FarmYield} every {building.FarmHarvestDuration:0.#}s, {building.FarmWorkers} worker(s)"));
+
             if (isNormalMode && building.BuildTime > 0f)
                 text.Append(FormattableString.Invariant($"\nBuild time: {building.BuildTime:0.#}s"));
 

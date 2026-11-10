@@ -23,22 +23,28 @@ namespace BarracksAndBolts.UI.Hud
         [SerializeField] private TMP_Text foodLabel;
         [SerializeField] private TMP_Text goldLabel;
         [SerializeField] private TMP_Text populationLabel;
+        [Tooltip("Food amount while the people are starving.")]
+        [SerializeField] private Color starvingColor = new(1f, 0.35f, 0.3f, 1f);
 
         private readonly CompositeDisposable _subscriptions = new();
         private ResourceService _resources;
         private PopulationService _population;
+        private HungerSystem _hunger;
         private IEventBus _eventBus;
+        private Color _foodColor;
 
         [Inject]
-        private void Construct(ResourceService resources, PopulationService population, IEventBus eventBus)
+        private void Construct(ResourceService resources, PopulationService population, HungerSystem hunger, IEventBus eventBus)
         {
             _resources = resources;
             _population = population;
+            _hunger = hunger;
             _eventBus = eventBus;
         }
 
         private void Start()
         {
+            _foodColor = foodLabel.color;
             if (_resources.IsUnlimited)
             {
                 woodLabel.text = InfiniteAmount;
@@ -54,6 +60,10 @@ namespace BarracksAndBolts.UI.Hud
             _eventBus.Subscribe<UnitDiedEvent>(_ => ShowPopulation()).AddTo(_subscriptions);
             _eventBus.Subscribe<BuildingPlacedEvent>(_ => ShowPopulation()).AddTo(_subscriptions);
             _eventBus.Subscribe<BuildingDestroyedEvent>(_ => ShowPopulation()).AddTo(_subscriptions);
+
+            // A house adds room only once it is finished.
+            _eventBus.Subscribe<BuildingCompletedEvent>(_ => ShowPopulation()).AddTo(_subscriptions);
+            _eventBus.Subscribe<HungerChangedEvent>(_ => ShowHunger()).AddTo(_subscriptions);
             ShowResources();
             ShowPopulation();
         }
@@ -69,6 +79,11 @@ namespace BarracksAndBolts.UI.Hud
             stoneLabel.text = _resources.Get(ResourceKind.Stone).ToString();
             foodLabel.text = _resources.Get(ResourceKind.Food).ToString();
             goldLabel.text = _resources.Get(ResourceKind.Gold).ToString();
+        }
+
+        private void ShowHunger()
+        {
+            foodLabel.color = _hunger.IsStarving ? starvingColor : _foodColor;
         }
 
         private void ShowPopulation()

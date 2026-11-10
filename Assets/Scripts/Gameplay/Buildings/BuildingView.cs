@@ -2,6 +2,7 @@ using BarracksAndBolts.Core.Simulation;
 using BarracksAndBolts.Gameplay.Combat;
 using BarracksAndBolts.Gameplay.Data;
 using BarracksAndBolts.Gameplay.Entities;
+using BarracksAndBolts.Gameplay.Teams;
 using UnityEngine;
 
 namespace BarracksAndBolts.Gameplay.Buildings
@@ -19,6 +20,17 @@ namespace BarracksAndBolts.Gameplay.Buildings
         [SerializeField] private CoverageRingView defenseRing;
         [SerializeField] private CoverageRingView territoryRing;
 
+        [Header("Rally point")]
+        [Tooltip("Shown at the rally point while the building is selected. It has its own Sorting Group, so it sorts where it stands.")]
+        [SerializeField] private SpriteRenderer rallyFlag;
+        [Tooltip("The flag's pole stands this far from the sprite's middle, so the pole's foot marks the point.")]
+        [SerializeField] private Vector2 rallyFlagPoleOffset = new(0.25f, 0.7f);
+
+        [Header("Health")]
+        [Tooltip("Hidden child shown while the finished building is hurt or selected.")]
+        [SerializeField] private HealthBarView healthBar;
+        [SerializeField] private float healthBarGapAboveRoof = 0.3f;
+
         [Header("Building site")]
         [Tooltip("Hidden child that shows how far the work has come.")]
         [SerializeField] private BuildProgressBarView progressBar;
@@ -34,13 +46,16 @@ namespace BarracksAndBolts.Gameplay.Buildings
         private Sprite _siteSprite;
         private Vector2 _footprintCenter;
         private bool _opensTerritory;
+        private bool _isSelected;
 
         public GameEntityId BuildingId { get; private set; }
 
         /// <param name="siteSprite">Grey look while the building is a site.</param>
         /// <param name="opensTerritory">False in sandbox mode and for the enemy, who have no territory to show.</param>
-        public void Bind(BuildingModel building, Sprite sprite, Sprite siteSprite, Vector2 position, bool opensTerritory)
+        public void Bind(BuildingModel building, Sprite sprite, Sprite siteSprite, Vector2 position, bool opensTerritory, Sprite rallyFlagSprite = null)
         {
+            rallyFlag.sprite = rallyFlagSprite;
+            rallyFlag.gameObject.SetActive(false);
             BuildingId = building.Id;
             name = $"{building.Definition.DisplayName} ({building.Id})";
             transform.position = position;
@@ -50,6 +65,9 @@ namespace BarracksAndBolts.Gameplay.Buildings
             _sprite = sprite;
             _siteSprite = siteSprite;
 
+            // Same width as the build progress bar, in the same place: a site shows that one instead.
+            var barWidth = Mathf.Clamp(building.Area.width * 0.75f, 1f, 2f);
+            healthBar.Layout(barWidth, _definition.VisualHeight + healthBarGapAboveRoof, building.Faction == Faction.Player);
             if (!building.IsBuilt)
                 progressBar.Show(building.Area.width, _definition.VisualHeight);
 
@@ -61,6 +79,7 @@ namespace BarracksAndBolts.Gameplay.Buildings
 
         public void SetSelected(bool isSelected)
         {
+            _isSelected = isSelected;
             SetRing(defenseRing, isSelected && _definition.HasDefense, _definition.DefenseRange);
             SetRing(territoryRing, isSelected && _opensTerritory, _definition.TerritoryRadius);
         }
@@ -96,12 +115,33 @@ namespace BarracksAndBolts.Gameplay.Buildings
             UpdateLook();
         }
 
+        private void UpdateRallyFlag()
+        {
+            var isShown = _isSelected && _building.RallyPoint.HasValue && rallyFlag.sprite != null;
+            if (rallyFlag.gameObject.activeSelf != isShown)
+                rallyFlag.gameObject.SetActive(isShown);
+
+            if (isShown)
+                rallyFlag.transform.position = _building.RallyPoint.Value + rallyFlagPoleOffset;
+        }
+
+        private void UpdateHealthBar()
+        {
+            var maxHp = _definition.MaxHp;
+            if (_building.IsBuilt && (_isSelected || _building.CurrentHp < maxHp))
+                healthBar.Show((float)_building.CurrentHp / maxHp);
+            else
+                healthBar.Hide();
+        }
+
         private void UpdateLook()
         {
             var shownSprite = _building.IsBuilt ? _sprite : _siteSprite;
             if (spriteRenderer.sprite != shownSprite)
                 BuildingSpriteLayout.PlaceOnFootprint(spriteRenderer, shownSprite);
 
+            UpdateHealthBar();
+            UpdateRallyFlag();
             if (progressBar.isActiveAndEnabled)
             {
                 if (_building.IsBuilt)

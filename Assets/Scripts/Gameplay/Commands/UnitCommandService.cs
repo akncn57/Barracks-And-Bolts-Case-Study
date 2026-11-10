@@ -5,6 +5,7 @@ using BarracksAndBolts.Gameplay.Buildings;
 using BarracksAndBolts.Gameplay.Combat;
 using BarracksAndBolts.Gameplay.Construction;
 using BarracksAndBolts.Gameplay.Entities;
+using BarracksAndBolts.Gameplay.Feedback;
 using BarracksAndBolts.Gameplay.Gathering;
 using BarracksAndBolts.Gameplay.Grid;
 using BarracksAndBolts.Gameplay.Pathfinding;
@@ -25,6 +26,7 @@ namespace BarracksAndBolts.Gameplay.Commands
         private readonly GridMap _gridMap;
         private readonly GatheringSystem _gathering;
         private readonly ConstructionSystem _construction;
+        private readonly FarmingSystem _farming;
         private readonly BuildingService _buildings;
         private readonly ResourceNodeService _nodes;
         private readonly IEventBus _eventBus;
@@ -38,7 +40,8 @@ namespace BarracksAndBolts.Gameplay.Commands
         private readonly Predicate<Vector2Int> _isDestinationFree;
 
         public UnitCommandService(UnitService units, UnitMovementSystem movement, CombatService combat, GridSearch gridSearch, GridMap gridMap,
-            GatheringSystem gathering, ConstructionSystem construction, BuildingService buildings, ResourceNodeService nodes, IEventBus eventBus)
+            GatheringSystem gathering, ConstructionSystem construction, FarmingSystem farming, BuildingService buildings, ResourceNodeService nodes,
+            IEventBus eventBus)
         {
             _units = units;
             _movement = movement;
@@ -47,6 +50,7 @@ namespace BarracksAndBolts.Gameplay.Commands
             _gridMap = gridMap;
             _gathering = gathering;
             _construction = construction;
+            _farming = farming;
             _buildings = buildings;
             _nodes = nodes;
             _eventBus = eventBus;
@@ -61,8 +65,14 @@ namespace BarracksAndBolts.Gameplay.Commands
             if (enemy.IsValid)
                 return Attack(ids, enemy, worldPosition);
 
-            if (_buildings.TryGet(_buildings.GetBuildingAt(worldPosition), out var building) && building.Faction == Faction.Player && !building.IsBuilt)
-                return Build(ids, building, worldPosition);
+            if (_buildings.TryGet(_buildings.GetBuildingAt(worldPosition), out var building) && building.Faction == Faction.Player)
+            {
+                if (!building.IsBuilt)
+                    return Build(ids, building, worldPosition);
+
+                if (FarmingSystem.IsFarm(building))
+                    return Farm(ids, building, worldPosition);
+            }
 
             var node = _nodes.GetNodeAt(worldPosition);
             return node != null ? Gather(ids, node, worldPosition) : MoveTo(ids, worldPosition);
@@ -79,6 +89,7 @@ namespace BarracksAndBolts.Gameplay.Commands
             foreach (var unit in _group)
             {
                 _construction.Cancel(unit.Id);
+                _farming.Cancel(unit.Id);
                 if (_gathering.TryOrder(unit, node))
                     hasGatherer = true;
                 else
@@ -105,6 +116,7 @@ namespace BarracksAndBolts.Gameplay.Commands
             foreach (var unit in _group)
             {
                 _gathering.Cancel(unit.Id);
+                _farming.Cancel(unit.Id);
                 if (_construction.TryOrder(unit, site))
                     hasBuilder = true;
                 else
@@ -118,6 +130,41 @@ namespace BarracksAndBolts.Gameplay.Commands
                 _eventBus.Publish(new MoveCommandIssuedEvent(worldPosition));
 
             return hasBuilder;
+        }
+
+        /// <summary>Villagers among the ids work the farm while it has room. Everyone else walks up to it.</summary>
+        /// <returns>False if the list holds no unit that can take the order.</returns>
+        public bool Farm(IReadOnlyList<GameEntityId> ids, BuildingModel farm, Vector2 worldPosition)
+        {
+            CollectGroup(ids);
+            AnnounceOrder();
+            _nonWorkers.Clear();
+            var hasFarmer = false;
+            var turnedAway = false;
+            foreach (var unit in _group)
+            {
+                _gathering.Cancel(unit.Id);
+                _construction.Cancel(unit.Id);
+                if (_farming.TryOrder(unit, farm))
+                {
+                    hasFarmer = true;
+                    continue;
+                }
+
+                turnedAway |= unit.Definition.CanGather;
+                _nonWorkers.Add(unit.Id);
+            }
+
+            if (turnedAway)
+                _eventBus.Publish(new FloatingTextRequestedEvent("The farm has all the workers it can take", worldPosition, FloatingTextKind.Warning));
+
+            if (_nonWorkers.Count > 0)
+                return MoveTo(_nonWorkers, worldPosition) || hasFarmer;
+
+            if (hasFarmer)
+                _eventBus.Publish(new MoveCommandIssuedEvent(worldPosition));
+
+            return hasFarmer;
         }
 
         /// <summary>Orders the player's units among the ids to attack the target. There is no friendly fire.</summary>
@@ -196,6 +243,7 @@ namespace BarracksAndBolts.Gameplay.Commands
         {
             _gathering.Cancel(unitId);
             _construction.Cancel(unitId);
+            _farming.Cancel(unitId);
         }
 
         private void AnnounceOrder()

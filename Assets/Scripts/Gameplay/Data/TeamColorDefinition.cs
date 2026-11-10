@@ -14,8 +14,11 @@ namespace BarracksAndBolts.Gameplay.Data
         [SerializeField] private TeamColor color;
         [SerializeField] private BuildingSprite[] buildingSprites = Array.Empty<BuildingSprite>();
         [SerializeField] private UnitSpriteSet[] unitSprites = Array.Empty<UnitSpriteSet>();
+        [Tooltip("Flag shown where units made in a building walk to.")]
+        [SerializeField] private Sprite rallyFlag;
 
         public TeamColor Color => color;
+        public Sprite RallyFlag => rallyFlag;
 
         /// <returns>The sprite, or null if this set has none for the building.</returns>
         public Sprite GetBuildingSprite(BuildingDefinition building)

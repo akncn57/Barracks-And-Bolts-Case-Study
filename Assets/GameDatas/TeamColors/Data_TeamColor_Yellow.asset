@@ -14,6 +14,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: BarracksAndBolts.Gameplay::BarracksAndBolts.Gameplay.Data.TeamColorDefinition
   color: 1
   buildingSprites:
+  - building: {fileID: 11400000, guid: f536558bd0e54dacb0896107f60672f1, type: 2}
+    sprite: {fileID: 21300000, guid: d299701d304c463cba43f8bd83edbd5e, type: 3}
+    siteSprite: {fileID: 21300000, guid: b9ada057ffab401e87cba6dede525abb, type: 3}
   - building: {fileID: 11400000, guid: 7203bca9a6fb4e1aabda4f97f03ce912, type: 2}
     sprite: {fileID: 21300000, guid: 4c72e0ad8c7c8c2448fe5c5dc1ef0db4, type: 3}
     siteSprite: {fileID: 21300000, guid: 69d26af008dc4140bf18aa0efea110a3, type: 3}
@@ -28,6 +31,7 @@ MonoBehaviour:
   - building: {fileID: 11400000, guid: a82d5c1f7e3946b0bd14f06c92e7a351, type: 2}
     sprite: {fileID: 21300000, guid: 616234ed193f4ecab05d7946e0277056, type: 3}
     siteSprite: {fileID: 21300000, guid: 4e5706561ae348dc92a7853ffd91ef91, type: 3}
+  rallyFlag: {fileID: 21300000, guid: 2380a9483c3549bcacf332de5e761286, type: 3}
   unitSprites:
   - unit: {fileID: 11400000, guid: 5ed1c31b43ef4510b9d5c8966a56d71a, type: 2}
     portrait: {fileID: -4216416322996058909, guid: 66e20241fe643c245bae33c16575631e, type: 3}

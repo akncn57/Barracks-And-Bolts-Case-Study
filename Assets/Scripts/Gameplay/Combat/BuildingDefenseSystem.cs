@@ -63,8 +63,12 @@ namespace BarracksAndBolts.Gameplay.Combat
 
             building.StartShotDelay(definition.DefenseCooldown);
             var muzzle = _gridMap.AreaToWorldBottomCenter(building.Area) + definition.DefenderPosition + MuzzleOffset;
-            _eventBus.Publish(new BuildingFiredEvent(building, muzzle, target.AimPoint));
-            _combat.ApplyDamage(building.DefenseTarget, definition.DefenseDamage, building.Id);
+
+            // The defender's own timing: the arrow leaves on its shooting frame and hits when it arrives.
+            var releaseDelay = definition.Defender != null ? definition.Defender.HitDelay : 0f;
+            var flightTime = definition.Defender != null ? definition.Defender.GetFlightTime(Vector2.Distance(muzzle, target.AimPoint)) : 0f;
+            _eventBus.Publish(new BuildingFiredEvent(building, muzzle, target.AimPoint, releaseDelay, flightTime));
+            _combat.ScheduleHit(building.DefenseTarget, definition.DefenseDamage, building.Id, releaseDelay, releaseDelay + flightTime);
         }
 
         private bool IsInRange(GameEntityId target, Vector2 center, float range)

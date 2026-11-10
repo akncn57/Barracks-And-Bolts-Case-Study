@@ -50,3 +50,4 @@ MonoBehaviour:
   autoInjectGameObjects: []
   gameDatabase: {fileID: 11400000, guid: fd8a994aac224eb885142892b37f5ff4, type: 2}
   debugOverlayPrefab: {fileID: 4201000000000000003, guid: 99d3d684e8164840aee3580903175878, type: 3}
+  effectSpawnerPrefab: {fileID: 7400000000000000003, guid: babc3cedce69477ebb996aedc7f70c82, type: 3}
