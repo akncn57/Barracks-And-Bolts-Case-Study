@@ -4,6 +4,7 @@ using BarracksAndBolts.Gameplay.Data;
 using BarracksAndBolts.Gameplay.Placement;
 using BarracksAndBolts.Gameplay.Sandbox;
 using BarracksAndBolts.Gameplay.Teams;
+using BarracksAndBolts.UI.Common;
 using BarracksAndBolts.UI.Scroll;
 using BarracksAndBolts.UI.Tooltips;
 using BarracksAndBolts.Utils.Disposables;
@@ -28,6 +29,8 @@ namespace BarracksAndBolts.UI.Production
         }
 
         [SerializeField] private RecyclingScrollView scrollView;
+        [Tooltip("The drawer this menu sits in. It slides away while something is placed, so the map is free.")]
+        [SerializeField] private SlideOutPanel drawer;
 
         [Header("Tabs (sandbox only)")]
         [SerializeField] private Button buildingsTab;
@@ -48,6 +51,7 @@ namespace BarracksAndBolts.UI.Production
         private IEventBus _eventBus;
         private TeamColorDefinition _colors;
         private Tab _tab;
+        private bool _reopensAfterPlacement;
         private readonly CompositeDisposable _subscriptions = new();
         private readonly List<BuildingDefinition> _buildings = new();
         private readonly List<UnitDefinition> _units = new();
@@ -69,6 +73,8 @@ namespace BarracksAndBolts.UI.Production
             CollectItems();
             SetUpTabs();
             _eventBus.Subscribe<SandboxFactionChangedEvent>(_ => ShowList()).AddTo(_subscriptions);
+            _eventBus.Subscribe<PlacementStartedEvent>(_ => OnPlacementStarted()).AddTo(_subscriptions);
+            _eventBus.Subscribe<PlacementEndedEvent>(_ => OnPlacementEnded()).AddTo(_subscriptions);
             ShowList();
         }
 
@@ -83,6 +89,25 @@ namespace BarracksAndBolts.UI.Production
 
             if (resourcesTab != null)
                 resourcesTab.onClick.RemoveListener(OnResourcesTabClicked);
+        }
+
+        private void OnPlacementStarted()
+        {
+            if (!drawer.IsOpen)
+                return;
+
+            drawer.Close();
+            _reopensAfterPlacement = true;
+        }
+
+        // Comes back only if placing closed it. A menu the player closed stays closed.
+        private void OnPlacementEnded()
+        {
+            if (!_reopensAfterPlacement)
+                return;
+
+            _reopensAfterPlacement = false;
+            drawer.Open();
         }
 
         private void CollectItems()

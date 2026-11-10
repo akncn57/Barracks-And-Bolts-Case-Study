@@ -38,7 +38,7 @@ Oyunu deneyince çıkan kullanılabilirlik istekleri. Sandbox'ta da olmalı, bui
 - [x] **Üzerine gelince bina adı:** Mouse binanın üstündeyken ekranda adı yazar, binada hover efekti olur
 - [x] **Information Panel boyutu:** Min-max arasında içeriğe göre boyutlanır. İçerik sığmazsa scroll olur, sağda sürüklenebilir scrollbar görünür. Üste anchor'landığı için geniş ekran taşması da çözüldü
 - [x] **Production Menu tooltip:** Hücrenin üstünde durunca bina bilgisi açılır (boyut, HP, ürettikleri). Maliyet satırı P1'de maliyetler gelince eklenir
-- [x] **Production Menu açılır kapanır:** Kapalı başlar, butona basınca soldan DOTween ile kayarak gelir. Haritayı kapatmasın diye
+- [x] **Production Menu açılır kapanır:** Kapalı başlar, butona basınca soldan DOTween ile kayarak gelir. Bir şey yerleştirilirken kenara çekilir, bitince geri gelir. Haritayı kapatmasın diye
 - [x] **Esc ve panel kapatma:** Esc her basışta en üstteki katmanı kapatır: yerleştirme, seçim, Production Menu. Information Panel'in köşesinde kapatma butonu var
 - [x] **Kaynak barı:** Ekranın üstünde odun, taş, yemek, altın ve nüfus. Sandbox'ta hepsi ∞. Üstteki UI barın altına indi
 - [x] **Harita:** 64x64 ada: su, köpük, düz zemin, üç plato, merdivenler. Askerler platoya sadece merdivenden çıkar; plato kenarına kadar bina konur. Ağaç ve kaynaklar P1'de

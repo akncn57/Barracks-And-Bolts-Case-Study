@@ -534,6 +534,7 @@ Haritada düşman kalmadı ─► Castle'ın yanında belirir ─► işine dön
 - `ProductionMenuView` binaları `GameDatabase` sırasıyla, aktif tarafın rengiyle gösterir; Normal modda Castle'ı, Sandbox'ta Karakolu gizler. Tıklama `PlacementService.Begin` çağırır.
 - **Sekmeler (Sandbox):** Başlığın altında *Buildings*, *Units* ve *Resources*. Resources sekmesi ağaç, kaya, maden ve koyunları ilk kareleriyle listeler, tıklama `PlacementService.BeginNode`. Units sekmesi `GameDatabase.Units`'i portreleriyle listeler, tıklama `PlacementService.BeginUnit` çağırır. Seçili olmayan sekme koyulaşır. Normal modda sekmeler gizli ve liste onların yerine uzar (`tabsSpace`); orada birimler sadece binadan, parayla gelir. Hücre (`ProductionMenuCell`) ne gösterdiğini bilmez, sadece listedeki sırasını (`Index`) tutar; menü sırayı o anki sekmenin listesinde arar.
 - `SlideOutPanel` menüyü soldan DOTween ile kaydırır; obje kapanmaz, sadece konumu değişir.
+- **Yerleştirirken kenara çekilir:** Menüden bir şey seçilince (`PlacementStartedEvent`) menü açılıştaki animasyonla kapanır, harita boşalır. Yerleştirme bitince (`PlacementEndedEvent`: konuldu, sağ tık ya da Esc) geri açılır. Shift ile art arda koyarken kapalı kalır, sonunda bir kez açılır. Sadece yerleştirmenin kapattığı menü geri gelir (`_reopensAfterPlacement`).
 
 ## 29. Information Panel ve Birim Kartı
 **Durum:** ✅ · **Dosyalar:** `UI/Information/*`, `UI/Common/ContentFitPanel.cs`, `PanelSizeMath.cs` · **Test:** `PanelSizeMathTests`

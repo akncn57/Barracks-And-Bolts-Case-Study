@@ -285,7 +285,7 @@ public interface IEventBus
 - Birim ve bina görünümleri havuzlanmıyor; ölüm ve yıkım seyrek olduğu için `Instantiate`/`Destroy` yeterli. Efekt turunda ölüm efektleri gelirse onlar havuzdan gelecek.
 - **Production Menu (sonsuz scroll):** `RecyclingScrollView`
 - **Kaynak barı:** `ResourceBarView`, ekranın üstünde tam genişlik. Üstteki paneller barın altından başlar.
-- **Sol kenardan açılan panel:** `SlideOutPanel` (DOTween). Production Menu kapalı başlar; panel kapalıyken de kendi butonu ekranda kalır.
+- **Sol kenardan açılan panel:** `SlideOutPanel` (DOTween). Production Menu kapalı başlar; panel kapalıyken de kendi butonu ekranda kalır. Yerleştirme sürerken menü kapanır, bitince geri açılır (`ProductionMenuView`, yerleştirme event'leriyle).
   - ScrollRect kullanılmaz; sürükleme, fırlatma ve tekerlek bileşenin kendisindedir. Kaydırma tek bir offset değeridir.
   - Sadece görünen satır sayısı + 1 kadar satır oluşturulur (kaydırırken üstte ve altta aynı anda yarım satır görünebilir).
   - Kaydırma sırasında görünümden çıkan satır diğer uca taşınır. Veri indeksi negatif olmayan mod ile bulunur: `(row * columns + column) mod dataCount`.

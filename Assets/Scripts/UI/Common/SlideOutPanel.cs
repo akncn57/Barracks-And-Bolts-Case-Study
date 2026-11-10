@@ -43,6 +43,12 @@ namespace BarracksAndBolts.UI.Common
             toggleButton.onClick.RemoveListener(Toggle);
         }
 
+        public void Open()
+        {
+            if (!IsOpen)
+                Toggle();
+        }
+
         public void Close()
         {
             if (IsOpen)

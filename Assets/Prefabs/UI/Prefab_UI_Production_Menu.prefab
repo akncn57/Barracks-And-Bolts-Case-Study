@@ -63,6 +63,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: BarracksAndBolts.UI::BarracksAndBolts.UI.Production.ProductionMenuView
   scrollView: {fileID: 7700025887997490559}
+  drawer: {fileID: 8947780534198004439}
   buildingsTab: {fileID: 7661202426935250002}
   unitsTab: {fileID: 7661202426935251002}
   resourcesTab: {fileID: 7661202426935252002}
