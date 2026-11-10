@@ -7,6 +7,7 @@ using BarracksAndBolts.UI.Production;
 using BarracksAndBolts.UI.Sandbox;
 using BarracksAndBolts.UI.Settings;
 using BarracksAndBolts.UI.Tooltips;
+using UnityEngine;
 using VContainer;
 using VContainer.Unity;
 
@@ -19,6 +20,9 @@ namespace BarracksAndBolts.UI
     /// </summary>
     public class GameplayUiLifetimeScope : LifetimeScope
     {
+        [Tooltip("The Controls page that F1 opens.")]
+        [SerializeField] private PopupData controlsPopup;
+
         protected override void Configure(IContainerBuilder builder)
         {
             builder.RegisterComponentInHierarchy<ProductionMenuView>();
@@ -31,6 +35,9 @@ namespace BarracksAndBolts.UI
             builder.RegisterComponentInHierarchy<CalendarLabelView>();
             builder.RegisterComponentInHierarchy<DayNightOverlayView>();
             builder.RegisterComponentInHierarchy<NoticeBannerView>();
+            builder.RegisterComponentInHierarchy<RaidArrowView>();
+            builder.RegisterComponentInHierarchy<CommandBarView>();
+            builder.RegisterComponentInHierarchy<IdleVillagerButtonView>();
             builder.RegisterComponentInHierarchy<GameEndView>();
             builder.RegisterComponentInHierarchy<FloatingTextSpawner>();
             builder.RegisterComponentInHierarchy<HoverLabelView>();
@@ -42,6 +49,7 @@ namespace BarracksAndBolts.UI
             builder.RegisterComponentInHierarchy<SettingsButtonView>().As<IEscapeMenu>().AsSelf();
             builder.Register<GameplaySettingsContext>(Lifetime.Singleton).As<ISettingsContext>();
             builder.RegisterEntryPoint<EscapeInputHandler>();
+            builder.RegisterEntryPoint<ControlsLauncher>().WithParameter(controlsPopup);
         }
     }
 }

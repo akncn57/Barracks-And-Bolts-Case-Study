@@ -16,7 +16,10 @@ using UnityEngine;
 
 namespace BarracksAndBolts.Gameplay.Commands
 {
-    /// <summary>Turns the player's orders into unit actions: attack an enemy, build a site, gather a resource, or move.</summary>
+    /// <summary>
+    /// Turns the player's orders into unit actions: attack an enemy, build a site, gather a resource, move, attack-move,
+    /// stop or hold position. Every order ends the unit's old stance (hold position, attack-move).
+    /// </summary>
     public sealed class UnitCommandService
     {
         private readonly UnitService _units;
@@ -196,6 +199,68 @@ namespace BarracksAndBolts.Gameplay.Commands
         /// <returns>False if the list holds no unit that can take the order.</returns>
         public bool MoveTo(IReadOnlyList<GameEntityId> ids, Vector2 worldPosition)
         {
+            if (!SendGroup(ids, worldPosition))
+                return false;
+
+            _eventBus.Publish(new MoveCommandIssuedEvent(worldPosition));
+            return true;
+        }
+
+        /// <summary>
+        /// Like <see cref="MoveTo"/>, but the units fight the enemies they meet on the way and then walk on
+        /// (<see cref="AttackMoveSystem"/>).
+        /// </summary>
+        /// <returns>False if the list holds no unit that can take the order.</returns>
+        public bool AttackMove(IReadOnlyList<GameEntityId> ids, Vector2 worldPosition)
+        {
+            if (!SendGroup(ids, worldPosition))
+                return false;
+
+            // SendGroup empties the group while it hands out cells, so the ids are walked again.
+            foreach (var id in ids)
+            {
+                if (_units.TryGet(id, out var unit) && unit.Faction == Faction.Player)
+                    unit.StartAttackMove(_gridMap.WorldToCell(unit.Destination));
+            }
+
+            _eventBus.Publish(new AttackCommandIssuedEvent(worldPosition));
+            return true;
+        }
+
+        /// <summary>The player's units among the ids stop where they are: no path, no target, no job.</summary>
+        /// <returns>False if the list holds no unit of the player.</returns>
+        public bool Stop(IReadOnlyList<GameEntityId> ids)
+        {
+            CollectGroup(ids);
+            if (_group.Count == 0)
+                return false;
+
+            AnnounceOrder();
+            foreach (var unit in _group)
+            {
+                CancelJobs(unit.Id);
+                unit.ClearAttackTarget();
+                unit.Stop();
+            }
+
+            return true;
+        }
+
+        /// <summary>Stops the units and keeps them there: they hit what comes into range but never chase.</summary>
+        /// <returns>False if the list holds no unit of the player.</returns>
+        public bool HoldPosition(IReadOnlyList<GameEntityId> ids)
+        {
+            if (!Stop(ids))
+                return false;
+
+            foreach (var unit in _group)
+                unit.HoldPosition();
+
+            return true;
+        }
+
+        private bool SendGroup(IReadOnlyList<GameEntityId> ids, Vector2 worldPosition)
+        {
             CollectGroup(ids);
             if (_group.Count == 0)
                 return false;
@@ -215,7 +280,6 @@ namespace BarracksAndBolts.Gameplay.Commands
                 CancelJobs(unit.Id);
 
             AssignDestinations();
-            _eventBus.Publish(new MoveCommandIssuedEvent(worldPosition));
             return true;
         }
 
@@ -249,7 +313,10 @@ namespace BarracksAndBolts.Gameplay.Commands
         private void AnnounceOrder()
         {
             foreach (var unit in _group)
+            {
+                unit.ClearStance();
                 _eventBus.Publish(new UnitOrderedEvent(unit.Id));
+            }
         }
 
         private void AssignDestinations()

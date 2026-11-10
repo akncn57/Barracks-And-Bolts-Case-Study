@@ -372,6 +372,78 @@ namespace BarracksAndBolts.Gameplay.Input
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""IdleVillager"",
+                    ""type"": ""Button"",
+                    ""id"": ""483192ac-5972-4808-9440-a5a2bbef1b2b"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""ControlGroup"",
+                    ""type"": ""Button"",
+                    ""id"": ""e5ea3279-f5d8-43f0-a0b4-6f341fcbd610"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""GroupModifier"",
+                    ""type"": ""Button"",
+                    ""id"": ""2e2f17df-e108-4199-a2c5-03440d27292b"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""AttackMove"",
+                    ""type"": ""Button"",
+                    ""id"": ""02e3a8db-72c7-4978-a6c8-4b779bc3c226"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""Stop"",
+                    ""type"": ""Button"",
+                    ""id"": ""d82986dc-d3fd-4648-a3e9-76214baed90d"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""HoldPosition"",
+                    ""type"": ""Button"",
+                    ""id"": ""1276ba64-702e-4e29-8a67-9ddaea73630a"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""FocusHome"",
+                    ""type"": ""Button"",
+                    ""id"": ""7651ade0-753a-444a-b09b-ec7a185c2ec3"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""ShowControls"",
+                    ""type"": ""Button"",
+                    ""id"": ""212b99dc-4694-45ec-8b03-e332439b40f4"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -482,6 +554,182 @@ namespace BarracksAndBolts.Gameplay.Input
                     ""processors"": """",
                     ""groups"": ""Keyboard&Mouse"",
                     ""action"": ""SpeedDown"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""d228fa98-8119-4a99-a9b0-e0fac51c8041"",
+                    ""path"": ""<Keyboard>/period"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""IdleVillager"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""28a07353-7ecf-40a2-87ac-14f418068655"",
+                    ""path"": ""<Keyboard>/1"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""ControlGroup"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""9bc3d0b0-bf19-45de-81a7-4edf3b4378a5"",
+                    ""path"": ""<Keyboard>/2"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""ControlGroup"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""71644e50-a568-44ac-bcc0-0e6fb2ebcb4a"",
+                    ""path"": ""<Keyboard>/3"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""ControlGroup"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""74aeeb30-4110-4e1c-9b05-4a4398efd2a7"",
+                    ""path"": ""<Keyboard>/4"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""ControlGroup"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""368bfba4-9da9-4634-bdf6-a853fd11a290"",
+                    ""path"": ""<Keyboard>/5"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""ControlGroup"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""871aca8c-8db6-4f93-9dac-b8e8e914c826"",
+                    ""path"": ""<Keyboard>/6"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""ControlGroup"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""13b45fa3-d961-41b0-9a1a-c8adfdc39747"",
+                    ""path"": ""<Keyboard>/7"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""ControlGroup"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""60ba91e5-2c3f-4ba2-bbb7-0af2293b8b00"",
+                    ""path"": ""<Keyboard>/8"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""ControlGroup"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""c1255869-a249-420c-8d32-e72084cc2669"",
+                    ""path"": ""<Keyboard>/9"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""ControlGroup"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""671027c6-9e7d-4b63-8100-129efe6449f3"",
+                    ""path"": ""<Keyboard>/ctrl"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""GroupModifier"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""f5cb6b4a-28a7-4804-a82e-3ca02f2cf46b"",
+                    ""path"": ""<Keyboard>/f"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""AttackMove"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""d5cf0a82-0232-4b28-a858-90f8568a8f96"",
+                    ""path"": ""<Keyboard>/x"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""Stop"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""c2ef217b-d2c7-4e65-9b59-395173345373"",
+                    ""path"": ""<Keyboard>/h"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""HoldPosition"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""286903ae-8977-4041-ad4a-98a9a3df877e"",
+                    ""path"": ""<Keyboard>/home"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""FocusHome"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""f4b80681-ec32-4912-b6e1-bb3628afc265"",
+                    ""path"": ""<Keyboard>/f1"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""ShowControls"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -623,6 +871,14 @@ namespace BarracksAndBolts.Gameplay.Input
             m_Gameplay_TogglePause = m_Gameplay.FindAction("TogglePause", throwIfNotFound: true);
             m_Gameplay_SpeedUp = m_Gameplay.FindAction("SpeedUp", throwIfNotFound: true);
             m_Gameplay_SpeedDown = m_Gameplay.FindAction("SpeedDown", throwIfNotFound: true);
+            m_Gameplay_IdleVillager = m_Gameplay.FindAction("IdleVillager", throwIfNotFound: true);
+            m_Gameplay_ControlGroup = m_Gameplay.FindAction("ControlGroup", throwIfNotFound: true);
+            m_Gameplay_GroupModifier = m_Gameplay.FindAction("GroupModifier", throwIfNotFound: true);
+            m_Gameplay_AttackMove = m_Gameplay.FindAction("AttackMove", throwIfNotFound: true);
+            m_Gameplay_Stop = m_Gameplay.FindAction("Stop", throwIfNotFound: true);
+            m_Gameplay_HoldPosition = m_Gameplay.FindAction("HoldPosition", throwIfNotFound: true);
+            m_Gameplay_FocusHome = m_Gameplay.FindAction("FocusHome", throwIfNotFound: true);
+            m_Gameplay_ShowControls = m_Gameplay.FindAction("ShowControls", throwIfNotFound: true);
             // Placement
             m_Placement = asset.FindActionMap("Placement", throwIfNotFound: true);
             m_Placement_Confirm = m_Placement.FindAction("Confirm", throwIfNotFound: true);
@@ -859,6 +1115,14 @@ namespace BarracksAndBolts.Gameplay.Input
         private readonly InputAction m_Gameplay_TogglePause;
         private readonly InputAction m_Gameplay_SpeedUp;
         private readonly InputAction m_Gameplay_SpeedDown;
+        private readonly InputAction m_Gameplay_IdleVillager;
+        private readonly InputAction m_Gameplay_ControlGroup;
+        private readonly InputAction m_Gameplay_GroupModifier;
+        private readonly InputAction m_Gameplay_AttackMove;
+        private readonly InputAction m_Gameplay_Stop;
+        private readonly InputAction m_Gameplay_HoldPosition;
+        private readonly InputAction m_Gameplay_FocusHome;
+        private readonly InputAction m_Gameplay_ShowControls;
         /// <summary>
         /// Provides access to input actions defined in input action map "Gameplay".
         /// </summary>
@@ -902,6 +1166,38 @@ namespace BarracksAndBolts.Gameplay.Input
             /// Provides access to the underlying input action "Gameplay/SpeedDown".
             /// </summary>
             public InputAction @SpeedDown => m_Wrapper.m_Gameplay_SpeedDown;
+            /// <summary>
+            /// Provides access to the underlying input action "Gameplay/IdleVillager".
+            /// </summary>
+            public InputAction @IdleVillager => m_Wrapper.m_Gameplay_IdleVillager;
+            /// <summary>
+            /// Provides access to the underlying input action "Gameplay/ControlGroup".
+            /// </summary>
+            public InputAction @ControlGroup => m_Wrapper.m_Gameplay_ControlGroup;
+            /// <summary>
+            /// Provides access to the underlying input action "Gameplay/GroupModifier".
+            /// </summary>
+            public InputAction @GroupModifier => m_Wrapper.m_Gameplay_GroupModifier;
+            /// <summary>
+            /// Provides access to the underlying input action "Gameplay/AttackMove".
+            /// </summary>
+            public InputAction @AttackMove => m_Wrapper.m_Gameplay_AttackMove;
+            /// <summary>
+            /// Provides access to the underlying input action "Gameplay/Stop".
+            /// </summary>
+            public InputAction @Stop => m_Wrapper.m_Gameplay_Stop;
+            /// <summary>
+            /// Provides access to the underlying input action "Gameplay/HoldPosition".
+            /// </summary>
+            public InputAction @HoldPosition => m_Wrapper.m_Gameplay_HoldPosition;
+            /// <summary>
+            /// Provides access to the underlying input action "Gameplay/FocusHome".
+            /// </summary>
+            public InputAction @FocusHome => m_Wrapper.m_Gameplay_FocusHome;
+            /// <summary>
+            /// Provides access to the underlying input action "Gameplay/ShowControls".
+            /// </summary>
+            public InputAction @ShowControls => m_Wrapper.m_Gameplay_ShowControls;
             /// <summary>
             /// Provides access to the underlying input action map instance.
             /// </summary>
@@ -952,6 +1248,30 @@ namespace BarracksAndBolts.Gameplay.Input
                 @SpeedDown.started += instance.OnSpeedDown;
                 @SpeedDown.performed += instance.OnSpeedDown;
                 @SpeedDown.canceled += instance.OnSpeedDown;
+                @IdleVillager.started += instance.OnIdleVillager;
+                @IdleVillager.performed += instance.OnIdleVillager;
+                @IdleVillager.canceled += instance.OnIdleVillager;
+                @ControlGroup.started += instance.OnControlGroup;
+                @ControlGroup.performed += instance.OnControlGroup;
+                @ControlGroup.canceled += instance.OnControlGroup;
+                @GroupModifier.started += instance.OnGroupModifier;
+                @GroupModifier.performed += instance.OnGroupModifier;
+                @GroupModifier.canceled += instance.OnGroupModifier;
+                @AttackMove.started += instance.OnAttackMove;
+                @AttackMove.performed += instance.OnAttackMove;
+                @AttackMove.canceled += instance.OnAttackMove;
+                @Stop.started += instance.OnStop;
+                @Stop.performed += instance.OnStop;
+                @Stop.canceled += instance.OnStop;
+                @HoldPosition.started += instance.OnHoldPosition;
+                @HoldPosition.performed += instance.OnHoldPosition;
+                @HoldPosition.canceled += instance.OnHoldPosition;
+                @FocusHome.started += instance.OnFocusHome;
+                @FocusHome.performed += instance.OnFocusHome;
+                @FocusHome.canceled += instance.OnFocusHome;
+                @ShowControls.started += instance.OnShowControls;
+                @ShowControls.performed += instance.OnShowControls;
+                @ShowControls.canceled += instance.OnShowControls;
             }
 
             /// <summary>
@@ -987,6 +1307,30 @@ namespace BarracksAndBolts.Gameplay.Input
                 @SpeedDown.started -= instance.OnSpeedDown;
                 @SpeedDown.performed -= instance.OnSpeedDown;
                 @SpeedDown.canceled -= instance.OnSpeedDown;
+                @IdleVillager.started -= instance.OnIdleVillager;
+                @IdleVillager.performed -= instance.OnIdleVillager;
+                @IdleVillager.canceled -= instance.OnIdleVillager;
+                @ControlGroup.started -= instance.OnControlGroup;
+                @ControlGroup.performed -= instance.OnControlGroup;
+                @ControlGroup.canceled -= instance.OnControlGroup;
+                @GroupModifier.started -= instance.OnGroupModifier;
+                @GroupModifier.performed -= instance.OnGroupModifier;
+                @GroupModifier.canceled -= instance.OnGroupModifier;
+                @AttackMove.started -= instance.OnAttackMove;
+                @AttackMove.performed -= instance.OnAttackMove;
+                @AttackMove.canceled -= instance.OnAttackMove;
+                @Stop.started -= instance.OnStop;
+                @Stop.performed -= instance.OnStop;
+                @Stop.canceled -= instance.OnStop;
+                @HoldPosition.started -= instance.OnHoldPosition;
+                @HoldPosition.performed -= instance.OnHoldPosition;
+                @HoldPosition.canceled -= instance.OnHoldPosition;
+                @FocusHome.started -= instance.OnFocusHome;
+                @FocusHome.performed -= instance.OnFocusHome;
+                @FocusHome.canceled -= instance.OnFocusHome;
+                @ShowControls.started -= instance.OnShowControls;
+                @ShowControls.performed -= instance.OnShowControls;
+                @ShowControls.canceled -= instance.OnShowControls;
             }
 
             /// <summary>
@@ -1268,6 +1612,62 @@ namespace BarracksAndBolts.Gameplay.Input
             /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
             void OnSpeedDown(InputAction.CallbackContext context);
+            /// <summary>
+            /// Method invoked when associated input action "IdleVillager" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+            /// </summary>
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+            void OnIdleVillager(InputAction.CallbackContext context);
+            /// <summary>
+            /// Method invoked when associated input action "ControlGroup" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+            /// </summary>
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+            void OnControlGroup(InputAction.CallbackContext context);
+            /// <summary>
+            /// Method invoked when associated input action "GroupModifier" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+            /// </summary>
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+            void OnGroupModifier(InputAction.CallbackContext context);
+            /// <summary>
+            /// Method invoked when associated input action "AttackMove" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+            /// </summary>
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+            void OnAttackMove(InputAction.CallbackContext context);
+            /// <summary>
+            /// Method invoked when associated input action "Stop" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+            /// </summary>
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+            void OnStop(InputAction.CallbackContext context);
+            /// <summary>
+            /// Method invoked when associated input action "HoldPosition" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+            /// </summary>
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+            void OnHoldPosition(InputAction.CallbackContext context);
+            /// <summary>
+            /// Method invoked when associated input action "FocusHome" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+            /// </summary>
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+            void OnFocusHome(InputAction.CallbackContext context);
+            /// <summary>
+            /// Method invoked when associated input action "ShowControls" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+            /// </summary>
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+            void OnShowControls(InputAction.CallbackContext context);
         }
         /// <summary>
         /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "Placement" which allows adding and removing callbacks.

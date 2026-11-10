@@ -88,7 +88,9 @@ namespace BarracksAndBolts.Gameplay.Raids
 
         private void UpdateIdleSoldier(UnitModel unit)
         {
-            var near = _combat.FindNearestHostile(unit.Position, unit.Faction, _settings.AggroRange);
+            // A soldier holding its position doesn't walk, so only what it can hit from here counts.
+            var range = unit.IsHoldingPosition ? unit.Definition.AttackRange : _settings.AggroRange;
+            var near = _combat.FindNearestHostile(unit.Position, unit.Faction, range);
             if (near.IsValid)
                 unit.SpotEnemy(near);
         }

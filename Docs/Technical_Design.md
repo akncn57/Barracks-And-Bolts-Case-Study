@@ -142,7 +142,7 @@ UI/
 ├── Scroll/         RecyclingScrollView, RecyclingScrollCell, RecyclingScrollMath
 ├── Production/     ProductionMenuView, ProductionMenuCell
 ├── Information/    InformationPanelView, ProducibleUnitCell, UnitSelectionCardView
-├── Hud/            ResourceBarView, CalendarLabelView, DayNightOverlayView, NoticeBannerView, GameEndView, TimeControlView, StatsPanelView
+├── Hud/            ResourceBarView, CalendarLabelView, DayNightOverlayView, NoticeBannerView, GameEndView, TimeControlView, StatsPanelView, RaidArrowView, OffScreenArrowMath, CommandBarView, IdleVillagerButtonView
 ├── Feedback/       FloatingTextSpawner, FloatingTextView, HoverLabelView
 ├── Tooltips/       TooltipView, TooltipPlacement, TooltipText
 └── Sandbox/        SandboxFactionToggleView, SandboxSwitchesView
@@ -296,7 +296,7 @@ public interface IEventBus
 ---
 
 ## 12. Input
-- Varsayılan `InputSystem_Actions` şablonu kaldırıldı. Yerine `Settings/Input/GameInputActions.inputactions` geldi; C# sınıfı otomatik üretiliyor. Map'ler: **Camera** (her zaman açık), **Gameplay** ve **Placement** (ikisinden biri açık). Gameplay map'inde ayrıca `Delete`, `TogglePause`, `SpeedUp`, `SpeedDown` var; hız tuşları karakterle (`<Keyboard>/#(+)`) bağlı, her klavye düzeninde çalışır. Pause map'i oyun içi menüyle gelecek. Asset değişince üretilen sınıf da değişmeli; Unity asset'i import edince kendisi yeniden üretir.
+- Varsayılan `InputSystem_Actions` şablonu kaldırıldı. Yerine `Settings/Input/GameInputActions.inputactions` geldi; C# sınıfı otomatik üretiliyor. Map'ler: **Camera** (her zaman açık), **Gameplay** ve **Placement** (ikisinden biri açık). Gameplay map'inde ayrıca `Delete`, `TogglePause`, `SpeedUp`, `SpeedDown`, `IdleVillager` (.), `ControlGroup` (1-9, hangi tuş olduğu `activeControl`'den okunur), `GroupModifier` (Ctrl), `AttackMove` (F), `Stop` (X), `HoldPosition` (H), `FocusHome` (Home), `ShowControls` (F1) var; hız tuşları karakterle (`<Keyboard>/#(+)`) bağlı, her klavye düzeninde çalışır. Pause map'i oyun içi menüyle gelecek. Asset değişince üretilen sınıf da değişmeli; Unity asset'i import edince kendisi yeniden üretir.
 - Tek bir büyük input servisi yok; her özelliğin kendi küçük handler'ı var:
 
 | Sınıf | Görevi |

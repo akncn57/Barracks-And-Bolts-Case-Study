@@ -1,4 +1,5 @@
 using BarracksAndBolts.Gameplay.CameraControl;
+using BarracksAndBolts.Gameplay.Commands;
 using BarracksAndBolts.Gameplay.Input;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -18,6 +19,7 @@ namespace BarracksAndBolts.Gameplay.Selection
         private const float DragThresholdPixels = 8f;
 
         private readonly SelectionService _selection;
+        private readonly AttackMoveTargeting _targeting;
         private readonly CameraController _cameraController;
         private readonly GameInputActions.GameplayActions _actions;
 
@@ -26,9 +28,11 @@ namespace BarracksAndBolts.Gameplay.Selection
         private Vector2 _pressScreenPosition;
         private Vector2 _pressWorldPosition;
 
-        public SelectionInputHandler(SelectionService selection, CameraController cameraController, GameInputActions inputActions)
+        public SelectionInputHandler(SelectionService selection, AttackMoveTargeting targeting, CameraController cameraController,
+            GameInputActions inputActions)
         {
             _selection = selection;
+            _targeting = targeting;
             _cameraController = cameraController;
             _actions = inputActions.Gameplay;
         }
@@ -60,7 +64,8 @@ namespace BarracksAndBolts.Gameplay.Selection
         private void BeginPress(Vector2 pointer, Vector2 pointerWorld)
         {
             // A press on a panel belongs to the UI and must not change the selection behind it.
-            if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
+            // While Attack Move waits for its point, the left click is that point.
+            if (_targeting.IsUsingClicks || (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject()))
                 return;
 
             _isPressing = true;

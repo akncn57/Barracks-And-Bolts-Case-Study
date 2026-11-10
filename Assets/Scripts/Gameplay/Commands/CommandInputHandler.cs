@@ -10,6 +10,7 @@ namespace BarracksAndBolts.Gameplay.Commands
 {
     /// <summary>
     /// Right click orders the selected units. With only a production building selected, it sets where new units go.
+    /// While Attack Move waits for its point, a left click on the map sends the units and a right click cancels.
     /// The Gameplay map is off while placing, so the right click that cancels placement never moves anyone.
     /// </summary>
     public sealed class CommandInputHandler : IPostTickable
@@ -17,31 +18,61 @@ namespace BarracksAndBolts.Gameplay.Commands
         private readonly UnitCommandService _commands;
         private readonly RallyPointService _rallyPoints;
         private readonly SelectionService _selection;
+        private readonly AttackMoveTargeting _targeting;
         private readonly CameraController _cameraController;
         private readonly GameInputActions.GameplayActions _actions;
 
         public CommandInputHandler(UnitCommandService commands, RallyPointService rallyPoints, SelectionService selection,
-            CameraController cameraController, GameInputActions inputActions)
+            AttackMoveTargeting targeting, CameraController cameraController, GameInputActions inputActions)
         {
             _commands = commands;
             _rallyPoints = rallyPoints;
             _selection = selection;
+            _targeting = targeting;
             _cameraController = cameraController;
             _actions = inputActions.Gameplay;
         }
 
         public void PostTick()
         {
-            if (!_actions.Command.WasPressedThisFrame() || !_selection.HasSelection)
+            if (_targeting.IsActive)
+            {
+                UpdateTargeting();
+                return;
+            }
+
+            if (!_actions.Command.WasPressedThisFrame() || !_selection.HasSelection || IsPointerOverUi())
                 return;
 
-            // A click on a panel belongs to the UI and must not send units behind it.
-            if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
-                return;
-
-            var point = _cameraController.ScreenToWorld(_actions.PointerPosition.ReadValue<Vector2>());
+            var point = GetPointerWorld();
             if (!_commands.CommandAt(_selection.Selected, point))
                 _rallyPoints.TrySet(_selection.Primary, point);
+        }
+
+        private void UpdateTargeting()
+        {
+            if (_actions.Command.WasPressedThisFrame())
+            {
+                _targeting.End();
+                return;
+            }
+
+            if (!_actions.Select.WasPressedThisFrame() || IsPointerOverUi())
+                return;
+
+            _commands.AttackMove(_selection.Selected, GetPointerWorld());
+            _targeting.End();
+        }
+
+        private Vector2 GetPointerWorld()
+        {
+            return _cameraController.ScreenToWorld(_actions.PointerPosition.ReadValue<Vector2>());
+        }
+
+        // A click on a panel belongs to the UI and must not send units behind it.
+        private static bool IsPointerOverUi()
+        {
+            return EventSystem.current != null && EventSystem.current.IsPointerOverGameObject();
         }
     }
 }

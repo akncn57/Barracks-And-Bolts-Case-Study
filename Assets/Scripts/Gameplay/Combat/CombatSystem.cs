@@ -6,7 +6,7 @@ namespace BarracksAndBolts.Gameplay.Combat
 {
     /// <summary>
     /// Every simulation tick: units with a target walk into range and strike when their cooldown allows.
-    /// A unit whose target is gone stops where it is.
+    /// A unit whose target is gone stops where it is. A unit holding its position drops a target out of range instead of chasing.
     /// </summary>
     public sealed class CombatSystem : ISimulationSystem
     {
@@ -53,6 +53,8 @@ namespace BarracksAndBolts.Gameplay.Combat
 
             if (target.Distance <= unit.Definition.AttackRange + RangeTolerance)
                 Strike(unit, target);
+            else if (unit.IsHoldingPosition)
+                unit.ClearAttackTarget();
             else
                 Chase(unit, target);
         }

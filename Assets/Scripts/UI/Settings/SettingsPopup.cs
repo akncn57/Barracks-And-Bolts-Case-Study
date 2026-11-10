@@ -26,6 +26,9 @@ namespace BarracksAndBolts.UI.Settings
         [SerializeField] private TMP_Text edgePanLabel;
         [SerializeField] private Button statsButton;
         [SerializeField] private TMP_Text statsLabel;
+        [SerializeField] private Button controlsButton;
+        [Tooltip("The Controls page, opened over this window.")]
+        [SerializeField] private PopupData controlsPopup;
         [SerializeField] private Button menuButton;
 
         private GameSettings _settings;
@@ -52,12 +55,18 @@ namespace BarracksAndBolts.UI.Settings
             cameraSpeedButton.onClick.AddListener(_settings.CycleCameraSpeed);
             edgePanButton.onClick.AddListener(_settings.ToggleEdgePan);
             statsButton.onClick.AddListener(_settings.ToggleStats);
+            controlsButton.onClick.AddListener(OnControlsClicked);
             menuButton.onClick.AddListener(OnMenuClicked);
             menuButton.gameObject.SetActive(_context.CanLeaveToMenu);
             _settings.Changed += Refresh;
 
             _context.OnSettingsOpened();
             Refresh();
+        }
+
+        private void OnControlsClicked()
+        {
+            _popupSystem.Open(controlsPopup);
         }
 
         protected override void OnCloseButtonClicked()
@@ -78,6 +87,7 @@ namespace BarracksAndBolts.UI.Settings
             uiSizeButton.onClick.RemoveAllListeners();
             cameraSpeedButton.onClick.RemoveAllListeners();
             edgePanButton.onClick.RemoveAllListeners();
+            controlsButton.onClick.RemoveAllListeners();
             statsButton.onClick.RemoveAllListeners();
             menuButton.onClick.RemoveAllListeners();
         }

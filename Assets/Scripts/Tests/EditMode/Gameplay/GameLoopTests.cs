@@ -441,6 +441,23 @@ namespace BarracksAndBolts.Tests.EditMode.Gameplay
         }
 
         [Test]
+        public void Raid_NearestRaider_OnlyFromTheWaveOnTheMap()
+        {
+            var raids = CreateSandboxRaids(CreateSandbox(GameMode.Sandbox));
+            _units.TrySpawn(_knight, new Vector2Int(1, 1), Faction.Enemy, out var placedByTester);
+
+            Assert.IsFalse(raids.TryGetNearestRaider(Vector2.zero, out _), "No raid yet; the tester's enemy doesn't count.");
+
+            raids.TryStartRaidNow();
+            raids.Tick(0.1f);
+            Assert.IsTrue(raids.TryGetNearestRaider(Vector2.zero, out var position));
+            Assert.AreNotEqual(placedByTester.Position, position);
+
+            KillEnemiesExcept(placedByTester.Id);
+            Assert.IsFalse(raids.TryGetNearestRaider(Vector2.zero, out _), "The wave is dead.");
+        }
+
+        [Test]
         public void Raid_Sandbox_StopsWhenTheMapIsCleared()
         {
             var raids = CreateSandboxRaids(CreateSandbox(GameMode.Sandbox));

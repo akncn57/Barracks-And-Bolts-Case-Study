@@ -6,6 +6,7 @@ namespace BarracksAndBolts.Gameplay.Hover
         None,
         Axe,
         Pickaxe,
-        Hammer
+        Hammer,
+        Attack
     }
 }

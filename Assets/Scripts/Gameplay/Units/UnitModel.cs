@@ -74,6 +74,12 @@ namespace BarracksAndBolts.Gameplay.Units
         /// <summary>The unit has a job to go back to, even if it isn't working this very moment.</summary>
         public bool IsOnJob { get; private set; }
 
+        /// <summary>Stays where it is: hits what comes into range, never chases. Any new order ends it.</summary>
+        public bool IsHoldingPosition { get; private set; }
+
+        /// <summary>The cell an attack-move goes to. The unit fights what it meets on the way. Null when not attack-moving.</summary>
+        public Vector2Int? AttackMoveCell { get; private set; }
+
         /// <summary>Nothing to do: no job, no target and not going anywhere.</summary>
         public bool IsIdle => !IsOnJob && !IsMoving && !HasAttackTarget;
 
@@ -126,6 +132,25 @@ namespace BarracksAndBolts.Gameplay.Units
         public void SetOnJob(bool isOnJob)
         {
             IsOnJob = isOnJob;
+        }
+
+        public void HoldPosition()
+        {
+            IsHoldingPosition = true;
+            AttackMoveCell = null;
+        }
+
+        public void StartAttackMove(Vector2Int cell)
+        {
+            AttackMoveCell = cell;
+            IsHoldingPosition = false;
+        }
+
+        /// <summary>Ends hold position and attack-move. Every new order of the player calls it.</summary>
+        public void ClearStance()
+        {
+            IsHoldingPosition = false;
+            AttackMoveCell = null;
         }
 
         public void SetInField(bool isInField)

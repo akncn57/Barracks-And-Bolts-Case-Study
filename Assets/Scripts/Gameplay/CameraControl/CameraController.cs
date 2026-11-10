@@ -57,6 +57,15 @@ namespace BarracksAndBolts.Gameplay.CameraControl
             return CameraMath.WorldToScreen(worldPosition, ScreenSize, transform.position, Zoom);
         }
 
+        /// <summary>The world point in the middle of the view.</summary>
+        public Vector2 Center => transform.position;
+
+        /// <summary>Jumps the view to the point, kept inside the map.</summary>
+        public void LookAt(Vector2 worldPoint)
+        {
+            MoveTo(worldPoint);
+        }
+
         private void Start()
         {
             var padding = Vector2.one * config.BoundsPadding;

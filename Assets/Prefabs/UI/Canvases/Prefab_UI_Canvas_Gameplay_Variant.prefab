@@ -1108,6 +1108,15 @@ PrefabInstance:
       addedObject: {fileID: 1174255621700906960}
     - targetCorrespondingSourceObject: {fileID: 5890645949319288878, guid: c1d666e340894944b9e863d064d4166d, type: 3}
       insertIndex: -1
+      addedObject: {fileID: 7413029512270119002}
+    - targetCorrespondingSourceObject: {fileID: 5890645949319288878, guid: c1d666e340894944b9e863d064d4166d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 870622283229097033}
+    - targetCorrespondingSourceObject: {fileID: 5890645949319288878, guid: c1d666e340894944b9e863d064d4166d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1040605555893187486}
+    - targetCorrespondingSourceObject: {fileID: 5890645949319288878, guid: c1d666e340894944b9e863d064d4166d, type: 3}
+      insertIndex: -1
       addedObject: {fileID: 4776602282439973473}
     - targetCorrespondingSourceObject: {fileID: 5890645949319288878, guid: c1d666e340894944b9e863d064d4166d, type: 3}
       insertIndex: -1
@@ -1143,6 +1152,7 @@ MonoBehaviour:
     TypeName: BarracksAndBolts.Gameplay.Bootstrap.GameplayLifetimeScope
   autoRun: 1
   autoInjectGameObjects: []
+  controlsPopup: {fileID: 11400000, guid: e7a5c9d1f3b68c0d2e4a6c8d0f2b4a56, type: 2}
 --- !u!1001 &8713897794033411236
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1436,4 +1446,70 @@ PrefabInstance:
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 7171586599622339364, guid: bd7705be7b8344d4af44c7c2a3cb296a, type: 3}
   m_PrefabInstance: {fileID: 211935581972105335}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &7413029512270119001
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 2993070357783825619}
+    m_Modifications:
+    - target: {fileID: 7413029512270118401, guid: 76874ae86b4a4a77a37ed0b7d42e67c7, type: 3}
+      propertyPath: m_Name
+      value: Prefab_UI_Raid_Arrow
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 76874ae86b4a4a77a37ed0b7d42e67c7, type: 3}
+--- !u!224 &7413029512270119002 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 7413029512270118402, guid: 76874ae86b4a4a77a37ed0b7d42e67c7, type: 3}
+  m_PrefabInstance: {fileID: 7413029512270119001}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &443282156213353010
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 2993070357783825619}
+    m_Modifications:
+    - target: {fileID: 151906352257066056, guid: f8b6d0e2a4c79d1e3f5b7d9e1a3c5b67, type: 3}
+      propertyPath: m_Name
+      value: Prefab_UI_Command_Bar
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: f8b6d0e2a4c79d1e3f5b7d9e1a3c5b67, type: 3}
+--- !u!224 &870622283229097033 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 815685836947570174, guid: f8b6d0e2a4c79d1e3f5b7d9e1a3c5b67, type: 3}
+  m_PrefabInstance: {fileID: 443282156213353010}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &111048475894561154
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 2993070357783825619}
+    m_Modifications:
+    - target: {fileID: 370070580076992991, guid: a9c7e1f3b5d80e2f4a6c8e0f2b4d6c78, type: 3}
+      propertyPath: m_Name
+      value: Prefab_UI_Idle_Villager_Button
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: a9c7e1f3b5d80e2f4a6c8e0f2b4d6c78, type: 3}
+--- !u!224 &1040605555893187486 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 497463735580403655, guid: a9c7e1f3b5d80e2f4a6c8e0f2b4d6c78, type: 3}
+  m_PrefabInstance: {fileID: 111048475894561154}
   m_PrefabAsset: {fileID: 0}

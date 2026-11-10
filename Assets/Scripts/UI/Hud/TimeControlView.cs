@@ -1,5 +1,6 @@
 using BarracksAndBolts.Core.Events;
 using BarracksAndBolts.Gameplay.TimeControl;
+using BarracksAndBolts.UI.Tooltips;
 using BarracksAndBolts.Utils.Disposables;
 using UnityEngine;
 using UnityEngine.UI;
@@ -18,22 +19,26 @@ namespace BarracksAndBolts.UI.Hud
 
         private readonly CompositeDisposable _subscriptions = new();
         private TimeControlService _timeControl;
+        private TooltipView _tooltip;
         private IEventBus _eventBus;
 
         [Inject]
-        private void Construct(TimeControlService timeControl, IEventBus eventBus)
+        private void Construct(TimeControlService timeControl, TooltipView tooltip, IEventBus eventBus)
         {
             _timeControl = timeControl;
+            _tooltip = tooltip;
             _eventBus = eventBus;
         }
 
         private void Start()
         {
             pauseButton.onClick.AddListener(_timeControl.TogglePause);
+            HoverTooltip.Attach(pauseButton, _tooltip, "Pause (P)", "Stops the game. The camera still moves.");
             for (var i = 0; i < speedButtons.Length && i < TimeControlService.Speeds.Count; i++)
             {
                 var speed = TimeControlService.Speeds[i];
                 speedButtons[i].onClick.AddListener(() => _timeControl.SetSpeed(speed));
+                HoverTooltip.Attach(speedButtons[i], _tooltip, $"Speed {speed:0}x (+ / -)", "+ and - step through the speeds.");
             }
 
             _eventBus.Subscribe<GameSpeedChangedEvent>(_ => Refresh()).AddTo(_subscriptions);

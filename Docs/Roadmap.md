@@ -58,7 +58,7 @@ Oyunu deneyince çıkan kullanılabilirlik istekleri. Sandbox'ta da olmalı, bui
 - [x] Nüfus sistemi: Castle ve House kapasite verir, barda `kullanılan/kapasite`
 - [x] Takvim: gündüz/gece döngüsü, gece kararması, saldırı günleri, baskın sırasında zamanın durması
 - [x] Düşman AI: Castle'a yürür, yolundakine saldırır, kapalı yolda binayı yıkar. Boştaki askerler de yakındaki düşmana saldırır
-- [x] Dalga sistemi ve baskın bildirimleri (ses ve mini harita yok; yön yazıyla söyleniyor)
+- [x] Dalga sistemi ve baskın bildirimleri (ses ve mini harita yok; yön yazıyla söyleniyor, dalga ekran dışındayken kenarda tıklanabilir ok)
 - [x] Kazanma ve kaybetme koşulları ve oyun sonu ekranı
 - [ ] Oyun döngüsünün dengesi (süreler, maliyetler, dalga büyüklükleri)
 - [ ] Test Runner sonucu (494 test) ve son SetPass ölçümü
@@ -87,7 +87,7 @@ Oyunu deneyince çıkan kullanılabilirlik istekleri. Sandbox'ta da olmalı, bui
 - [x] Arayüz cilası: konturlu ve gölgeli yazı malzemeleri, buton hover/basma animasyonu, kaynak sayısı punch, ana menü arka planı ve giriş animasyonları, FPS paneli sağ altta
 - [ ] Ses ve müzik
 - [ ] Tutorial
-- [ ] Kontrol grupları, AttackMove, HoldPosition (oyun hızı ve duraklatma yapıldı, iki modda da)
+- [x] Kısayollar: kontrol grupları, Attack Move (F), Stop (X), Hold Position (H), boştaki köylü (.), Castle'a kamera (Home); F1 Controls sayfası, birim kartı üstünde komut butonları, tooltip'lerde tuşlar
 - [x] Tarla: 3x3, 40 odun, bir köylü, bitmez, 6 saniyede 5 yemek
 - [ ] Düşman yerleşkeleri
 - [x] Efekt turu: vuruş animasyon karesinde, ok varınca hasar, ölüm ve yıkılma efekti, can barları (hasarlı ya da seçiliyken)

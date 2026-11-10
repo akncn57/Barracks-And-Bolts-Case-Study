@@ -343,6 +343,8 @@ Sol tık bırakılınca ─► SelectionInputHandler
 - Aynı şey tekrar seçilince event gitmez; panel boşuna yenilenmez.
 - **Hover** tıklamayla aynı sırayla seçer; tıklayınca seçilecek şey neyse çerçeve de onda. Her karede bakar, çünkü altından birim geçebilir. Yerleştirmede ve UI üstünde kapalı.
 - Kutu, seçim halkası ve hover çerçevesi dünyada SpriteRenderer ile çizilir; Gameplay UI'a bağımlı olmaz.
+- **Kontrol grupları (`ControlGroupService`):** Ctrl+1-9 seçimi gruba yazar (sadece oyuncunun birim ve binaları; "Group 3" uçan yazısı), 1-9 grubu seçer (`SelectionService.Select(liste)`), aynı numaraya 0,35 sn içinde ikinci basış kamerayı grubun ortasına götürür. Id'ler tekrar kullanılmadığı için ölen üye kendiliğinden bulunmaz olur; sığınan köylü çıkınca gruba döner.
+- **Boştaki köylü (`IdleVillagerFinder`):** "." ya da alttaki "Idle: N" butonu sıradaki boş köylüyü (id sırasıyla, sonda başa döner) seçer ve kamerayı ona götürür. Home kamerayı Castle'a götürür.
 
 ## 17. Komutlar ve Hareket
 **Durum:** ✅ · **Dosyalar:** `Gameplay/Commands/*`, `Gameplay/Units/UnitMovementSystem.cs`, `UnitModel.cs` · **Test:** `UnitCommandServiceTests`, `UnitMovementTests`
@@ -354,12 +356,19 @@ Sağ tık ─► CommandInputHandler ─► UnitCommandService.CommandAt(seçim,
    kaynak                   ─► Gather ─► köylüler GatheringSystem.TryOrder, askerler yanına yürür
    zemin                    ─► MoveTo ─► her birime ayrı hücre ─► UnitMovementSystem.SendTo ─► MoveCommandIssuedEvent
    ─► UnitOrderedEvent
+F (ya da komut çubuğundaki buton) ─► AttackMoveTargeting.Begin ─► imleç kılıç ─► sol tık ─► UnitCommandService.AttackMove
+X ─► Stop        H ─► HoldPosition        (HotkeyInputHandler; butonlar aynı metotları çağırır)
 Movement fazı: UnitMovementSystem ─► UnitModel.MoveAlongPath(hız * dt)
 ```
 - Sadece oyuncunun birimleri emir alır; dost ateşi `CombatService.GetHostileAt`'te engellenir. Kendi binana sağ tık hareket olur.
 - **Dağılma:** `CollectDestinations` birim sayısı kadar hücre bulur; başka birimin durduğu ya da yürüdüğü hücre alınmaz. Hedefler yakından uzağa, her birine kalanlar içinde en yakın birim.
 - **Yol değişince:** `GridChangedEvent` gelince sadece kalan yolu değişen alandan geçen birimler yeni yol bulur.
 - Durağa varınca artan mesafe sonraki durağa devredilir; uzun karede birim durağı aşıp titremez.
+- **Duruşlar (`UnitModel.IsHoldingPosition`, `AttackMoveCell`):** Oyuncunun her yeni emri ikisini de bitirir (`AnnounceOrder` içinde `ClearStance`).
+  - **Stop:** yol, hedef ve iş (toplama, inşaat, tarla) iptal.
+  - **Hold Position:** Stop + yerinde kalır. `CombatSystem` menzil dışındaki hedefi kovalamaz, bırakır; `BattleAiSystem` ona sadece kendi menzilindeki düşmanı verir. Uzaktan vurulunca da dönüp koşmaz.
+  - **Attack Move:** `MoveTo` gibi dağılır, her birim kendi varış hücresini `AttackMoveCell`'e yazar. `AttackMoveSystem` (AI fazı, saniyede 4 kez, sandbox'ta yapay zekâ kapalıyken de çalışır; oyuncunun emri) yürürken 5 hücre içindeki düşmana döner, düşman ölünce yoluna devam eder, varınca duruş biter. Oraya yol kalmadıysa da biter, saniyede 4 kez A* aranmaz. Kırmızı halka çıkar.
+  - Hedef seçme modu (`AttackMoveTargeting`): açıkken sol tık seçim yapmaz (bittiği karede de, `IsUsingClicks`), sağ tık ya da Esc iptal eder, seçimde oyuncu birimi kalmazsa ya da yerleştirme başlarsa kendi kapanır.
 
 ## 18. Savaş ve Yok Olma
 **Durum:** ✅ · **Dosyalar:** `Gameplay/Combat/*` · **Test:** `CombatTests`
@@ -487,7 +496,7 @@ Baskın günü sabahı: "Today is a raid day!" ─► günün %20-%80'i arasınd
 Dalga doğar ─► hepsi ölür ─► 8 sn ─► sonraki dalga ... ─► "Raid beaten!" ─► RaidEndedEvent ─► takvim devam
 ```
 - Baskın günleri 3, 6, 8 ve 10. Her baskın birkaç dalga; sonrakiler daha kalabalık ve daha çok şövalyeli. Can ve hasar çarpanı yok, PDF değerleri korunur.
-- **Doğma noktası (`PickSpawnCell`):** Castle'dan yürünerek ulaşılan, kıyıda, en az 20 hücre uzak rastgele hücre. O anda hesaplanır, çünkü binalar haritayı değiştirmiş olabilir. Yön yazıyla söylenir ("from the north-east").
+- **Doğma noktası (`PickSpawnCell`):** Castle'dan yürünerek ulaşılan, kıyıda, en az 20 hücre uzak rastgele hücre. O anda hesaplanır, çünkü binalar haritayı değiştirmiş olabilir. Yön yazıyla söylenir ("from the north-east"), dalga ekran dışındayken kenarda bir ok da gösterir (`RaidArrowView`, Bölüm 30).
 - Zamanlar seed'den; aynı seed aynı baskın zamanları.
 - **`BattleAiSystem`** saniyede 4 kez hedef seçer; yürüme ve vurma `CombatSystem`'de:
   - Düşman: hedefi Castle (Sandbox'ta Castle yoksa oyuncunun en yakın binası ya da birimi, uzaklık sınırı olmadan). Yakınında (`aggroRange` 5) oyuncu birimi ya da binası varsa ona döner; 10 hücreden uzaklaşırsa bırakır. Binalar da hedef olduğu için yolu kapatan binayı yıkar; ayrı "engel yıkma" kodu yok.
@@ -556,7 +565,10 @@ Haritada düşman kalmadı ─► Castle'ın yanında belirir ─► işine dön
 | `DayNightOverlayView` | Gece kararması |
 | `NoticeBannerView` | `GameNoticeEvent` metinleri (baskın, sığınma) |
 | `GameEndView` | Kazandın / kaybettin, iki buton |
-| `TimeControlView` | Takvimin solunda duraklat ve 1x / 2x / 3x; seçili olan parlak (Bölüm 33b) |
+| `CommandBarView` | Birim kartının üstünde, oyuncunun birimi seçiliyken: *Attack Move (F)*, *Stop (X)*, *Hold (H)*. Tuşla aynı metotlar (`HotkeyInputHandler`); hover'da tooltip. Attack Move nokta beklerken buton turuncu. `Prefab_UI_Command_Bar` |
+| `IdleVillagerButtonView` | Kartın solunda *Idle: N*, sadece boş köylü varken; tıklayınca ya da "." ile sıradaki. Sayı saniyede 4 kez sayılır. `Prefab_UI_Idle_Villager_Button` |
+| `RaidArrowView` | Baskın dalgası ekran dışındayken kenarda turuncu ok (ortasında kılıç), en yakın akıncıyı gösterir (`RaidService.TryGetNearestRaider`). Hafifçe nabız atar; tıklayınca kamera oraya atlar (`CameraController.LookAt`). Akıncı ekrana girince ya da oyun bitince gizlenir. Kendi prefab'ı `Prefab_UI_Raid_Arrow`, GameEnd ekranının altında. Kenar hesabı `OffScreenArrowMath` (testli) |
+| `TimeControlView` | Takvimin solunda duraklat ve 1x / 2x / 3x; seçili olan parlak, tooltip'te tuşları (Bölüm 33b) |
 | `StatsPanelView` | Sağ altta, ekranın hep boş köşesinde (`Prefab_UI_Stats_Panel`, DynamicCanvas'ta; yazısı saniyede iki kez değişir, statik canvas'ı yeniden kurmasın): FPS, birim ve bina sayısı, saniyede A* araması, ortalama ve en uzun süre (ms); editörde SetPass ve draw call. Ayarlardaki FPS Panel ile açılıp kapanır, iki modda da |
 | `SettingsButtonView` | Barda zaman butonlarının yanındaki dişli (barın layout grubu dizer); ayarları açar (Bölüm 32b) |
 
@@ -572,7 +584,7 @@ Haritada düşman kalmadı ─► Castle'ın yanında belirir ─► işine dön
 ## 32. Esc Katmanları
 **Durum:** ✅ · **Dosyalar:** `UI/Common/EscapeInputHandler.cs`, `ICloseablePanel.cs` · **Test:** `EscapeInputHandlerTests`
 
-Her Esc en üstteki tek katmanı kapatır: yerleştirme (Placement map'inde, `PlacementInputHandler`) → açık popup (ayarlar) → seçim → Production Menu. Kapatacak bir şey kalmadıysa ayarları açar. Sıra tek yerde (`CloseTopLayer`) okunur; popup tarafı `IEscapeMenu` arkasında, testte sahte sürümü kullanılır.
+Her Esc en üstteki tek katmanı kapatır: yerleştirme (Placement map'inde, `PlacementInputHandler`) → nokta bekleyen Attack Move → açık popup (ayarlar, kontroller) → seçim → Production Menu. Kapatacak bir şey kalmadıysa ayarları açar. Sıra tek yerde (`CloseTopLayer`) okunur; popup tarafı `IEscapeMenu` arkasında, testte sahte sürümü kullanılır.
 
 ## 32b. Ayarlar ve Popup'lar
 **Durum:** ✅ · **Dosyalar:** `Core/Settings/*`, `UI/Settings/*`, `Popup/*` · **Veri:** `GameDatas/UI/Data_Popup_Settings` · **Test:** `GameSettingsTests`, `EscapeInputHandlerTests`
@@ -591,6 +603,8 @@ Ana menüde Settings butonu / oyunda kaynak barının sağındaki dişli / Esc (
 - **Bağlam (`ISettingsContext`):** Ana menüde boş. Oyunda (`GameplaySettingsContext`) popup açılınca oyun duraklar, kapanınca daha önce çalışıyorsa devam eder; "Main Menu" satırı sadece oyunda görünür.
 - **Popup modülü (`Popup/*`):** Projede hazır duruyordu, ilk kez kullanıldı. `PopupSystem` `Prefab_UI_Canvas_Main` içindeki `PopupCanvas`'ta (kendi Canvas'ı, sıralama 100; sahnelerin eklediği her panelin üstünde). Popup'lar scope'un container'ıyla oluşturulur, `[Inject]` çalışır. Modal popup arkasına yarı saydam engel koyar; engele tıklamak popup'ı kapatır. Engel ebeveyne gerilir (anchor 0-1), sabit boyut değil; popup açıkken UI boyutu değişse de bütün ekranı kaplar. Açılış OutBack, kapanış InBack ölçek animasyonu (`PopupData`), duraklatılmış oyunda da oynar (unscaled).
 - **Esc:** Önce açık popup'ı kapatır, sonra seçimi, sonra Production Menu'yü; kapatacak bir şey yoksa ayarları açar (`IEscapeMenu`, Bölüm 32).
+- **Kontroller (`ControlsPopup`, `Data_Popup_Controls`):** Bütün tuşlar gruplu, kaydırılabilen tek listede (`ControlsText`, kodda; bağlamaların yanında durur). Oyunda F1 açıp kapatır (`ControlsLauncher`), ayarlar penceresindeki *Controls* satırı ana menüde de açar (ayarların üstüne yığılır). Oyunda açıkken oyun durur. Oyun başlayınca 2 sn sonra bir kez "Press F1 to see the controls" bildirimi çıkar.
+- **Tooltip'te tuşlar:** `HoverTooltip` bileşenini butonun sahibi view koddan ekler (`HoverTooltip.Attach`), prefab'ta ayar gerekmez: duraklat "Pause (P)", hızlar "+ / -", komut ve boş köylü butonları.
 
 ## 32c. Yazı Malzemeleri ve Arayüz Animasyonları
 **Durum:** ✅ · **Dosyalar:** `Materials/Font/MedievalSharp-Regular SDF - *.mat`, `UI/Common/ButtonFeedback.cs`, `ButtonFeedbackInstaller.cs`, `UI/MainMenu/MainMenuBackgroundView.cs`
@@ -666,9 +680,6 @@ Her biri mevcut yapıya şöyle oturacak. Yapılınca kendi bölümüne taşın�
 
 ### Ses ⏳
 - **Nasıl:** Root scope'ta `AudioService` (müzik ve havuzlu `AudioSource`'lar). Gameplay'de bir köprü event'leri seslere çevirir (`UnitAttackedEvent` → kılıç, `BuildingDestroyedEvent` → yıkım, baskın başlangıcı → borozan). Oyun kodu ses bilmez.
-
-### Komut Kısayolları ⏳
-- Kontrol grupları (Ctrl+1-9), AttackMove (A), Stop (S), HoldPosition (X), boştaki köylü (.). (Oyun hızı, duraklatma ve Delete yapıldı, Bölüm 33b.) Hepsi Gameplay action map'ine eylem ve `UnitCommandService`'e metot. Duruş (`HoldPosition`) `UnitModel`'de bir alan; `BattleAiSystem` ona bakar.
 
 ### Diğerleri ⏳
 - Yürürken ayırma (separation) kuvveti, tutorial, düşman yerleşkeleri, Production Menu hücresinde maliyet.

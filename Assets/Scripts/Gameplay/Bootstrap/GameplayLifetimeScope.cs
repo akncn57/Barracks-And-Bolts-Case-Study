@@ -147,7 +147,10 @@ namespace BarracksAndBolts.Gameplay.Bootstrap
             builder.RegisterComponentInHierarchy<ProjectileSpawner>();
 
             builder.Register<UnitCommandService>(Lifetime.Singleton);
+            builder.Register<AttackMoveTargeting>(Lifetime.Singleton);
+            builder.RegisterSimulationSystem<AttackMoveSystem>();
             builder.RegisterEntryPoint<CommandInputHandler>();
+            builder.RegisterEntryPoint<HotkeyInputHandler>().AsSelf();
             builder.RegisterComponentInHierarchy<MoveMarkerView>();
         }
 
@@ -176,6 +179,8 @@ namespace BarracksAndBolts.Gameplay.Bootstrap
             builder.RegisterComponentInHierarchy<PlacementPreviewView>();
 
             builder.Register<SelectionService>(Lifetime.Singleton);
+            builder.Register<IdleVillagerFinder>(Lifetime.Singleton);
+            builder.Register<ControlGroupService>(Lifetime.Singleton);
             builder.RegisterEntryPoint<SelectionInputHandler>();
             builder.RegisterComponentInHierarchy<BoxSelectionView>();
             builder.Register<DeletionService>(Lifetime.Singleton);

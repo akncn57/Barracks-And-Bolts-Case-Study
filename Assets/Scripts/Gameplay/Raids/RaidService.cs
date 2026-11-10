@@ -106,6 +106,31 @@ namespace BarracksAndBolts.Gameplay.Raids
             _subscriptions.Dispose();
         }
 
+        /// <summary>The living raider of the wave on the map that is closest to the point. For the arrow that points at the raid.</summary>
+        /// <returns>False when no raid wave is on the map.</returns>
+        public bool TryGetNearestRaider(Vector2 point, out Vector2 position)
+        {
+            position = default;
+            if (_activeRaid == null)
+                return false;
+
+            var nearestDistance = float.MaxValue;
+            foreach (var id in _waveUnits)
+            {
+                if (!_units.TryGet(id, out var unit) || unit.IsDead)
+                    continue;
+
+                var distance = (unit.Position - point).sqrMagnitude;
+                if (distance < nearestDistance)
+                {
+                    nearestDistance = distance;
+                    position = unit.Position;
+                }
+            }
+
+            return nearestDistance < float.MaxValue;
+        }
+
         public void Tick(float deltaTime)
         {
             if (_activeRaid == null)

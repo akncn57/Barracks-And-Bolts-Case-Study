@@ -1,5 +1,6 @@
 using BarracksAndBolts.Core.Events;
 using BarracksAndBolts.Gameplay.Buildings;
+using BarracksAndBolts.Gameplay.Commands;
 using BarracksAndBolts.Gameplay.Data;
 using BarracksAndBolts.Gameplay.Entities;
 using BarracksAndBolts.Gameplay.Grid;
@@ -69,7 +70,7 @@ namespace BarracksAndBolts.Tests.EditMode.UI
             _selection = new SelectionService(_units, new BuildingService(map, ids, eventBus), eventBus);
             _panel = new FakePanel { IsOpen = true };
             _menu = new FakeMenu();
-            _handler = new EscapeInputHandler(_selection, _panel, _menu, _inputActions);
+            _handler = new EscapeInputHandler(_selection, new AttackMoveTargeting(), _panel, _menu, _inputActions);
         }
 
         [TearDown]

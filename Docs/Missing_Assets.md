@@ -39,7 +39,7 @@
 | 8 | ~~Taş ikonu~~ | ✅ Paketteki kayalardan (gölgesiz, dış hatlı): `Texture_UI_Icons_Stone` | – |
 | 9 | ~~Nüfus ikonu~~ | ✅ Gri köylü avatarından: `Texture_UI_Icons_Population` | – |
 | 10 | Gün / gece / takvim ikonu | Takvim UI'ı | 🔍 / 🛠 |
-| 11 | Baskın uyarı ikonu ve ekran kenarı yön oku | Baskın bildirimi | 🛠 Kılıç ikonu + ok ikonu |
+| 11 | ~~Baskın uyarı ikonu ve ekran kenarı yön oku~~ | ✅ Paketteki `Texture_UI_Icons_Arrow_Orange` döndürülüyor, ortasında `Texture_UI_Icons_Sword` (`Prefab_UI_Raid_Arrow`) | – |
 | 12 | ~~Koyun kesme imleci~~ | ✅ Koyunda da balta imleci (`Texture_Cursors_Axe`) | – |
 | 13 | ~~Kaynak taşıyan köylü~~ | ✅ Köylünün başında küçük kaynak ikonu: `Textures/Markers/Texture_Markers_Carry_*` (UI ikonlarından küçültüldü, Gameplay atlas'ında) | – |
 | 14 | Kaynak toplama ve hasar sayıları (ör. "+5", "-10") | Geri bildirim | 💻 Uçan yazı sistemi hazır (`FloatingTextSpawner`, şu an uyarılar için); sayılar efekt turunda |

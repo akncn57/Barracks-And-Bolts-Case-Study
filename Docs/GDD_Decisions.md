@@ -320,7 +320,7 @@ Tuşlar Age of Empires, StarCraft ve Warcraft III gibi RTS oyunlarının alış�
 | `GameSpeed` | + / − | Button | Oyun hızı 1x, 2x, 3x (opsiyonel) |
 | `ToggleHealthBars` | Alt (basılı tutulduğunda) | Button | Tüm can barlarını gösterir |
 
-> **Şu anki hali:** Yapılanlar: `Pan`, `DragPan`, `Zoom`, `EdgePan` (ayarda kapalı), `Select`, `BoxSelect`, `Command`, Placement map'inin üçü, Esc ile katman kapatma, `DeleteSelected` (Delete; Normal modda sadece kendi birim ve binası, Castle hariç, onaysız), `Pause` (P, oyun içi menü olmadan sadece duraklatma) ve `GameSpeed` (+/-, 1x-3x). Geri kalanlar (kontrol grupları, AttackMove, Stop, HoldPosition, diğer kısayollar) henüz yok.
+> **Şu anki hali:** Yapılanlar: `Pan`, `DragPan`, `Zoom`, `EdgePan` (ayarda kapalı), `Select`, `BoxSelect`, `Command`, Placement map'inin üçü, Esc ile katman kapatma, `DeleteSelected` (Delete; Normal modda sadece kendi birim ve binası, Castle hariç, onaysız), `Pause` (P, oyun içi menü olmadan sadece duraklatma), `GameSpeed` (+/-, 1x-3x), kontrol grupları (Ctrl+1-9, 1-9, çift basış kamerayı götürür), `IdleVillager` (.), Castle'a kamera (**Home**, H değil). Kamera WASD ile kaydığı için A ve S boşta değil; bu yüzden **AttackMove F** (sonra sol tık), **Stop X**, **HoldPosition H**. Bunlar birim kartının üstündeki butonlarla fareyle de verilir, tooltip'lerde tuşları yazar. Bütün liste F1 ile açılan Controls sayfasında (ayarlarda da). Yapılmayanlar: `AddToSelection`, `SelectAllOfType`, `QueueCommand`, `FocusSelection`, `ToggleHealthBars`.
 
 ### Edge Case Notları
 - Mouse UI üzerindeyken (`EventSystem.IsPointerOverGameObject`) dünya inputları (Select, Command, Placement) çalışmaz.

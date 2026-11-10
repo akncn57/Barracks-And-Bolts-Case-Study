@@ -64,6 +64,19 @@ namespace BarracksAndBolts.Gameplay.Selection
             ApplyCandidates();
         }
 
+        /// <summary>Replaces the selection with these entities. An empty list clears it.</summary>
+        public void Select(IReadOnlyList<GameEntityId> ids)
+        {
+            _candidates.Clear();
+            foreach (var id in ids)
+            {
+                if (id.IsValid)
+                    _candidates.Add(id);
+            }
+
+            ApplyCandidates();
+        }
+
         public void Clear()
         {
             _candidates.Clear();
