@@ -1,3 +1,4 @@
+using BarracksAndBolts.Core.Session;
 using BarracksAndBolts.Gameplay.Buildings;
 using BarracksAndBolts.Gameplay.Data;
 using BarracksAndBolts.Gameplay.Grid;
@@ -9,7 +10,7 @@ using VContainer.Unity;
 
 namespace BarracksAndBolts.Gameplay.Economy
 {
-    /// <summary>Sets up the player's base when a normal game starts. Sandbox games start empty.</summary>
+    /// <summary>Sets up the player's base when a normal game starts, with more or less to start with by difficulty. Sandbox games start empty.</summary>
     public sealed class NormalModeStarter : IStartable
     {
         private readonly SandboxService _sandbox;
@@ -18,10 +19,12 @@ namespace BarracksAndBolts.Gameplay.Economy
         private readonly BuildingService _buildings;
         private readonly UnitService _units;
         private readonly GridMap _gridMap;
+        private readonly GameSessionSettings _session;
 
         public NormalModeStarter(SandboxService sandbox, NormalModeSettings settings, ResourceService resources,
-            BuildingService buildings, UnitService units, GridMap gridMap)
+            BuildingService buildings, UnitService units, GridMap gridMap, GameSessionSettings session)
         {
+            _session = session;
             _sandbox = sandbox;
             _settings = settings;
             _resources = resources;
@@ -36,7 +39,7 @@ namespace BarracksAndBolts.Gameplay.Economy
                 return;
 
             foreach (var part in _settings.StartingResources)
-                _resources.Add(part.Kind, part.Amount);
+                _resources.Add(part.Kind, _settings.ScaleStartingAmount(part.Amount, _session.Difficulty));
 
             var castle = _settings.Castle;
             var origin = new Vector2Int((_gridMap.Width - castle.Size.x) / 2, (_gridMap.Height - castle.Size.y) / 2);

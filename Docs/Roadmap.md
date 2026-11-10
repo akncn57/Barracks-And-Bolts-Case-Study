@@ -73,7 +73,7 @@ Oyunu deneyince çıkan kullanılabilirlik istekleri. Sandbox'ta da olmalı, bui
 5. [ ] Kilise ve Monk (kendiliğinden iyileştirme)
 6. [x] Köylünün inşa etmesi: Normal modda bina gri inşaat alanı olarak konur, köylüler bitirir, üstünde ilerleme çubuğu var. Kaynakta ve inşaatta araç imleci. (Tamir ve iptal sonra)
 7. [ ] Depo binaları ve kapasite sistemi
-8. [x] Açlık: her sabah birim başına yemek, yetmezse yavaş HP kaybı; değerler zorluğa göre (menüde zorluk seçimi henüz yok)
+8. [x] Açlık: her sabah birim başına yemek, yetmezse yavaş HP kaybı; değerler zorluğa göre
 9. [x] Bölge sistemi ve Karakol (yarıçap yükseltmesi, yükseltme sistemiyle gelecek). Seçili binada menzil ve bölge halkası
 10. [ ] Köylülerin House'a da sığınması ve bina başına sığınma kapasitesi (Castle'a sığınma yapıldı)
 11. [x] Toplanma noktası (rally point): üretim binası seçiliyken sağ tık, yeni birimler oraya sağ tık emriyle gider
@@ -81,7 +81,7 @@ Oyunu deneyince çıkan kullanılabilirlik istekleri. Sandbox'ta da olmalı, bui
 
 ## P3 – Cila (yetişirse; yetişmezse README'de "Gelecek Planları" olarak listelenir)
 - [ ] Kayıt sistemi (manuel kayıt, birden fazla slot)
-- [ ] Zorluk seviyeleri
+- [x] Zorluk seviyeleri: Play'den sonra seçim, baskın büyüklüğü, başlangıç kaynağı, açlık; sandbox'ta buton
 - [ ] Sonsuz mod
 - [x] Ayarlar menüsü (pencere modu, VSync, arayüz boyutu, kamera hızı, kenar kaydırma, FPS paneli; ses ayarları ses gelince)
 - [x] Arayüz cilası: konturlu ve gölgeli yazı malzemeleri, buton hover/basma animasyonu, kaynak sayısı punch, ana menü arka planı ve giriş animasyonları, FPS paneli sağ altta
@@ -91,7 +91,7 @@ Oyunu deneyince çıkan kullanılabilirlik istekleri. Sandbox'ta da olmalı, bui
 - [x] Tarla: 3x3, 40 odun, bir köylü, bitmez, 6 saniyede 5 yemek
 - [ ] Düşman yerleşkeleri
 - [x] Efekt turu: vuruş animasyon karesinde, ok varınca hasar, ölüm ve yıkılma efekti, can barları (hasarlı ya da seçiliyken)
-- [ ] Ana menüde zorluk seçimi (açlık hazır, dalgalar ve başlangıç kaynağı da bağlanacak)
+- [x] Ana menüde zorluk seçimi
 
 ## Teslim Öncesi
 - [ ] Sahne ayırıcıları: `----- CAMERAS-----` adı ve `----- WORLD -----`'ın yeri

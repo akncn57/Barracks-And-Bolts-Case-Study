@@ -441,6 +441,36 @@ namespace BarracksAndBolts.Tests.EditMode.Gameplay
         }
 
         [Test]
+        public void Raid_Difficulty_ScalesEveryGroup_NeverToNothing()
+        {
+            Assert.AreEqual(2, _raids.ScaleCount(4, Difficulty.Easy));
+            Assert.AreEqual(4, _raids.ScaleCount(4, Difficulty.Normal));
+            Assert.AreEqual(6, _raids.ScaleCount(4, Difficulty.Hard));
+            Assert.AreEqual(1, _raids.ScaleCount(1, Difficulty.Easy), "A group never disappears.");
+            Assert.AreEqual(2, _raids.ScaleCount(1, Difficulty.Hard), "Halves round up.");
+            Assert.AreEqual(0, _raids.ScaleCount(0, Difficulty.Hard));
+        }
+
+        [Test]
+        public void Raid_Difficulty_IsReadAtEveryWave()
+        {
+            var session = new GameSessionSettings { Seed = 3, Difficulty = Difficulty.Hard };
+            var sandbox = CreateSandbox(GameMode.Sandbox);
+            var calendar = new CalendarService(_raids, sandbox, _eventBus);
+            var raids = new RaidService(_raids, _normal, calendar, _units, _buildings, _search, _map, sandbox, session, _eventBus);
+
+            raids.TryStartRaidNow();
+            raids.Tick(0.1f);
+            Assert.AreEqual(2, _units.Units.Count(u => u.Faction == Faction.Enemy), "Hard: one knight becomes two.");
+
+            // The sandbox button changes it in the middle of a raid; the next wave follows.
+            session.Difficulty = Difficulty.Normal;
+            KillEnemies();
+            RunRaid(raids, 1.5f);
+            Assert.AreEqual(1, _units.Units.Count(u => u.Faction == Faction.Enemy));
+        }
+
+        [Test]
         public void Raid_NearestRaider_OnlyFromTheWaveOnTheMap()
         {
             var raids = CreateSandboxRaids(CreateSandbox(GameMode.Sandbox));

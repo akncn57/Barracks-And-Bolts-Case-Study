@@ -258,7 +258,7 @@ public interface IEventBus
 | `CameraConfig` | Kaydırma, zoom ve sınır değerleri |
 
 - PDF değerleri bu asset'lerde tutulur: Barracks 100 HP, House 50 HP, askerler 10 HP ve 10 / 5 / 2 hasar.
-- Zorluk (`DifficultySettings`) henüz yok; `Difficulty` enum'u oturum ayarlarında hazır bekliyor.
+- Zorluk ayrı bir asset'te değil: değerler etkilediği yerin ayarında (`RaidSettings.ScaleCount`, `NormalModeSettings.ScaleStartingAmount`, `GetHunger`). Böylece bir sistemin bütün sayıları tek asset'te kalıyor. Oturumdaki `Difficulty` her kullanımda okunuyor.
 - Tüm tanımlar bir `GameDatabase` asset'inde toplanır ve VContainer'a bu şekilde kaydedilir.
 - Her tanımın `OnValidate` metodu geçersiz değerleri editörde yakalar: boyut ≤ 0, HP ≤ 0, `Producibles` listesinde null eleman gibi.
 

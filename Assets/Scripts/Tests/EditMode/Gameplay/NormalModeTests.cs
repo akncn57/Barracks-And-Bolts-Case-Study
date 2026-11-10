@@ -256,17 +256,28 @@ namespace BarracksAndBolts.Tests.EditMode.Gameplay
         [Test]
         public void Starter_Normal_PlacesCastleVillagersAndResources()
         {
-            new NormalModeStarter(CreateSandbox(GameMode.Normal), _settings, _resources, _buildings, _units, _map).Start();
+            new NormalModeStarter(CreateSandbox(GameMode.Normal), _settings, _resources, _buildings, _units, _map, new GameSessionSettings()).Start();
 
             Assert.AreEqual(1, _buildings.Count);
             Assert.AreEqual(2, _units.Count);
             Assert.AreEqual(40, _resources.Get(ResourceKind.Wood));
         }
 
+        [TestCase(Difficulty.Easy, 60)]
+        [TestCase(Difficulty.Normal, 40)]
+        [TestCase(Difficulty.Hard, 30)]
+        public void Starter_Difficulty_ScalesTheStartingResources(Difficulty difficulty, int wood)
+        {
+            new NormalModeStarter(CreateSandbox(GameMode.Normal), _settings, _resources, _buildings, _units, _map,
+                new GameSessionSettings { Difficulty = difficulty }).Start();
+
+            Assert.AreEqual(wood, _resources.Get(ResourceKind.Wood));
+        }
+
         [Test]
         public void Starter_Sandbox_LeavesMapEmpty()
         {
-            new NormalModeStarter(CreateSandbox(GameMode.Sandbox), _settings, _resources, _buildings, _units, _map).Start();
+            new NormalModeStarter(CreateSandbox(GameMode.Sandbox), _settings, _resources, _buildings, _units, _map, new GameSessionSettings()).Start();
 
             Assert.AreEqual(0, _buildings.Count);
             Assert.AreEqual(0, _units.Count);

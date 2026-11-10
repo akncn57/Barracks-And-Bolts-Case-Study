@@ -1,10 +1,14 @@
 using System;
 using System.Collections.Generic;
+using BarracksAndBolts.Core.Session;
 using UnityEngine;
 
 namespace BarracksAndBolts.Gameplay.Data
 {
-    /// <summary>The calendar of a normal game and the enemies of every raid. Sandbox mode doesn't use this.</summary>
+    /// <summary>
+    /// The calendar of a normal game and the enemies of every raid. Sandbox mode uses only the raids, for its Start Raid
+    /// button.
+    /// </summary>
     [CreateAssetMenu(fileName = "Data_Config_Raids", menuName = "Barracks & Bolts/Config/Raids")]
     public sealed class RaidSettings : ScriptableObject
     {
@@ -51,6 +55,11 @@ namespace BarracksAndBolts.Gameplay.Data
         [Tooltip("Surviving the raid of the last day wins the game.")]
         [SerializeField] private Raid[] raids = Array.Empty<Raid>();
 
+        [Header("Raid size, by difficulty")]
+        [Tooltip("Every group of a wave is this many times its count, at least one. Normal is the counts as they are.")]
+        [SerializeField, Min(0.1f)] private float easyRaidSize = 0.6f;
+        [SerializeField, Min(0.1f)] private float hardRaidSize = 1.5f;
+
         [Header("Fighting")]
         [Tooltip("How far units notice something to attack. In cells.")]
         [SerializeField, Min(0f)] private float aggroRange = 5f;
@@ -66,6 +75,17 @@ namespace BarracksAndBolts.Gameplay.Data
         public float MinSpawnDistance => minSpawnDistance;
         public IReadOnlyList<Raid> Raids => raids;
         public float AggroRange => aggroRange;
+
+        /// <summary>How many of a group come on this difficulty. A group never shrinks to nothing.</summary>
+        public int ScaleCount(int count, Difficulty difficulty)
+        {
+            if (count <= 0 || difficulty == Difficulty.Normal)
+                return count;
+
+            var scale = difficulty == Difficulty.Easy ? easyRaidSize : hardRaidSize;
+            // Halves round up, not to the even number as Mathf.RoundToInt does.
+            return Mathf.Max(1, Mathf.FloorToInt(count * scale + 0.5f));
+        }
         public float ShelterRadius => shelterRadius;
 
         public int LastDay

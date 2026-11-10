@@ -15,6 +15,9 @@ namespace BarracksAndBolts.Gameplay.Data
         [SerializeField] private UnitDefinition villager;
         [SerializeField, Min(0)] private int startingVillagers = 3;
         [SerializeField] private ResourceCost[] startingResources = Array.Empty<ResourceCost>();
+        [Tooltip("The starting resources are this many times the list above. Normal is the list as it is.")]
+        [SerializeField, Min(0f)] private float easyStartingResources = 1.5f;
+        [SerializeField, Min(0f)] private float hardStartingResources = 0.75f;
 
         [Header("Gathering")]
         [Tooltip("How much a villager brings back in one trip.")]
@@ -47,6 +50,19 @@ namespace BarracksAndBolts.Gameplay.Data
         public float NextNodeRadius => nextNodeRadius;
         public int SheepPerMorning => sheepPerMorning;
         public int MaxSheep => maxSheep;
+
+        public int ScaleStartingAmount(int amount, Difficulty difficulty)
+        {
+            switch (difficulty)
+            {
+                case Difficulty.Easy:
+                    return Mathf.FloorToInt(amount * easyStartingResources + 0.5f);
+                case Difficulty.Hard:
+                    return Mathf.FloorToInt(amount * hardStartingResources + 0.5f);
+                default:
+                    return amount;
+            }
+        }
 
         public HungerLevel GetHunger(Difficulty difficulty)
         {

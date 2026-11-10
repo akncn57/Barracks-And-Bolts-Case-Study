@@ -1,8 +1,11 @@
 using BarracksAndBolts.Core.Events;
+using BarracksAndBolts.Core.Session;
 using BarracksAndBolts.Gameplay.CameraControl;
 using BarracksAndBolts.Gameplay.Raids;
 using BarracksAndBolts.Gameplay.Sandbox;
 using BarracksAndBolts.Gameplay.Selection;
+using BarracksAndBolts.UI.Common;
+using BarracksAndBolts.UI.Tooltips;
 using BarracksAndBolts.Utils.Disposables;
 using TMPro;
 using UnityEngine;
@@ -12,18 +15,25 @@ using VContainer;
 namespace BarracksAndBolts.UI.Sandbox
 {
     /// <summary>
-    /// The sandbox tool column beside the production menu: battle AI and debug switches, a raid on demand,
-    /// clearing the map and a test battle. Hidden in a normal game. The stats panel is its own view (StatsPanelView).
+    /// The Sandbox panel beside the production menu. Settings: the side new things belong to (its own view on the same
+    /// panel), the difficulty of the raids, battle AI and debug view. Actions: a raid on demand, a test battle, clearing
+    /// the map. Hidden in a normal game. The stats panel is its own view (StatsPanelView).
     /// </summary>
     public sealed class SandboxSwitchesView : MonoBehaviour
     {
         // A second click within this time clears the map. One stray click shouldn't wipe a setup.
         private const float ClearConfirmSeconds = 3f;
 
+        [Tooltip("Holds every sandbox button. Hidden in a normal game.")]
+        [SerializeField] private GameObject panel;
         [SerializeField] private Button battleAiButton;
         [SerializeField] private TMP_Text battleAiLabel;
         [SerializeField] private Button debugViewButton;
         [SerializeField] private TMP_Text debugViewLabel;
+
+        [Tooltip("Steps through Easy, Normal and Hard. Sets how big the next raid wave is.")]
+        [SerializeField] private Button difficultyButton;
+        [SerializeField] private TMP_Text difficultyLabel;
 
         [Header("Tools")]
         [SerializeField] private Button raidButton;
@@ -41,14 +51,18 @@ namespace BarracksAndBolts.UI.Sandbox
         private DeletionService _deletion;
         private SandboxBattleSpawner _battle;
         private CameraController _camera;
+        private GameSessionSettings _session;
+        private TooltipView _tooltip;
         private IEventBus _eventBus;
 
         private float _clearConfirmUntil = -1f;
 
         [Inject]
         private void Construct(SandboxService sandbox, RaidService raids, DeletionService deletion, SandboxBattleSpawner battle,
-            CameraController cameraController, IEventBus eventBus)
+            CameraController cameraController, GameSessionSettings session, TooltipView tooltip, IEventBus eventBus)
         {
+            _session = session;
+            _tooltip = tooltip;
             _sandbox = sandbox;
             _raids = raids;
             _deletion = deletion;
@@ -61,17 +75,14 @@ namespace BarracksAndBolts.UI.Sandbox
         {
             if (!_sandbox.IsEnabled)
             {
-                battleAiButton.gameObject.SetActive(false);
-                debugViewButton.gameObject.SetActive(false);
-                raidButton.gameObject.SetActive(false);
-                clearMapButton.gameObject.SetActive(false);
-                battleButton.gameObject.SetActive(false);
+                panel.SetActive(false);
                 enabled = false;
                 return;
             }
 
             battleAiButton.onClick.AddListener(_sandbox.ToggleBattleAi);
             debugViewButton.onClick.AddListener(_sandbox.ToggleDebugView);
+            difficultyButton.onClick.AddListener(OnDifficultyClicked);
             raidButton.onClick.AddListener(OnRaidClicked);
             clearMapButton.onClick.AddListener(OnClearMapClicked);
             battleButton.onClick.AddListener(OnBattleClicked);
@@ -87,6 +98,7 @@ namespace BarracksAndBolts.UI.Sandbox
             _subscriptions.Dispose();
             battleAiButton.onClick.RemoveAllListeners();
             debugViewButton.onClick.RemoveAllListeners();
+            difficultyButton.onClick.RemoveAllListeners();
             raidButton.onClick.RemoveAllListeners();
             clearMapButton.onClick.RemoveAllListeners();
             battleButton.onClick.RemoveAllListeners();
@@ -109,6 +121,15 @@ namespace BarracksAndBolts.UI.Sandbox
         {
             battleAiLabel.text = _sandbox.IsBattleAiOn ? "Enemy AI: On" : "Enemy AI: Off";
             debugViewLabel.text = _sandbox.IsDebugViewOn ? "Debug: On" : "Debug: Off";
+            difficultyLabel.text = $"Difficulty: {_session.Difficulty}";
+            HoverTooltip.Attach(difficultyButton, _tooltip, $"Difficulty: {_session.Difficulty}",
+                DifficultyText.Summary(_session.Difficulty) + ". In the sandbox it sets the size of the next raid wave.");
+        }
+
+        private void OnDifficultyClicked()
+        {
+            _session.Difficulty = _session.Difficulty == Difficulty.Hard ? Difficulty.Easy : _session.Difficulty + 1;
+            Refresh();
         }
 
         private void OnRaidClicked()

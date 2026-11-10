@@ -38,6 +38,7 @@ namespace BarracksAndBolts.Gameplay.Raids
         private readonly IEventBus _eventBus;
         private readonly Random _random;
         private readonly SandboxService _sandbox;
+        private readonly GameSessionSettings _session;
         private readonly bool _isEnabled;
         private readonly CompositeDisposable _subscriptions = new();
 
@@ -64,6 +65,7 @@ namespace BarracksAndBolts.Gameplay.Raids
             _eventBus = eventBus;
             _random = new Random(session.Seed);
             _sandbox = sandbox;
+            _session = session;
             _isEnabled = !sandbox.IsEnabled;
 
             if (_isEnabled)
@@ -191,7 +193,9 @@ namespace BarracksAndBolts.Gameplay.Raids
             _waveUnits.Clear();
             foreach (var group in groups)
             {
-                for (var i = 0; i < group.Count; i++)
+                // Read at every wave, so the sandbox's difficulty button counts from the next wave on.
+                var count = _settings.ScaleCount(group.Count, _session.Difficulty);
+                for (var i = 0; i < count; i++)
                 {
                     if (_units.TrySpawn(group.Unit, spawnCell, Faction.Enemy, out var raider))
                         _waveUnits.Add(raider.Id);

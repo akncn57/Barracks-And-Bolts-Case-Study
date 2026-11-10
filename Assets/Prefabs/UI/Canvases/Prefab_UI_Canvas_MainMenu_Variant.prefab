@@ -269,6 +269,7 @@ MonoBehaviour:
   playButton: {fileID: 4912927639989184019}
   sandboxButton: {fileID: 3669881956623130899}
   quitButton: {fileID: 7802058579767648780}
+  difficultyPopup: {fileID: 11400000, guid: 3a6b8c0d2e4f6a7b9c1d3e5f7a9b1c45, type: 2}
   entranceOrder:
   - {fileID: 4044234290745479540}
   - {fileID: 5683597927532287604}

@@ -479,7 +479,7 @@ Köylüyle kendi bitmiş tarlana sağ tık ─► UnitCommandService.Farm ─►
 - Borç varken her birim belli aralıkla 1 HP kaybeder: Kolay 15, Normal 10, Zor 5 saniye. Gelen yemek önce borcu öder, ödenince kayıp durur.
 - Başlarken "Not enough food! Your people are starving", bitince "There is food again" bildirimi; kaynak barında yemek sayısı kırmızı (`HungerChangedEvent`).
 - Hasar saldırgansız verilir (`CombatService.ApplyDamage(..., GameEntityId.None)`); birim bu yüzden kimseye dönmez, "!" çıkmaz. Ölüm normal ölüm event'leriyle olur, yani son birim de ölürse mevcut kaybetme koşulu çalışır.
-- Zorluk `GameSessionSettings.Difficulty`'den okunur. Ana menüde henüz zorluk seçimi yok, oyun Normal ile başlar. Sandbox'ta açlık yok.
+- Zorluk `GameSessionSettings.Difficulty`'den okunur; ana menüde Play'den sonra seçilir (Bölüm 27). Sandbox'ta açlık yok.
 
 ## 23. Takvim ve Gece
 **Durum:** ✅ · **Dosyalar:** `Gameplay/Calendar/CalendarService.cs`, `UI/Hud/DayNightOverlayView.cs`, `CalendarLabelView.cs` · **Veri:** `Data_Config_Raids`
@@ -502,6 +502,7 @@ Dalga doğar ─► hepsi ölür ─► 8 sn ─► sonraki dalga ... ─► "Ra
   - Düşman: hedefi Castle (Sandbox'ta Castle yoksa oyuncunun en yakın binası ya da birimi, uzaklık sınırı olmadan). Yakınında (`aggroRange` 5) oyuncu birimi ya da binası varsa ona döner; 10 hücreden uzaklaşırsa bırakır. Binalar da hedef olduğu için yolu kapatan binayı yıkar; ayrı "engel yıkma" kodu yok.
   - Oyuncunun boştaki askeri yakındaki düşmana saldırır; hareket emri alanı rahatsız etmez.
 - Bir dalganın bitmesi o dalganın kendi birimlerinin ölmesidir (`_waveUnits`); Sandbox'ta elle konan düşmanlar sonraki dalgayı bekletmez.
+- **Zorluk:** Her dalgada her grubun sayısı `RaidSettings.ScaleCount` ile çarpılır: Easy ×0,6, Normal ×1, Hard ×1,5; yarımlar yukarı yuvarlanır, grup hiç sıfıra inmez. Zorluk her dalgada yeniden okunur, sandbox'taki *Difficulty* butonu sonraki dalgadan itibaren geçerli. Başlangıç kaynakları da zorluğa göre (`NormalModeSettings.ScaleStartingAmount`: ×1,5 / ×1 / ×0,75), açlık da (Bölüm 22d). Değerler asset'lerde, kodda değil.
 - Sandbox'ta varsayılan kapalı; "Enemy AI" düğmesiyle açılır (Bölüm 33). **Sandbox baskını:** "Start Raid" `RaidService.TryStartRaidNow` ile listedeki sıradaki baskını hemen başlatır (sonuncudan sonra başa döner) ve yapay zekâyı açar. Takvim yok, bitince `RaidEndedEvent` yayınlanmaz (oyun kazanılmaz). Harita temizlenince durur.
 
 ## 25. Sığınma
@@ -530,10 +531,10 @@ Haritada düşman kalmadı ─► Castle'ın yanında belirir ─► işine dön
 ## 27. Ana Menü
 **Durum:** 🟡 (Play, Sandbox, Settings, Quit) · **Dosyalar:** `UI/MainMenu/*` · **Görsel:** `Textures/Backgrounds/Texture_Backgrounds_MainMenu`
 
-- Play Normal modu, Sandbox Sandbox'ı yeni bir seed'le başlatır. Basınca butonlar kilitlenir; `SceneLoader` da yükleme sürerken gelen ikinci isteği yok sayar.
+- **Play** önce "Choose Difficulty" penceresini açar (`DifficultyPopup`, `Data_Popup_Difficulty`): Easy, Normal, Hard, her birinin altında ne değiştirdiği (`DifficultyText`). Seçim `GameSessionSettings.Difficulty`'ye yazılır ve Normal oyun başlar; Back vazgeçer. **Sandbox** hemen başlar, zorluğu oyunun içindeki butondan değişir. İkisi de yeni bir seed'le. Basınca butonlar kilitlenir; `SceneLoader` da yükleme sürerken gelen ikinci isteği yok sayar.
 - Settings ayarlar popup'ını açar (Bölüm 32b). Quit editörde Play modunu kapatır, build'de uygulamayı.
 - **Arka plan:** Oyunun kendi tile ve sprite'larından birleştirilmiş 1920x1080 tek bir resim (sahnede sprite yok, tek draw call): iki tarafın kalesi, kuleleri, evleri, ormanlar ve karşı karşıya duran iki küçük ordu; ortası menüye boş bırakıldı, kenarlar hafif karartıldı. Atlas dışında (`Textures/Backgrounds`), çünkü UI atlası bu boyutta bir resmi şişirirdi. Her ekran oranında ekranı kaplar (`MainMenuBackgroundView.FitPicture`). Başlık *Outline Shadow* malzemesinde. Prefab: `Prefab_UI_MainMenu_Background`, canvas varyantında panelin arkasında.
-- Planlanan: renk ve zorluk seçimi, seed girişi, kayıt yükleme (bkz. G).
+- Planlanan: renk seçimi, seed girişi, kayıt yükleme (bkz. G).
 
 ## 28. Production Menu
 **Durum:** ✅ · **Dosyalar:** `UI/Scroll/*`, `UI/Production/*`, `UI/Common/SlideOutPanel.cs` · **Test:** `RecyclingScrollMathTests`
@@ -616,12 +617,15 @@ Ana menüde Settings butonu / oyunda kaynak barının sağındaki dişli / Esc (
 - Var olanlar: Production Menu kayması (`SlideOutPanel`), duyuru bandı, popup aç/kapa.
 
 ## 33. Sandbox
-**Durum:** ✅ · **Dosyalar:** `Gameplay/Sandbox/SandboxService.cs`, `SandboxBattleSpawner.cs`, `UI/Sandbox/SandboxFactionToggleView.cs`, `SandboxSwitchesView.cs`, `Gameplay/DebugView/DebugOverlayView.cs` · **Test:** `SandboxServiceTests`, `SandboxToolsTests`, `GameLoopTests`
+**Durum:** ✅ · **Dosyalar:** `Gameplay/Sandbox/SandboxService.cs`, `SandboxBattleSpawner.cs`, `UI/Sandbox/SandboxFactionToggleView.cs`, `SandboxSwitchesView.cs` (prefab: `Prefab_UI_Production_Menu` > `Panel_Sandbox`), `Gameplay/DebugView/DebugOverlayView.cs` · **Test:** `SandboxServiceTests`, `SandboxToolsTests`, `GameLoopTests`
 
 - `SandboxService.ActiveFaction`: yeni bina ve birimlerin tarafı. Side düğmesi değiştirir; menü o tarafın renginde gösterir. Düşman Barracks'ından düşman askeri üretmek için Side: Enemy olmalı.
 - Kaynak sınırsız, nüfus ve bölge yok, takvim kapalı, baskın sadece elle, bina anında hazır.
 - **Production Menu sekmeleri:** *Buildings*, *Units*, *Resources*. Birimler ve kaynaklar (ağaç, kaya, altın madeni, koyun) doğrudan haritaya konur (Bölüm 10 ve 28). Barracks'tan üretim (PDF yolu) aynen duruyor. Kaynak listesi `ResourceDistribution` gruplarından toplanır, her tanım bir kez.
-- **Düğmeler** (`SandboxSwitchesView`, "Production >" butonunun altında, menü kapalıyken de görünür):
+- **Sandbox paneli** (`Panel_Sandbox`, `SandboxSwitchesView`): "Production >" butonunun altında, Information Panel'in kâğıt arka planında, menü kapalıyken de görünür, menüyle birlikte kayar. İki grup: *Settings* (Side, Difficulty, Enemy AI, Debug) ve *Actions* (Start Raid, +100 Units, Clear Map). Butonlar 50 yüksek, yazıları butona sığacak kadar küçülür. Eskiden butonlar tek tek ekranın sol kenarına dizilmişti, Side da ekranın üst ortasında tek başına duruyordu. Normal oyunda panelin tamamı gizli.
+- **Düğmeler:**
+  - **Side:** `SandboxFactionToggleView` (aynı panelde, kendi bileşeni). Yeni bina ve birimler kimin.
+  - **Difficulty:** Easy, Normal, Hard arasında döner; sonraki baskın dalgasının büyüklüğü (Bölüm 24). Tooltip'te ne yaptığı yazar.
   - **Enemy AI:** `SandboxService.IsBattleAiOn`. Açıkken `BattleAiSystem` çalışır: düşman oyuncunun en yakın binasına ya da birimine yürür, yolda yakınına geleni vurur; oyuncunun boştaki askeri yakındaki düşmana saldırır. Varsayılan kapalı; test edenin emirleri olduğu gibi kalsın. Baskın ve test savaşı onu kendiliğinden açar (`TurnBattleAiOn`).
   - **Debug:** `SandboxService.IsDebugViewOn`. `DebugOverlayView` grid'i ve seçili birimlerin yolunu çizer (aşağıda).
   - **Start Raid:** Listedeki sıradaki baskın hemen gelir (Bölüm 24). Baskın sürerken düğme kilitli ve "Raid 3: wave 2 of 4" yazar.
@@ -674,8 +678,7 @@ Her biri mevcut yapıya şöyle oturacak. Yapılınca kendi bölümüne taşın�
 ### Kayıt ⏳
 - **Nasıl:** Core'da `SaveService`, JSON, `Application.persistentDataPath`, birden fazla slot. Seed + değişiklikler: binalar, birimler (emirleriyle), kaynak miktarları, gün, kaynaklar. Tanımlar `Id` alanıyla yazılır. Yükleme: harita seed'den kurulur, üstüne kayıt uygulanır.
 
-### Zorluk ve Sonsuz Mod ⏳
-- **Zorluk:** Ana menüde Kolay / Normal / Zor seçimi, `GameSessionSettings.Difficulty`'ye yazar. Açlık bunu zaten okuyor (Bölüm 22d); dalga çarpanı ve başlangıç kaynağı `RaidService` ve `NormalModeStarter`'a eklenecek.
+### Sonsuz Mod ⏳
 - **Sonsuz mod:** Son baskından sonra `RaidService` formülle yeni baskın üretir. `GameEndView`'e *Continue*; hayatta kalınan gün HUD'da.
 
 ### Ses ⏳
@@ -724,7 +727,6 @@ Kuralı servisin içinde `IsEnabled` / `IsUnlimited` gibi tek bir bayrakla kapat
 # I. Bilinen Sınırlar
 - Birimler yürürken birbirinin içinden geçer; sadece hedeflerde ayrılırlar.
 - Yakın dövüşçü plato kenarının altından üstteki hedefe vurabilir; menzil seviyeye bakmaz.
-- Ana menüde zorluk seçimi yok; açlık değerleri zorluğa göre hazır ama oyun Normal ile başlar.
 - Hasar sayıları (ör. "-4") yok; vuruş kırmızı flaş ve can barıyla görünür.
 - Bölge halkası gerçek daire, bölge katmanı hücre hücre; aralarında en fazla bir hücrelik fark olabilir.
 - Bölge katmanı footprint her hücre değiştirdiğinde baştan çizilir; büyük haritada takılma olursa sadece değişen bölge çizilecek.

@@ -1,6 +1,7 @@
 using System;
 using BarracksAndBolts.Core.Scenes;
 using BarracksAndBolts.Core.Session;
+using BarracksAndBolts.Popup;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using UnityEngine;
@@ -9,11 +10,16 @@ using VContainer;
 
 namespace BarracksAndBolts.UI.MainMenu
 {
+    /// <summary>
+    /// Play asks for the difficulty first and then starts a normal game; Sandbox starts at once, its difficulty is a
+    /// button inside the game.
+    /// </summary>
     public sealed class MainMenuView : MonoBehaviour
     {
         [SerializeField] private Button playButton;
         [SerializeField] private Button sandboxButton;
         [SerializeField] private Button quitButton;
+        [SerializeField] private PopupData difficultyPopup;
 
         [Header("Entrance")]
         [Tooltip("Pop in one after another, from the top. Settings is here too; its click is handled by SettingsButtonView.")]
@@ -23,12 +29,15 @@ namespace BarracksAndBolts.UI.MainMenu
 
         private SceneLoader _sceneLoader;
         private GameSessionSettings _sessionSettings;
+        private PopupSystem _popups;
+        private DifficultyPopup _openPopup;
 
         [Inject]
-        private void Construct(SceneLoader sceneLoader, GameSessionSettings sessionSettings)
+        private void Construct(SceneLoader sceneLoader, GameSessionSettings sessionSettings, PopupSystem popups)
         {
             _sceneLoader = sceneLoader;
             _sessionSettings = sessionSettings;
+            _popups = popups;
         }
 
         private void Start()
@@ -58,7 +67,29 @@ namespace BarracksAndBolts.UI.MainMenu
 
         private void OnPlayClicked()
         {
+            // A second click while it is open would stack a second window.
+            if (_openPopup != null)
+                return;
+
+            _openPopup = _popups.Open<DifficultyPopup>(difficultyPopup);
+            _openPopup.Chosen += OnDifficultyChosen;
+            _popups.Closed += OnPopupClosed;
+        }
+
+        private void OnDifficultyChosen(Difficulty difficulty)
+        {
+            _sessionSettings.Difficulty = difficulty;
             StartGame(GameMode.Normal);
+        }
+
+        private void OnPopupClosed(PopupBase popup)
+        {
+            if (popup != _openPopup)
+                return;
+
+            _openPopup.Chosen -= OnDifficultyChosen;
+            _openPopup = null;
+            _popups.Closed -= OnPopupClosed;
         }
 
         private void OnSandboxClicked()
