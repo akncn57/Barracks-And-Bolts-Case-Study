@@ -400,7 +400,7 @@ Cleanup fazı: DeathCleanupSystem ─► CombatService.RemoveDead ─► UnitSer
 - Öncelik: saldırı (bir kez oynar) > inşaat (çekiç) > toplama (balta ya da kazma) > koşma > bekleme. Sprite sadece kare değişince atanır.
 - Pivotlar ayakta; `flipX` karakteri kendi ekseninde çevirir.
 - Seçim halkası ayakların altında, rengi tarafa göre.
-- **Durum ikonları:** Tek `SpriteRenderer`, iki sprite. Boştaki köylüde krem "Zz" (`UnitModel.IsIdle`); düşmanı kendi fark eden ya da vurulup karşılık veren askerde 1,5 sn kırmızı "!" (`UnitModel.SpotEnemy`, `HasJustSpottedEnemy`). Oyuncunun emrinde çıkmaz. Kendi Sorting Group'u (`Sort At Root`, 160) ile ağaç ve binaların önünde.
+- **Durum ikonları:** Tek `SpriteRenderer`, iki sprite. Boştaki köylüde krem "Zz" (`UnitModel.IsIdle`); düşmanı kendi fark eden ya da vurulup karşılık veren askerde 1,5 sn kırmızı "!" (`UnitModel.SpotEnemy`, `HasJustSpottedEnemy`). Oyuncunun emrinde çıkmaz. Son 3 saniyede savaşmış askerde de çıkmaz: büyük savaşta her öldürmenin ardından yeni hedef geliyor ve bütün askerlerin başında "!" hiç sönmüyordu; artık sadece savaşın başlangıcını gösterir. Kendi Sorting Group'u (`Sort At Root`, 160) ile ağaç ve binaların önünde.
 - **Taşıma ikonu:** Yükle bırakma noktasına giden köylünün başında taşıdığı kaynağın küçük ikonu (odun, taş, et, altın). Aynı `SpriteRenderer`'da, öncelik "Zz" > "!" > yük. Model `UnitModel.CarriedKind` ile söyler; `GatheringSystem` ve `FarmingSystem` yükü alınca doldurur, teslimde ya da yük kaybolunca (iptal, yol yok, ölüm) boşaltır. Kaçarken yük elde kalır, ikon da. Dokular `Texture_Markers_Carry_*`: UI ikonlarının 26 piksele küçültülmüş kopyaları, Gameplay atlas'ında (UI atlas'ı dünyada ayrı çizim isterdi). İkon değişince 0,15 sn büyükten küçülür (pop).
 
 ---

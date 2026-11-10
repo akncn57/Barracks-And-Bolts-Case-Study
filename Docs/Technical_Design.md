@@ -271,7 +271,7 @@ public interface IEventBus
 - **Yazı malzemeleri:** Kontur ve gölge TMP preset'leri aynı font atlasını kullanır; ek doku yok, sadece malzeme başına bir çizim.
 - **Gece efekti:** Ekranı kaplayan tek bir yarı saydam UI görseli (`DayNightOverlayView`), alfası takvimden gelir. Işık sistemi kullanılmıyor.
 - **Çizim sırası (Order in Layer):** su -5, köpük -4, zemin -3, plato ve merdiven -2, bölge katmanı ve halkalar -1, bina, birim ve kaynak 0, tarlanın içindeki köylü 1, yerleştirme önizlemesi 99-100, patlama efekti 145, ok ve debug yol noktaları 150, inşaat çubuğu 155, can barı 158, durum ikonu 160, hover çerçevesi 190, seçim kutusu 200.
-- Ölçüm Frame Debugger ve Game view Stats ile yapılır: savaş sırasında **10 SetPass**. Son özelliklerden sonra tekrar ölçülecek, sonuç README'ye yazılacak.
+- Ölçüm Frame Debugger ve Game view Stats ile yapılır: savaş sırasında **10 SetPass**. Bütün özelliklerden sonra, 150 birimlik test savaşında (+100 Units) **16 SetPass, 231 draw call**. Artış can barları, efektler, durum ikonları ve yeni UI panellerinden.
 
 ---
 

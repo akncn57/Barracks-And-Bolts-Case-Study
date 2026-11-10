@@ -242,6 +242,25 @@ namespace BarracksAndBolts.Tests.EditMode.Gameplay
         }
 
         [Test]
+        public void SpottedEnemy_RightAfterAFight_ShowsNoIcon_UntilTheUnitIsCalm()
+        {
+            var enemy = Spawn(_tank, new Vector2Int(6, 5), Faction.Enemy);
+            var soldier = Spawn(_knight, new Vector2Int(5, 5));
+
+            // Its last target just died; the next one is part of the same fight.
+            soldier.SetAttackTarget(enemy.Id);
+            soldier.TickCombatTimers(0.1f);
+            soldier.ClearAttackTarget();
+            soldier.SpotEnemy(enemy.Id);
+            Assert.IsFalse(soldier.HasJustSpottedEnemy);
+
+            soldier.ClearAttackTarget();
+            soldier.TickCombatTimers(4f);
+            soldier.SpotEnemy(enemy.Id);
+            Assert.IsTrue(soldier.HasJustSpottedEnemy, "Calm for a while, so a new enemy is news again.");
+        }
+
+        [Test]
         public void BusyVictim_KeepsWhatItWasDoing()
         {
             var attacker = Spawn(_knight, new Vector2Int(5, 5));

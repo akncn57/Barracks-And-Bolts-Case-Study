@@ -1,6 +1,6 @@
 # Barracks & Bolts – Öncelik ve Takvim
 
-> **Durum (10 Kasım):** P0 ve P0+ bitti, sadece README kaldı. P1 oyun döngüsü kuruldu ve oynandı. P2'den kule, bölge sistemi, köylünün inşaatı, tam Sandbox, toplanma noktası ve açlık yapıldı; P3'ten tarla ve efekt turu (vuruş karesi, ölüm ve yıkılma efekti, can barları). SetPass 10 (son özelliklerden önce ölçüldü), Windows build 8 Kasım'da denendi. **Sıradaki adım:** Test Runner sonucu, SetPass ölçümü, yeni build, denge, README en son.
+> **Durum (10 Kasım):** P0 ve P0+ bitti, sadece README kaldı. P1 oyun döngüsü kuruldu ve oynandı. P2'den kule, bölge sistemi, köylünün inşaatı, tam Sandbox, toplanma noktası ve açlık yapıldı; P3'ten tarla ve efekt turu (vuruş karesi, ölüm ve yıkılma efekti, can barları). SetPass 16 (150 birimlik savaşta, son özelliklerle), Windows build 8 Kasım'da denendi. **Sıradaki adım:** Test Runner sonucu, SetPass ölçümü, yeni build, denge, README en son.
 > Sistemlerin kodda nasıl çalıştığı: [Systems.md](Systems.md)
 
 > **Teslim tarihi:** 13 Kasım 2026, Cuma
@@ -27,7 +27,7 @@ Bu seviye bittiğinde PDF'teki her madde karşılanmış olur. **Hedef: 10 Kası
 - [x] HP 0 olunca yok olma: seçim ve panel temizlenir, grid hücreleri boşalır, saldıranlar hedefini bırakır
 - [x] **Minimal Sandbox:** düşman birimi ve binası yerleştirme. Dost ateşi olmadığı için saldırı maddesinin test edilebilmesi buna bağlı
 - [x] Ana menü (Sandbox ile başlama ve çıkış yeterli)
-- [x] SetPass < 20 kontrolü: savaş sırasında Stats'ta 10
+- [x] SetPass < 20 kontrolü: savaş sırasında Stats'ta 10; bütün özelliklerden sonra 150 birimlik savaşta 16
 - [x] Resizable Windows build
 - [ ] README: nasıl oynanır, kontroller, mimari özeti, PDF maddelerinin nasıl karşılandığı
 
@@ -61,7 +61,8 @@ Oyunu deneyince çıkan kullanılabilirlik istekleri. Sandbox'ta da olmalı, bui
 - [x] Dalga sistemi ve baskın bildirimleri (ses ve mini harita yok; yön yazıyla söyleniyor, dalga ekran dışındayken kenarda tıklanabilir ok)
 - [x] Kazanma ve kaybetme koşulları ve oyun sonu ekranı
 - [ ] Oyun döngüsünün dengesi (süreler, maliyetler, dalga büyüklükleri)
-- [ ] Test Runner sonucu (520 test; ilk koşuda 8 hata düzeltildi, tekrar koşulacak) ve son SetPass ölçümü
+- [x] Test Runner: 520 test geçiyor (ilk koşuda çıkan 8 hata düzeltildi)
+- [x] Son SetPass ölçümü: +100 Units savaşında (150 birim) SetPass 16, 231 draw call, editörde 511 FPS
 
 ## P2 – Derinlik (zaman kaldıkça, aşağıdaki sırayla)
 **Hedef: 12 Kasım Perşembe.**

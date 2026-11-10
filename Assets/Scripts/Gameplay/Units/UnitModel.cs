@@ -21,9 +21,14 @@ namespace BarracksAndBolts.Gameplay.Units
         // How long a unit keeps telling that it noticed an enemy.
         private const float EnemySpottedDuration = 1.5f;
 
+        // A unit that fought this recently is still in the fight: its next target is no news, so it shows nothing.
+        // Without this every soldier of a big battle kept the icon on, as each kill is followed by a new target.
+        private const float CalmAfterFight = 3f;
+
         private readonly List<Vector2> _waypoints = new();
         private int _nextWaypoint;
         private float _enemySpottedLeft;
+        private float _fightLeft;
 
         public UnitModel(GameEntityId id, UnitDefinition definition, Faction faction, Vector2 position)
         {
@@ -102,11 +107,15 @@ namespace BarracksAndBolts.Gameplay.Units
             _enemySpottedLeft = 0f;
         }
 
-        /// <summary>Attacks a target the unit found by itself, not one the player ordered.</summary>
+        /// <summary>
+        /// Attacks a target the unit found by itself, not one the player ordered. It tells so only if it wasn't fighting
+        /// a moment ago.
+        /// </summary>
         public void SpotEnemy(GameEntityId target)
         {
             SetAttackTarget(target);
-            _enemySpottedLeft = EnemySpottedDuration;
+            if (_fightLeft <= 0f)
+                _enemySpottedLeft = EnemySpottedDuration;
         }
 
         public void ClearAttackTarget()
@@ -170,6 +179,7 @@ namespace BarracksAndBolts.Gameplay.Units
             AttackCooldownLeft = Mathf.Max(AttackCooldownLeft - deltaTime, 0f);
             RepathDelayLeft = Mathf.Max(RepathDelayLeft - deltaTime, 0f);
             _enemySpottedLeft = Mathf.Max(_enemySpottedLeft - deltaTime, 0f);
+            _fightLeft = HasAttackTarget ? CalmAfterFight : Mathf.Max(_fightLeft - deltaTime, 0f);
         }
 
         public void StartAttackCooldown()
