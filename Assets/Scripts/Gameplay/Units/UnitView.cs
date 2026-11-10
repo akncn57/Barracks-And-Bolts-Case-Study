@@ -22,6 +22,10 @@ namespace BarracksAndBolts.Gameplay.Units
         private const float IconBobHeight = 0.05f;
         private const float IconBobSpeed = 4f;
 
+        // A new icon starts a little bigger and shrinks back, so the change is easy to notice.
+        private const float IconPopScale = 1.35f;
+        private const float IconPopDuration = 0.15f;
+
         [SerializeField] private SpriteRenderer spriteRenderer;
         [SerializeField, Min(1f)] private float framesPerSecond = 10f;
 
@@ -49,6 +53,11 @@ namespace BarracksAndBolts.Gameplay.Units
         [SerializeField] private Sprite idleSprite;
         [Tooltip("A player's soldier that just noticed an enemy by itself.")]
         [SerializeField] private Sprite enemySpottedSprite;
+        [Tooltip("A player's villager on the way to a drop-off, by what it carries.")]
+        [SerializeField] private Sprite carriedWoodSprite;
+        [SerializeField] private Sprite carriedStoneSprite;
+        [SerializeField] private Sprite carriedFoodSprite;
+        [SerializeField] private Sprite carriedGoldSprite;
 
         private readonly DamageFlash _damageFlash = new();
         private UnitModel _unit;
@@ -62,6 +71,8 @@ namespace BarracksAndBolts.Gameplay.Units
         private bool _isPlayerSoldier;
         private bool _isSelected;
         private Vector3 _iconRestPosition;
+        private Sprite _shownIcon;
+        private float _iconShownAt;
 
         public GameEntityId UnitId => _unit.Id;
 
@@ -138,11 +149,19 @@ namespace BarracksAndBolts.Gameplay.Units
         private void UpdateStatusIcon()
         {
             var sprite = PickStatusSprite();
+            if (sprite != _shownIcon)
+            {
+                _shownIcon = sprite;
+                _iconShownAt = _clock.ElapsedTime;
+                statusIcon.sprite = sprite;
+            }
+
             statusIcon.enabled = sprite != null;
             if (sprite == null)
                 return;
 
-            statusIcon.sprite = sprite;
+            var popLeft = 1f - Mathf.Clamp01((_clock.ElapsedTime - _iconShownAt) / IconPopDuration);
+            statusIcon.transform.localScale = Vector3.one * Mathf.Lerp(1f, IconPopScale, popLeft);
             statusIcon.transform.localPosition = _iconRestPosition + Vector3.up * (Mathf.Sin(_clock.ElapsedTime * IconBobSpeed) * IconBobHeight);
         }
 
@@ -154,7 +173,25 @@ namespace BarracksAndBolts.Gameplay.Units
             if (_isPlayerSoldier && _unit.HasJustSpottedEnemy)
                 return enemySpottedSprite;
 
+            if (_isPlayerVillager && _unit.CarriedKind.HasValue)
+                return GetCarriedSprite(_unit.CarriedKind.Value);
+
             return null;
+        }
+
+        private Sprite GetCarriedSprite(ResourceKind kind)
+        {
+            switch (kind)
+            {
+                case ResourceKind.Wood:
+                    return carriedWoodSprite;
+                case ResourceKind.Stone:
+                    return carriedStoneSprite;
+                case ResourceKind.Food:
+                    return carriedFoodSprite;
+                default:
+                    return carriedGoldSprite;
+            }
         }
 
         private bool TryShowAttackFrame()

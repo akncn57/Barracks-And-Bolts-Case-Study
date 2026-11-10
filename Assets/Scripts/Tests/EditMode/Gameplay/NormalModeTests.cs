@@ -138,6 +138,14 @@ namespace BarracksAndBolts.Tests.EditMode.Gameplay
             return node;
         }
 
+        private void RunUntilCarrying(UnitModel villager)
+        {
+            for (var time = 0f; time < 5f && !villager.CarriedKind.HasValue; time += Step)
+                Run(Step);
+
+            Assert.IsTrue(villager.CarriedKind.HasValue, "It never picked up a load.");
+        }
+
         private void Run(float seconds)
         {
             for (var time = 0f; time < seconds; time += Step)
@@ -347,6 +355,73 @@ namespace BarracksAndBolts.Tests.EditMode.Gameplay
 
             Assert.IsFalse(_gathering.IsGathering(villager.Id));
             Assert.AreEqual(0, _resources.Get(ResourceKind.Wood));
+            Assert.IsNull(villager.CarriedKind, "The load is lost, so no icon either.");
+        }
+
+        [Test]
+        public void Gather_AfterHarvest_CarriesTheKindUntilDelivered()
+        {
+            _buildings.TryPlace(_castle, new Vector2Int(2, 2), Faction.Player, out _);
+            var node = PlaceNode(new Vector2Int(10, 2));
+            var villager = SpawnVillager(new Vector2Int(9, 2));
+            _gathering.TryOrder(villager, node);
+
+            Assert.IsNull(villager.CarriedKind, "Nothing in hand on the way to the node.");
+            RunUntilCarrying(villager);
+            Assert.AreEqual(ResourceKind.Wood, villager.CarriedKind);
+            Assert.AreEqual(0, _resources.Get(ResourceKind.Wood));
+
+            for (var time = 0f; time < 12f && villager.CarriedKind.HasValue; time += Step)
+                Run(Step);
+
+            Assert.IsNull(villager.CarriedKind);
+            Assert.AreEqual(10, _resources.Get(ResourceKind.Wood));
+        }
+
+        [Test]
+        public void Gather_CancelWhileCarrying_DropsTheLoad()
+        {
+            _buildings.TryPlace(_castle, new Vector2Int(2, 2), Faction.Player, out _);
+            var node = PlaceNode(new Vector2Int(10, 2));
+            var villager = SpawnVillager(new Vector2Int(9, 2));
+            _gathering.TryOrder(villager, node);
+            RunUntilCarrying(villager);
+
+            _gathering.Cancel(villager.Id);
+
+            Assert.IsNull(villager.CarriedKind);
+        }
+
+        [Test]
+        public void Gather_SuspendWhileCarrying_KeepsTheLoadUntilItIsDelivered()
+        {
+            _buildings.TryPlace(_castle, new Vector2Int(2, 2), Faction.Player, out _);
+            var node = PlaceNode(new Vector2Int(10, 2));
+            var villager = SpawnVillager(new Vector2Int(9, 2));
+            _gathering.TryOrder(villager, node);
+            RunUntilCarrying(villager);
+
+            _gathering.Suspend(villager.Id);
+            Assert.AreEqual(ResourceKind.Wood, villager.CarriedKind, "Still in hand while it runs.");
+
+            _gathering.DeliverLoad(villager.Id);
+            Assert.IsNull(villager.CarriedKind);
+            Assert.AreEqual(10, _resources.Get(ResourceKind.Wood));
+        }
+
+        [Test]
+        public void Gather_CancelWhileSuspended_DropsTheLoad()
+        {
+            _buildings.TryPlace(_castle, new Vector2Int(2, 2), Faction.Player, out _);
+            var node = PlaceNode(new Vector2Int(10, 2));
+            var villager = SpawnVillager(new Vector2Int(9, 2));
+            _gathering.TryOrder(villager, node);
+            RunUntilCarrying(villager);
+            _gathering.Suspend(villager.Id);
+
+            _gathering.Cancel(villager.Id);
+
+            Assert.IsNull(villager.CarriedKind);
         }
 
         [Test]

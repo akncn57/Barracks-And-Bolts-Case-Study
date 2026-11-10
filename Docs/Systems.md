@@ -392,6 +392,7 @@ Cleanup fazı: DeathCleanupSystem ─► CombatService.RemoveDead ─► UnitSer
 - Pivotlar ayakta; `flipX` karakteri kendi ekseninde çevirir.
 - Seçim halkası ayakların altında, rengi tarafa göre.
 - **Durum ikonları:** Tek `SpriteRenderer`, iki sprite. Boştaki köylüde krem "Zz" (`UnitModel.IsIdle`); düşmanı kendi fark eden ya da vurulup karşılık veren askerde 1,5 sn kırmızı "!" (`UnitModel.SpotEnemy`, `HasJustSpottedEnemy`). Oyuncunun emrinde çıkmaz. Kendi Sorting Group'u (`Sort At Root`, 160) ile ağaç ve binaların önünde.
+- **Taşıma ikonu:** Yükle bırakma noktasına giden köylünün başında taşıdığı kaynağın küçük ikonu (odun, taş, et, altın). Aynı `SpriteRenderer`'da, öncelik "Zz" > "!" > yük. Model `UnitModel.CarriedKind` ile söyler; `GatheringSystem` ve `FarmingSystem` yükü alınca doldurur, teslimde ya da yük kaybolunca (iptal, yol yok, ölüm) boşaltır. Kaçarken yük elde kalır, ikon da. Dokular `Texture_Markers_Carry_*`: UI ikonlarının 26 piksele küçültülmüş kopyaları, Gameplay atlas'ında (UI atlas'ı dünyada ayrı çizim isterdi). İkon değişince 0,15 sn büyükten küçülür (pop).
 
 ---
 
@@ -424,6 +425,7 @@ Köylüye kaynağa sağ tık ─► UnitCommandService.Gather ─► GatheringSy
 - **Emir değişirse** (hareket, saldırı, karşılık verme) iş biter, yük kaybolur. **Kaçarken** iş `Suspend` ile saklanır, dönünce `Resume` ile devam eder.
 - Koyun tek kesimde ölür, bütün yemeği tek seferde taşınır. Kesilirken `Hold()` onu durdurur.
 - Çalışma kareleri: ağaç ve koyunda balta, taş ve altında kazma (`UnitModel.HarvestingKind`).
+- Taşınan yük `UnitModel.CarriedKind`'da; başta küçük ikon olarak görünür (Bölüm 19).
 
 ## 22b. İnşaat
 **Durum:** ✅ (tamir yok) · **Dosyalar:** `Gameplay/Construction/ConstructionSystem.cs`, `Gameplay/Buildings/BuildingModel.cs`, `BuildingCompletedEvent.cs` · **Veri:** `BuildingDefinition.buildTime`, renk setlerinde `siteSprite` ve köylünün `buildFrames` · **Test:** `ConstructionTests`, `VillagerBehaviourTests`

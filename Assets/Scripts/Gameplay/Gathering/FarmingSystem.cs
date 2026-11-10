@@ -127,11 +127,16 @@ namespace BarracksAndBolts.Gameplay.Gathering
         {
             for (var i = _orders.Count - 1; i >= 0; i--)
             {
-                if (_orders[i].Unit.Id == unitId)
-                    End(i);
+                if (_orders[i].Unit.Id != unitId)
+                    continue;
+
+                SetLoad(_orders[i], 0);
+                End(i);
             }
 
-            TakeSuspended(unitId);
+            var suspended = TakeSuspended(unitId);
+            if (suspended != null)
+                SetLoad(suspended, 0);
         }
 
         /// <summary>Stops the work but remembers it for <see cref="Resume"/>. For a villager running from danger.</summary>
@@ -161,8 +166,14 @@ namespace BarracksAndBolts.Gameplay.Gathering
         public bool Resume(UnitModel unit)
         {
             var order = TakeSuspended(unit.Id);
-            if (order == null || !_buildings.TryGet(order.Farm.Id, out _) || order.Farm.IsDead || !TryWalkToFarm(order))
+            if (order == null)
                 return false;
+
+            if (!_buildings.TryGet(order.Farm.Id, out _) || order.Farm.IsDead || !TryWalkToFarm(order))
+            {
+                SetLoad(order, 0);
+                return false;
+            }
 
             unit.SetOnJob(true);
             _orders.Add(order);
@@ -186,8 +197,11 @@ namespace BarracksAndBolts.Gameplay.Gathering
             for (var i = _orders.Count - 1; i >= 0; i--)
             {
                 var order = _orders[i];
-                if (!_units.TryGet(order.Unit.Id, out _) || order.Unit.HasAttackTarget || !Advance(order, deltaTime))
-                    End(i);
+                if (_units.TryGet(order.Unit.Id, out _) && !order.Unit.HasAttackTarget && Advance(order, deltaTime))
+                    continue;
+
+                SetLoad(order, 0);
+                End(i);
             }
 
             UpdateLeaving();
@@ -254,7 +268,7 @@ namespace BarracksAndBolts.Gameplay.Gathering
                 return true;
 
             order.Unit.SetHarvesting(null);
-            order.Carried = order.Farm.Definition.FarmYield;
+            SetLoad(order, order.Farm.Definition.FarmYield);
             return TryWalkToDropOff(order);
         }
 
@@ -304,7 +318,14 @@ namespace BarracksAndBolts.Gameplay.Gathering
 
             _resources.Add(ResourceKind.Food, order.Carried);
             _eventBus.Publish(new FloatingTextRequestedEvent($"+{order.Carried} Food", order.Unit.Position));
-            order.Carried = 0;
+            SetLoad(order, 0);
+        }
+
+        /// <summary>Sets what the villager carries. The unit model shows it, so the view can draw an icon.</summary>
+        private static void SetLoad(Order order, int amount)
+        {
+            order.Carried = amount;
+            order.Unit.SetCarrying(amount > 0 ? ResourceKind.Food : null);
         }
 
         /// <summary>The nearest free cell around the field, beside or below it if it can.</summary>

@@ -155,6 +155,25 @@ namespace BarracksAndBolts.Tests.EditMode.Gameplay
         }
 
         [Test]
+        public void Farm_VillagerCarriesFood_UntilItReachesTheDropOff()
+        {
+            Place(_castle, 2, 10);
+            var farm = Place(_farm, 12, 10);
+            var villager = Spawn(_villager, 8, 11);
+            _farming.TryOrder(villager, farm);
+
+            RunUntil(() => villager.CarriedKind.HasValue);
+            Assert.AreEqual(ResourceKind.Food, villager.CarriedKind);
+            Assert.AreEqual(0, _resources.Get(ResourceKind.Food));
+
+            RunUntil(() => !villager.CarriedKind.HasValue);
+            Assert.AreEqual(5, _resources.Get(ResourceKind.Food));
+
+            _farming.Cancel(villager.Id);
+            Assert.IsNull(villager.CarriedKind);
+        }
+
+        [Test]
         public void Farm_VillagerWorksInsideTheFence_AndLeavesItForTheDropOff()
         {
             Place(_castle, 2, 10);

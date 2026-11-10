@@ -200,7 +200,7 @@ Bu değerler ScriptableObject üzerinden ayarlanabilir olacak, ileride değişti
 - Renk setleri arasında küçük bir fark var: Sarıda `Warrior_Guard` var, Kırmızıda yok. Kod, bir animasyon eksikse varsayılan animasyona (Idle / Run) düşmelidir.
 - **Dost ateşi yok:** Oyuncu kendi birimlerine ve binalarına saldırma emri veremez.
 - **Karşılık verme:** Boşta duran birim, kendisine vurana saldırır. Yürüyen ya da hedefi olan birim işine devam eder.
-- **Durum ikonları:** Boştaki köylünün başında "Zz" yazan krem baloncuk durur. Oyuncunun askeri düşmanı kendi fark edince ya da vurulup karşılık verince başında 1,5 saniye kırmızı "!" çıkar; oyuncunun verdiği saldırı emrinde çıkmaz. İkonlar ağaç ve binaların arkasında kalmaz.
+- **Durum ikonları:** Boştaki köylünün başında "Zz" yazan krem baloncuk durur. Oyuncunun askeri düşmanı kendi fark edince ya da vurulup karşılık verince başında 1,5 saniye kırmızı "!" çıkar; oyuncunun verdiği saldırı emrinde çıkmaz. Yükünü bırakma noktasına götüren köylünün başında taşıdığı kaynağın küçük ikonu (odun, taş, et, altın) durur; teslim edince kaybolur. İkonlar ağaç ve binaların arkasında kalmaz.
 - **Düşman yerleşkeleri (ileride konuşulacak):** Haritada rastgele küçük düşman yerleşkeleri olabilir. Böylece PDF'teki "binaya saldırma" maddesi düşman binaları üzerinden de karşılanır.
 
 ### Birlikte Hareket

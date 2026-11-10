@@ -50,7 +50,7 @@ Oyunu deneyince çıkan kullanılabilirlik istekleri. Sandbox'ta da olmalı, bui
 - [x] **Haritada rastgele kaynak dağılımı:** seed'li; orman, taş ocağı, altın madeni, koyun sürüsü
 - [x] **Normal modun ilk dilimi:** menüde Play; Castle, 3 köylü ve başlangıç kaynağıyla başlangıç; sayaçlar; bina ve asker maliyetleri, yetmezse uyarı; köylüyle toplama, Castle'a taşıma, kaynağın tükenmesi
 - [x] **Oyun döngüsü (aşağıdaki maddeler):** kuruldu ve oynandı; dengesi henüz ayarlanmadı
-- [x] **Durum ikonları:** boştaki köylüde "Zz" baloncuğu, düşman fark eden askerde kırmızı "!"
+- [x] **Durum ikonları:** boştaki köylüde "Zz" baloncuğu, düşman fark eden askerde kırmızı "!", yük taşıyan köylüde kaynağın küçük ikonu
 - [x] Koyunların çoğalması: her sabah 3 yeni koyun, en fazla 30
 - [x] **İlk oyun notları:** köylü kaynağın dibinde çalışıyor, düşman yaklaşınca Castle'a sığınıyor, boştayken ikon, koyunlar geziyor ve tek kesimde ölüyor, isim etiketi hedefin üstünde
 - [x] Köylü: Castle'dan üretim, sadece Normal modda

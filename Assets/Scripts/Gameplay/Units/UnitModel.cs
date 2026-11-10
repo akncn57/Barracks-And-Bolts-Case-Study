@@ -62,6 +62,9 @@ namespace BarracksAndBolts.Gameplay.Units
         /// <summary>What the unit is working on right now. Null when it isn't working.</summary>
         public ResourceKind? HarvestingKind { get; private set; }
 
+        /// <summary>The load on the way to a drop-off. Null when the unit carries nothing.</summary>
+        public ResourceKind? CarriedKind { get; private set; }
+
         /// <summary>Hammering at a building site right now.</summary>
         public bool IsBuilding { get; private set; }
 
@@ -108,6 +111,11 @@ namespace BarracksAndBolts.Gameplay.Units
         public void SetHarvesting(ResourceKind? kind)
         {
             HarvestingKind = kind;
+        }
+
+        public void SetCarrying(ResourceKind? kind)
+        {
+            CarriedKind = kind;
         }
 
         public void SetBuilding(bool isBuilding)

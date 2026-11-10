@@ -41,7 +41,7 @@
 | 10 | Gün / gece / takvim ikonu | Takvim UI'ı | 🔍 / 🛠 |
 | 11 | Baskın uyarı ikonu ve ekran kenarı yön oku | Baskın bildirimi | 🛠 Kılıç ikonu + ok ikonu |
 | 12 | ~~Koyun kesme imleci~~ | ✅ Koyunda da balta imleci (`Texture_Cursors_Axe`) | – |
-| 13 | Kaynak taşıyan köylü (odun/altın/et taşırken) | Görsel geri bildirim (opsiyonel) | 🔍 Tiny Swords'ta var. Alternatif: köylünün üstünde küçük kaynak ikonu |
+| 13 | ~~Kaynak taşıyan köylü~~ | ✅ Köylünün başında küçük kaynak ikonu: `Textures/Markers/Texture_Markers_Carry_*` (UI ikonlarından küçültüldü, Gameplay atlas'ında) | – |
 | 14 | Kaynak toplama ve hasar sayıları (ör. "+5", "-10") | Geri bildirim | 💻 Uçan yazı sistemi hazır (`FloatingTextSpawner`, şu an uyarılar için); sayılar efekt turunda |
 | 15 | Ana menü arka planı | Ana menü | 🛠 Oyun sahnesinden bir görüntü veya Banner/Paper ile |
 | 16 | Kazandın / Kaybettin ekranı görseli | Oyun sonu | 🛠 Banner + Ribbon |

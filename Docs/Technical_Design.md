@@ -60,7 +60,7 @@ Assets/
 ├── Settings/                   URP, Renderer2D, Input Actions
 ├── Textures/                   Texture_<Klasör yolu>_<İsim>.png (renge göre: Red/, Yellow/)
 │   ├── Backgrounds/            Menü arka planı; UI atlasına girmesin diye UI/ dışında
-│   └── Markers/                Dünya üzerindeki işaretler (seçim halkası, yerleştirme hücresi, durum ikonları); renkliler Markers/<Renk>/
+│   └── Markers/                Dünya üzerindeki işaretler (seçim halkası, yerleştirme hücresi, durum ve taşıma ikonları); renkliler Markers/<Renk>/
 │   (Buildings/Neutral/ takım rengi olmayan yapılar, ör. tarla)
 ├── Tiles/
 │   ├── Palettes/               Palette_<İsim>.prefab

@@ -102,11 +102,16 @@ namespace BarracksAndBolts.Gameplay.Gathering
         {
             for (var i = _orders.Count - 1; i >= 0; i--)
             {
-                if (_orders[i].Unit.Id == unitId)
-                    End(i);
+                if (_orders[i].Unit.Id != unitId)
+                    continue;
+
+                SetLoad(_orders[i], 0);
+                End(i);
             }
 
-            TakeSuspended(unitId);
+            var suspended = TakeSuspended(unitId);
+            if (suspended != null)
+                SetLoad(suspended, 0);
         }
 
         /// <summary>Stops the work but remembers it for <see cref="Resume"/>. For a villager running from danger.</summary>
@@ -142,7 +147,10 @@ namespace BarracksAndBolts.Gameplay.Gathering
 
             var node = order.Node.IsDepleted ? _nodes.FindNearest(order.Kind, unit.Position, order.Node) : order.Node;
             if (!TryWalkToNode(order, node))
+            {
+                SetLoad(order, 0);
                 return false;
+            }
 
             unit.SetOnJob(true);
             _orders.Add(order);
@@ -166,8 +174,11 @@ namespace BarracksAndBolts.Gameplay.Gathering
             for (var i = _orders.Count - 1; i >= 0; i--)
             {
                 var order = _orders[i];
-                if (!_units.TryGet(order.Unit.Id, out _) || order.Unit.HasAttackTarget || !Advance(order, deltaTime))
-                    End(i);
+                if (_units.TryGet(order.Unit.Id, out _) && !order.Unit.HasAttackTarget && Advance(order, deltaTime))
+                    continue;
+
+                SetLoad(order, 0);
+                End(i);
             }
         }
 
@@ -230,7 +241,7 @@ namespace BarracksAndBolts.Gameplay.Gathering
                 return true;
 
             order.Unit.SetHarvesting(null);
-            order.Carried = order.Node.Take(order.Node.Definition.IsOneCut ? order.Node.Remaining : _settings.CarryCapacity);
+            SetLoad(order, order.Node.Take(order.Node.Definition.IsOneCut ? order.Node.Remaining : _settings.CarryCapacity));
             if (order.Node.IsDepleted)
                 _nodes.Remove(order.Node);
 
@@ -278,7 +289,14 @@ namespace BarracksAndBolts.Gameplay.Gathering
 
             _resources.Add(order.Kind, order.Carried);
             _eventBus.Publish(new FloatingTextRequestedEvent($"+{order.Carried} {order.Kind}", order.Unit.Position));
-            order.Carried = 0;
+            SetLoad(order, 0);
+        }
+
+        /// <summary>Sets what the villager carries. The unit model shows it, so the view can draw an icon.</summary>
+        private static void SetLoad(Order order, int amount)
+        {
+            order.Carried = amount;
+            order.Unit.SetCarrying(amount > 0 ? order.Kind : null);
         }
 
         /// <summary>The best free cell around the node: close by, and beside it if possible.</summary>
