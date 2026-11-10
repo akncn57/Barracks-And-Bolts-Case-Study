@@ -26,11 +26,7 @@
 ## 2. Klasör Yapısı
 ```
 Assets/
-├── Animations/, Animators/     Şimdilik boş. Animator kullanılmıyor (bkz. Bölüm 13)
 ├── Atlases/                    Atlases_Gameplay, Atlases_UI, Atlases_Effects
-├── Audio/
-│   ├── Music/                  Music_<İsim>
-│   └── SFX/                    SFX_<Kategori>_<İsim>
 ├── Fonts/
 ├── GameDatas/                  ScriptableObject verileri (UI/ altında popup verileri: Data_Popup_<İsim>)
 │   ├── Buildings/              Data_Building_<İsim>.asset
@@ -39,7 +35,6 @@ Assets/
 │   ├── TeamColors/             Data_TeamColor_<Renk>.asset
 │   └── Configs/                Data_Config_<İsim>.asset (harita, takvim, zorluk...)
 ├── Materials/                  Font/ altında TMP preset'leri (Outline, Shadow, Outline Shadow)
-├── Editor/                     Tek seferlik editör araçları (iş bitince silinir)
 ├── Plugins/                    3. parti kütüphaneler (dokunulmaz)
 ├── Prefabs/
 │   ├── Core/                   Prefab_Core_<İsim>LifetimeScope
@@ -84,7 +79,7 @@ Scripts/
     └── EditMode/ BarracksAndBolts.Tests.EditMode   494 test
 ```
 - Oyuncu ayarları `Core/Settings`'te (`GameSettings`, PlayerPrefs). Kayıt (save) henüz yok; geldiğinde Core'a girer.
-- Tek seferlik editör araçları `Assets/Editor/` altında asmdef'siz durur ve iş bitince silinir.
+- Tek seferlik editör araçları gerekirse `Assets/Editor/` altına asmdef'siz konur ve iş bitince silinir (prefab dönüştürme aracı silindi). Ses ve animasyon klasörleri boş olduğu için kaldırıldı; animasyon kareleri renk setlerinde, Animator yok (Bölüm 13).
 
 **Bağımlılık yönü** (oklar "bağımlıdır" anlamındadır):
 ```
@@ -397,7 +392,7 @@ Prefab_Core_GameplayLifetimeScope
 - Ayırıcı objeler (`----- X -----`) boş GameObject'tir. Transform'ları sıfırda durur, üzerlerinde component yoktur.
 - Runtime'da üretilen nesneler her zaman ilgili parent'ın altına konur. Hiyerarşinin kök seviyesine nesne eklenmez.
 - Scope'lar objeleri adla değil bileşen tipiyle bulur; obje adı değişikliği davranışı etkilemez.
-- **Sahnede düzeltilecek:** `----- CAMERAS-----` ayırıcısında boşluk eksik ve `----- WORLD -----` şu an `----- GRIDS -----`'ın altında duruyor. Yukarıdaki düzen hedeflenen düzendir.
+- Sahne bu düzende. `----- WORLD -----` eskiden `----- GRIDS -----`'ın altındaydı, köke alındı (GRIDS orijinde ve döndürülmemiş olduğu için hiçbir şeyin yeri değişmedi).
 
 ---
 
@@ -421,7 +416,7 @@ Testler *Window → General → Test Runner → EditMode → Run All* ile çalı
 ## 16. Build ve Proje Ayarları
 - [x] **Player Settings → Resizable Window: açık** (PDF zorunlu tutuyor)
 - [x] Fullscreen Mode: **Windowed**, varsayılan çözünürlük 1600x900
-- [ ] Company Name: `DefaultCompany` → gerçek bir isim
+- [x] Company Name: `Akin Can Hancer` (ASCII; kayıt yolunda kullanılıyor)
 - [x] Build Settings sahne sırası: Bootstrap, MainMenu, Gameplay
 - [x] Kamera: ekran oranı değişince harita sınırlarına göre her karede yeniden kısıtlanır
 - [x] Canvas Scaler: Scale With Screen Size, referans 1920x1080, Match 0.5

@@ -94,9 +94,9 @@ Oyunu deneyince çıkan kullanılabilirlik istekleri. Sandbox'ta da olmalı, bui
 - [x] Ana menüde zorluk seçimi
 
 ## Teslim Öncesi
-- [ ] Sahne ayırıcıları: `----- CAMERAS-----` adı ve `----- WORLD -----`'ın yeri
-- [ ] Company Name (`DefaultCompany`)
-- [ ] `Assets/Editor` altındaki tek seferlik aracın silinmesi
+- [x] Sahne ayırıcıları: `----- CAMERAS -----` adı, `----- WORLD -----` köke alındı
+- [x] Company Name: `Akin Can Hancer`
+- [x] `Assets/Editor` altındaki tek seferlik aracın ve boş klasörlerin (Animations, Animators, Audio, Scripts/Editor) silinmesi
 - [ ] Yeni Windows build, GitHub Release'e zip (`_BurstDebugInformation_DoNotShip` hariç), `v1.0-pdf` tag'i
 - [ ] README (en son)
 

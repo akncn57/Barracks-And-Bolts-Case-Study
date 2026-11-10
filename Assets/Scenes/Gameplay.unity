@@ -27345,7 +27345,7 @@ Transform:
   - {fileID: 1532714528}
   - {fileID: 593596382}
   - {fileID: 655592854}
-  m_Father: {fileID: 254955788}
+  m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &186405435
 GameObject:
@@ -34513,7 +34513,6 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1996329143}
-  - {fileID: 149533827}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &304361922
@@ -99238,7 +99237,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1114131995}
   m_Layer: 0
-  m_Name: ----- CAMERAS-----
+  m_Name: ----- CAMERAS -----
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -112851,4 +112850,5 @@ SceneRoots:
   - {fileID: 610080161}
   - {fileID: 1114131995}
   - {fileID: 254955788}
+  - {fileID: 149533827}
   - {fileID: 1237853451}
