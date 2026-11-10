@@ -44,6 +44,7 @@ namespace BarracksAndBolts.Gameplay.Placement
         private TeamService _teams;
         private BuildingDefinition _shownDefinition;
         private UnitDefinition _shownUnit;
+        private ResourceNodeDefinition _shownNode;
         private Faction _shownFaction;
 
         [Inject]
@@ -79,10 +80,13 @@ namespace BarracksAndBolts.Gameplay.Placement
             if (!isVisible)
                 return;
 
-            if (_shownDefinition != _placement.Definition || _shownUnit != _placement.Unit || _shownFaction != _placement.Faction)
+            if (_shownDefinition != _placement.Definition || _shownUnit != _placement.Unit || _shownNode != _placement.Node ||
+                _shownFaction != _placement.Faction)
             {
                 if (_placement.IsPlacingUnit)
                     ShowUnit(_placement.Unit, _placement.Faction);
+                else if (_placement.IsPlacingNode)
+                    ShowNode(_placement.Node);
                 else
                     ShowBuilding(_placement.Definition, _placement.Faction);
             }
@@ -119,9 +123,24 @@ namespace BarracksAndBolts.Gameplay.Placement
             _territoryOverlay.SetVisible(_placement.IsActive);
         }
 
+        private void ShowNode(ResourceNodeDefinition node)
+        {
+            _shownDefinition = null;
+            _shownUnit = null;
+            _shownNode = node;
+            _shownFaction = _placement.Faction;
+
+            // Resource sprites have their pivot on the base, and their views stand on the bottom-center of the footprint.
+            buildingRenderer.sprite = node.Frames.Count > 0 ? node.Frames[0] : null;
+            buildingRenderer.transform.localPosition = Vector3.zero;
+            defenseRing.Hide();
+            ShowCells(node.Size.x * node.Size.y);
+        }
+
         private void ShowUnit(UnitDefinition unit, Faction faction)
         {
             _shownDefinition = null;
+            _shownNode = null;
             _shownUnit = unit;
             _shownFaction = faction;
 
@@ -137,6 +156,7 @@ namespace BarracksAndBolts.Gameplay.Placement
         {
             _shownDefinition = definition;
             _shownUnit = null;
+            _shownNode = null;
             _shownFaction = faction;
 
             var sprite = _teams.GetColorSet(faction).GetBuildingSprite(definition);

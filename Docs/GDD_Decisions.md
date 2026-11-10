@@ -19,7 +19,7 @@
   - Takvim ve baskınlar açılıp kapatılabilir. Baskın manuel olarak da başlatılabilir.
   - Silme aracı ve zaman kontrolü (durdur, hızlandır) var.
   - Oyuncu kendi savaşlarını kurabilir: kendi ordusu ile düşman birim ve binalarını karşı karşıya koyabilir.
-  - **Şu anki hali:** Side düğmesi yeni bina ve birimlerin tarafını değiştirir. Production Menu'de *Buildings* ve *Units* sekmeleri var: binalar ve birimler (Knight, Spearman, Archer, Villager) doğrudan haritaya konur, Shift ile arka arkaya. Barracks'tan üretim de duruyor (PDF). Kaynak koyma, silme aracı ve zaman kontrolü henüz yok.
+  - **Şu anki hali:** Side düğmesi yeni bina ve birimlerin tarafını değiştirir. Production Menu'de *Buildings*, *Units* ve *Resources* sekmeleri var: binalar, birimler (Knight, Spearman, Archer, Villager) ve kaynaklar (ağaç, kaya, altın madeni, koyun) doğrudan haritaya konur, Shift ile arka arkaya. Barracks'tan üretim de duruyor (PDF). Delete seçili her şeyi, seçim yoksa farenin altındaki kaynağı siler. Duraklat ve 1x/2x/3x butonları kaynak barında. "Enemy AI" düğmesi düşmanın ve boştaki askerlerin kendiliğinden saldırmasını açar (varsayılan kapalı). "Debug" düğmesi grid'i, engelleri ve seçili birimlerin A* yolunu gösterir. Takvim ve baskın Sandbox'ta yok, elle baskın başlatma da yok.
 - **Zorluk Seviyesi (Normal Mod):** Kolay, Normal, Zor. Düşman sayısını, düşman gücünü ve başlangıç kaynaklarını etkiler. Değerler bir `DifficultySettings` ScriptableObject'inde tutulur.
 
 ### Nüfus (Power Plant karşılığı = House)
@@ -318,7 +318,7 @@ Tuşlar Age of Empires, StarCraft ve Warcraft III gibi RTS oyunlarının alış�
 | `GameSpeed` | + / − | Button | Oyun hızı 1x, 2x, 3x (opsiyonel) |
 | `ToggleHealthBars` | Alt (basılı tutulduğunda) | Button | Tüm can barlarını gösterir |
 
-> **Şu anki hali:** Yapılanlar: `Pan`, `DragPan`, `Zoom`, `EdgePan` (ayarda kapalı), `Select`, `BoxSelect`, `Command`, Placement map'inin üçü, Esc ile katman kapatma. Geri kalanlar (kontrol grupları, AttackMove, Stop, HoldPosition, kısayollar, Pause, oyun hızı) henüz yok.
+> **Şu anki hali:** Yapılanlar: `Pan`, `DragPan`, `Zoom`, `EdgePan` (ayarda kapalı), `Select`, `BoxSelect`, `Command`, Placement map'inin üçü, Esc ile katman kapatma, `DeleteSelected` (Delete; Normal modda sadece kendi birim ve binası, Castle hariç, onaysız), `Pause` (P, oyun içi menü olmadan sadece duraklatma) ve `GameSpeed` (+/-, 1x-3x). Geri kalanlar (kontrol grupları, AttackMove, Stop, HoldPosition, diğer kısayollar) henüz yok.
 
 ### Edge Case Notları
 - Mouse UI üzerindeyken (`EventSystem.IsPointerOverGameObject`) dünya inputları (Select, Command, Placement) çalışmaz.

@@ -161,7 +161,7 @@ namespace BarracksAndBolts.Tests.EditMode.Gameplay
 
         private PlacementService CreatePlacement(ResourceService resources)
         {
-            return new PlacementService(_map, _buildings, _units, resources, TestDefinitions.CreateFreeTerritory(_map, _buildings, _eventBus), _eventBus);
+            return new PlacementService(_map, _buildings, _units, new ResourceNodeService(_map, new GameEntityIdGenerator(), _eventBus), resources, TestDefinitions.CreateFreeTerritory(_map, _buildings, _eventBus), _eventBus);
         }
 
         private BuildingModel PlaceWith(PlacementService placement, BuildingDefinition definition)

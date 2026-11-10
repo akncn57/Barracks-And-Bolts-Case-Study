@@ -190,6 +190,14 @@ namespace BarracksAndBolts.Gameplay.Units
                 Stop();
         }
 
+        /// <summary>Fills the list with the waypoints still ahead, nearest first. Empty when the unit stands.</summary>
+        public void CopyRemainingPath(List<Vector2> into)
+        {
+            into.Clear();
+            for (var i = _nextWaypoint; i < _waypoints.Count; i++)
+                into.Add(_waypoints[i]);
+        }
+
         /// <summary>True if a waypoint still ahead lies inside the area of cells.</summary>
         public bool IsPathThrough(RectInt area, Func<Vector2, Vector2Int> worldToCell)
         {

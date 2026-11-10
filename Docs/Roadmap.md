@@ -61,7 +61,7 @@ Oyunu deneyince çıkan kullanılabilirlik istekleri. Sandbox'ta da olmalı, bui
 - [x] Dalga sistemi ve baskın bildirimleri (ses ve mini harita yok; yön yazıyla söyleniyor)
 - [x] Kazanma ve kaybetme koşulları ve oyun sonu ekranı
 - [ ] Oyun döngüsünün dengesi (süreler, maliyetler, dalga büyüklükleri)
-- [ ] Test Runner sonucu (447 test) ve son SetPass ölçümü
+- [ ] Test Runner sonucu (459 test) ve son SetPass ölçümü
 
 ## P2 – Derinlik (zaman kaldıkça, aşağıdaki sırayla)
 **Hedef: 12 Kasım Perşembe.**
@@ -77,7 +77,7 @@ Oyunu deneyince çıkan kullanılabilirlik istekleri. Sandbox'ta da olmalı, bui
 9. [x] Bölge sistemi ve Karakol (yarıçap yükseltmesi, yükseltme sistemiyle gelecek). Seçili binada menzil ve bölge halkası
 10. [ ] Köylülerin House'a da sığınması ve bina başına sığınma kapasitesi (Castle'a sığınma yapıldı)
 11. [ ] Toplanma noktası (rally point)
-12. [ ] Tam Creative Sandbox (her şeyi yerleştirme, silme aracı, zaman kontrolü). Bina ve birim yerleştirme yapıldı: Production Menu'de *Buildings / Units* sekmeleri
+12. [x] Tam Creative Sandbox: bina, birim ve kaynak sekmeleri, Delete ile silme, zaman kontrolü, Enemy AI ve Debug (grid + A* yolu) düğmeleri. Baskını elle başlatma yok
 
 ## P3 – Cila (yetişirse; yetişmezse README'de "Gelecek Planları" olarak listelenir)
 - [ ] Kayıt sistemi (manuel kayıt, birden fazla slot)
@@ -86,7 +86,7 @@ Oyunu deneyince çıkan kullanılabilirlik istekleri. Sandbox'ta da olmalı, bui
 - [ ] Ayarlar menüsü
 - [ ] Ses ve müzik
 - [ ] Tutorial
-- [ ] Kontrol grupları, AttackMove, HoldPosition, oyun hızı
+- [ ] Kontrol grupları, AttackMove, HoldPosition (oyun hızı ve duraklatma yapıldı, iki modda da)
 - [ ] Tarla (asset hazır, kuralları onay bekliyor; sıradaki iş)
 - [ ] Düşman yerleşkeleri
 - [ ] Efekt turu: vuruşun animasyon karesine alınması, ölüm ve yıkılma efekti, dünya üzerinde can barı

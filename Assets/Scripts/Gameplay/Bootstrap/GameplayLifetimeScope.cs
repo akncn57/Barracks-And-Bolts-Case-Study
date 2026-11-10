@@ -9,6 +9,7 @@ using BarracksAndBolts.Gameplay.Combat;
 using BarracksAndBolts.Gameplay.Construction;
 using BarracksAndBolts.Gameplay.Commands;
 using BarracksAndBolts.Gameplay.Data;
+using BarracksAndBolts.Gameplay.DebugView;
 using BarracksAndBolts.Gameplay.Economy;
 using BarracksAndBolts.Gameplay.Entities;
 using BarracksAndBolts.Gameplay.Gathering;
@@ -23,6 +24,7 @@ using BarracksAndBolts.Gameplay.ResourceNodes;
 using BarracksAndBolts.Gameplay.Sandbox;
 using BarracksAndBolts.Gameplay.Selection;
 using BarracksAndBolts.Gameplay.Teams;
+using BarracksAndBolts.Gameplay.TimeControl;
 using BarracksAndBolts.Gameplay.Units;
 using UnityEngine;
 using VContainer;
@@ -36,6 +38,8 @@ namespace BarracksAndBolts.Gameplay.Bootstrap
     public sealed class GameplayLifetimeScope : LifetimeScope
     {
         [SerializeField] private GameDatabase gameDatabase;
+        [Tooltip("Sandbox debug view. Created under this object when the scene starts.")]
+        [SerializeField] private DebugOverlayView debugOverlayPrefab;
 
         protected override void Configure(IContainerBuilder builder)
         {
@@ -63,6 +67,17 @@ namespace BarracksAndBolts.Gameplay.Bootstrap
             RegisterResourceNodes(builder);
             RegisterEconomy(builder);
             builder.RegisterComponentInHierarchy<CameraController>();
+
+            builder.Register<TimeControlService>(Lifetime.Singleton);
+            builder.RegisterEntryPoint<TimeControlInputHandler>();
+
+            if (debugOverlayPrefab != null)
+            {
+                builder.RegisterComponentInNewPrefab(debugOverlayPrefab, Lifetime.Singleton).UnderTransform(transform);
+
+                // Nothing asks for it; it only draws.
+                builder.RegisterBuildCallback(container => container.Resolve<DebugOverlayView>());
+            }
         }
 
         private void RegisterResourceNodes(IContainerBuilder builder)
@@ -151,6 +166,8 @@ namespace BarracksAndBolts.Gameplay.Bootstrap
             builder.Register<SelectionService>(Lifetime.Singleton);
             builder.RegisterEntryPoint<SelectionInputHandler>();
             builder.RegisterComponentInHierarchy<BoxSelectionView>();
+            builder.Register<DeletionService>(Lifetime.Singleton);
+            builder.RegisterEntryPoint<DeleteInputHandler>();
 
             builder.Register<HoverService>(Lifetime.Singleton);
             builder.RegisterEntryPoint<HoverInputHandler>();

@@ -63,6 +63,9 @@ namespace BarracksAndBolts.Gameplay.Placement
             if (isUnit)
                 return block == PlacementBlock.NotEnoughResources ? "Not enough resources" : "Can't place a unit here";
 
+            if (block == PlacementBlock.UnitInTheWay)
+                return "Units are in the way";
+
             switch (block)
             {
                 case PlacementBlock.OutsideMap:

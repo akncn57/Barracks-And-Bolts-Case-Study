@@ -3,7 +3,7 @@
 > Oyundaki her sistemin kodda **nasıl** yapıldığını anlatır: yapılanlar ve planlananlar.
 > Kurallar ve mimari: [Technical_Design.md](Technical_Design.md) · Oyun tasarımı: [GDD_Decisions.md](GDD_Decisions.md) · Öncelikler: [Roadmap.md](Roadmap.md) · Assetler: [Missing_Assets.md](Missing_Assets.md)
 >
-> **Son güncelleme:** 9 Kasım 2026 · renge göre birim portreleri, Sandbox'ta birim sekmesi · 447 EditMode testi
+> **Son güncelleme:** 9 Kasım 2026 · zaman kontrolü, silme, Sandbox araçları ve debug görünümü · 459 EditMode testi
 >
 > **Durum işaretleri:** ✅ yapıldı · 🟡 kısmen · ⏳ planlandı
 
@@ -61,6 +61,7 @@
 31. [Geri Bildirim](#31-geri-bildirim)
 32. [Esc Katmanları](#32-esc-katmanları)
 33. [Sandbox](#33-sandbox)
+33b. [Zaman Kontrolü ve Silme](#33b-zaman-kontrolü-ve-silme)
 
 **G. [Planlanan Sistemler](#g-planlanan-sistemler)**
 
@@ -116,7 +117,7 @@ Gameplay ─► GameplayLifetimeScope (servisler, sistemler, dünya view'ları)
        Combat(400)      CombatSystem, BuildingDefenseSystem
        Cleanup(500)     DeathCleanupSystem
 2. MonoBehaviour Update                          CameraController kamerayı taşır
-3. IPostTickable                                 Placement, Selection, Command, Hover, Escape input handler'ları
+3. IPostTickable                                 Placement, Selection, Command, Hover, Delete, TimeControl, Escape input handler'ları
 4. LateUpdate                                    View'lar modeli okuyup çizer
 ```
 - **`GameClock`** oyun zamanının tek sahibi: `IsPaused`, `TimeScale`, `ElapsedTime`. Kare süresi en fazla 0,1 sn sayılır. `Time.timeScale` hiç değişmez; UI ve DOTween oyun dururken de çalışır.
@@ -156,6 +157,8 @@ Gameplay ─► GameplayLifetimeScope (servisler, sistemler, dünya view'ları)
 | `GameEndedEvent` | `GameOutcomeService` | `GameEndView` |
 | `FloatingTextRequestedEvent` | `PlacementInputHandler`, `InformationPanelView`, `GatheringSystem` | `FloatingTextSpawner` |
 | `SandboxFactionChangedEvent` | `SandboxService` | `ProductionMenuView`, `InformationPanelView` |
+| `SandboxSwitchesChangedEvent` | `SandboxService` | `SandboxSwitchesView` (`DebugOverlayView` ve `BattleAiSystem` her karede okur) |
+| `GameSpeedChangedEvent` | `TimeControlService` | `TimeControlView` |
 
 ## 5. Veri ve Oyun Modları
 **Durum:** ✅ · **Dosyalar:** `Gameplay/Data/*` · **Veri:** `GameDatas/`
@@ -174,6 +177,9 @@ Gameplay ─► GameplayLifetimeScope (servisler, sistemler, dünya view'ları)
 | `NormalModeStarter` | Hiçbir şey yapmaz | Castle, köylü, başlangıç kaynağı |
 | `PlacementService.TryConfirm` | Bina anında hazır | `buildTime` > 0 ise inşaat alanı olarak konur |
 | `ToolCursorView` | Normal imleç | Kaynakta ve inşaatta araç imleci |
+| `BattleAiSystem` | Düğmeyle açılır (varsayılan kapalı) | Hep açık |
+| `DeletionService` | Her şey silinir, fare altındaki kaynak da | Sadece oyuncunun birim ve binası, Castle hariç |
+| Production Menu | Buildings, Units, Resources sekmeleri | Sadece binalar |
 | `BuildingDefinition.GetProducibles` | `producibles` | `normalModeProducibles` (Castle köylü üretir) |
 | `BuildingDefinition.IsNormalModeOnly` | Menüde yok (Karakol) | Menüde var |
 | Takvim, baskın, AI, sığınma, oyun sonu | Çalışmaz | Çalışır |
@@ -443,7 +449,7 @@ Dalga doğar ─► hepsi ölür ─► 8 sn ─► sonraki dalga ... ─► "Ra
 - **`BattleAiSystem`** saniyede 4 kez hedef seçer; yürüme ve vurma `CombatSystem`'de:
   - Düşman: hedefi Castle. Yakınında (`aggroRange` 5) oyuncu birimi ya da binası varsa ona döner; 10 hücreden uzaklaşırsa bırakır. Binalar da hedef olduğu için yolu kapatan binayı yıkar; ayrı "engel yıkma" kodu yok.
   - Oyuncunun boştaki askeri yakındaki düşmana saldırır; hareket emri alanı rahatsız etmez.
-- Sandbox'ta hiçbiri çalışmaz.
+- Sandbox'ta varsayılan kapalı; "Enemy AI" düğmesiyle açılır (Bölüm 33).
 
 ## 25. Sığınma
 **Durum:** 🟡 (sadece Castle) · **Dosyalar:** `Gameplay/Raids/ShelterSystem.cs`, `UnitService.Shelter/BringOut` · **Test:** `VillagerBehaviourTests`
@@ -481,7 +487,7 @@ Haritada düşman kalmadı ─► Castle'ın yanında belirir ─► işine dön
 - **Sonsuz scroll (`RecyclingScrollView`, generic):** Sadece görünen satır + 1 kadar hücre oluşur. Veri indeksi `PositiveModulo(satır * sütun + sütun, öğeSayısı)`; liste iki yöne de biter. Hücre sadece gösterdiği öğe değişince yeniden bağlanır, liste dururken hiçbir RectTransform değişmez.
 - Offset döngü uzunluğuna sarılır; saatlerce kaydırılsa da float hassasiyeti bozulmaz. Sürükleme, fırlatma ve tekerlek bileşenin kendisinde, `ScrollRect` yok.
 - `ProductionMenuView` binaları `GameDatabase` sırasıyla, aktif tarafın rengiyle gösterir; Normal modda Castle'ı, Sandbox'ta Karakolu gizler. Tıklama `PlacementService.Begin` çağırır.
-- **Sekmeler (Sandbox):** Başlığın altında *Buildings* ve *Units*. Units sekmesi `GameDatabase.Units`'i portreleriyle listeler, tıklama `PlacementService.BeginUnit` çağırır. Seçili olmayan sekme koyulaşır. Normal modda sekmeler gizli ve liste onların yerine uzar (`tabsSpace`); orada birimler sadece binadan, parayla gelir. Hücre (`ProductionMenuCell`) ne gösterdiğini bilmez, sadece listedeki sırasını (`Index`) tutar; menü sırayı o anki sekmenin listesinde arar.
+- **Sekmeler (Sandbox):** Başlığın altında *Buildings*, *Units* ve *Resources*. Resources sekmesi ağaç, kaya, maden ve koyunları ilk kareleriyle listeler, tıklama `PlacementService.BeginNode`. Units sekmesi `GameDatabase.Units`'i portreleriyle listeler, tıklama `PlacementService.BeginUnit` çağırır. Seçili olmayan sekme koyulaşır. Normal modda sekmeler gizli ve liste onların yerine uzar (`tabsSpace`); orada birimler sadece binadan, parayla gelir. Hücre (`ProductionMenuCell`) ne gösterdiğini bilmez, sadece listedeki sırasını (`Index`) tutar; menü sırayı o anki sekmenin listesinde arar.
 - `SlideOutPanel` menüyü soldan DOTween ile kaydırır; obje kapanmaz, sadece konumu değişir.
 
 ## 29. Information Panel ve Birim Kartı
@@ -504,6 +510,7 @@ Haritada düşman kalmadı ─► Castle'ın yanında belirir ─► işine dön
 | `DayNightOverlayView` | Gece kararması |
 | `NoticeBannerView` | `GameNoticeEvent` metinleri (baskın, sığınma) |
 | `GameEndView` | Kazandın / kaybettin, iki buton |
+| `TimeControlView` | Takvimin solunda duraklat ve 1x / 2x / 3x; seçili olan parlak (Bölüm 33b) |
 
 ## 31. Geri Bildirim
 **Durum:** ✅ · **Dosyalar:** `UI/Feedback/*`, `UI/Tooltips/*`, `Gameplay/Feedback/*`, `Gameplay/Commands/MoveMarkerView.cs` · **Test:** `TooltipTests`
@@ -520,12 +527,27 @@ Haritada düşman kalmadı ─► Castle'ın yanında belirir ─► işine dön
 Her Esc en üstteki tek katmanı kapatır: yerleştirme (Placement map'inde, `PlacementInputHandler`) → seçim → Production Menu. Sıra tek yerde (`CloseTopLayer`) okunur. Oyun içi menü gelince en alt katman o olacak.
 
 ## 33. Sandbox
-**Durum:** 🟡 (minimal) · **Dosyalar:** `Gameplay/Sandbox/SandboxService.cs`, `UI/Sandbox/SandboxFactionToggleView.cs` · **Test:** `SandboxServiceTests`
+**Durum:** ✅ (baskını elle başlatma yok) · **Dosyalar:** `Gameplay/Sandbox/SandboxService.cs`, `UI/Sandbox/SandboxFactionToggleView.cs`, `SandboxSwitchesView.cs`, `Gameplay/DebugView/DebugOverlayView.cs` · **Test:** `SandboxServiceTests`, `SandboxToolsTests`
 
-- `SandboxService.ActiveFaction`: yeni bina ve birimlerin tarafı. Side düğmesi değiştirir; menü o tarafın renginde binaları gösterir. Düşman Barracks'ından düşman askeri üretmek için Side: Enemy olmalı.
-- Kaynak sınırsız, nüfus ve bölge yok, takvim ve baskın kapalı. PDF'teki saldırı maddesini test etmek için yeterli.
-- **Units sekmesi:** Production Menu'den asker ve köylü doğrudan haritaya konur, Side düğmesine göre taraf seçilir (Bölüm 10 ve 28). Barracks'tan üretim (PDF yolu) aynen duruyor.
-- Tam palet: bkz. G.
+- `SandboxService.ActiveFaction`: yeni bina ve birimlerin tarafı. Side düğmesi değiştirir; menü o tarafın renginde gösterir. Düşman Barracks'ından düşman askeri üretmek için Side: Enemy olmalı.
+- Kaynak sınırsız, nüfus ve bölge yok, takvim ve baskın kapalı, bina anında hazır.
+- **Production Menu sekmeleri:** *Buildings*, *Units*, *Resources*. Birimler ve kaynaklar (ağaç, kaya, altın madeni, koyun) doğrudan haritaya konur (Bölüm 10 ve 28). Barracks'tan üretim (PDF yolu) aynen duruyor. Kaynak listesi `ResourceDistribution` gruplarından toplanır, her tanım bir kez.
+- **Düğmeler** (`SandboxSwitchesView`, "Production >" butonunun altında, menü kapalıyken de görünür):
+  - **Enemy AI:** `SandboxService.IsBattleAiOn`. Açıkken `BattleAiSystem` çalışır: düşman yakındaki oyuncu birim ve binasına, oyuncunun boştaki askeri yakındaki düşmana saldırır. Castle olmadığı için düşmanın yürüyeceği bir ana hedef yok. Varsayılan kapalı; test edenin emirleri olduğu gibi kalsın.
+  - **Debug:** `SandboxService.IsDebugViewOn`. `DebugOverlayView` grid'i ve seçili birimlerin yolunu çizer (aşağıda).
+- **Silme:** Delete tuşu seçili her şeyi siler (iki taraf). Hiçbir şey seçili değilse farenin altındaki kaynak silinir (Bölüm 33b).
+- **Debug görünümü (`DebugOverlayView`):**
+  - Haritanın tamamını kaplayan tek doku, hücre başına 8 piksel: hücre çizgileri, zemin yüzünden yürünemeyen hücre (su, uçurum) koyu, bina ya da kaynağın tuttuğu hücre kırmızı, merdiven mavi. `GridChangedEvent` gelince bir sonraki gösterimde yeniden çizilir.
+  - Seçili ve yürüyen her birimin kalan yolu (`UnitModel.CopyRemainingPath`) 0,3 birim aralıklı noktalarla, hedefi büyük noktayla gösterilir. Oyuncu beyaz, düşman kırmızı. Noktalar havuzdan gelir, en fazla 800.
+  - Prefab: `Prefab_Gameplay_Debug_Overlay`. Sahnede durmaz; `GameplayLifetimeScope` onu `RegisterComponentInNewPrefab` ile oluşturup inject eder. Kapalıyken hiçbir şey çizmez ve dokuyu hiç oluşturmaz.
+
+## 33b. Zaman Kontrolü ve Silme
+**Durum:** ✅ · **Dosyalar:** `Gameplay/TimeControl/*`, `UI/Hud/TimeControlView.cs`, `Gameplay/Selection/DeletionService.cs`, `DeleteInputHandler.cs` · **Test:** `SandboxToolsTests`
+
+- **İki modda da var.** Kaynak barında takvimin solunda *II, 1x, 2x, 3x* butonları; tuşlar **P** (duraklat/devam), **+** ve **-** (hız; karakterle bağlı, her klavye düzeninde ve numpad'de çalışır).
+- `TimeControlService` sadece `GameClock`'u değiştirir; takvim, baskın sayacı ve bütün sistemler onu izlediği için ek kod gerekmez. Hız seçmek duraklatmayı da bitirir. Oyun bitince (`GameEndedEvent`) saat bir daha başlatılamaz.
+- **Silme (Delete tuşu):** `DeletionService.CanDelete` kuralı tek yerde tutar. Sandbox'ta her şey; Normal modda sadece oyuncunun birim ve binası, Castle asla (yanlışlıkla silinse oyun biterdi). Silmek ölümle aynı event'leri yayınlar (`UnitDiedEvent`, `BuildingDestroyedEvent`), yani seçim, panel, grid ve saldıranlar her zamanki gibi temizlenir. Geri ödeme yok. Silinemeyen bir şey seçiliyse "Can't delete this" yazar.
+- Silinen kaynak önce boşaltılır, üstünde çalışan köylü tükenmiş kaynak gibi bir sonrakine geçer.
 
 ---
 
@@ -566,8 +588,8 @@ Her biri mevcut yapıya şöyle oturacak. Yapılınca kendi bölümüne taşın�
 - **Nasıl:** UI'da `MinimapView`: `GridMap` ve kaynaklardan tek `Texture2D` (zemin bir kez, binalar ve kaynaklar event'le), birimler 0,25 sn'de bir nokta. Kameranın gördüğü alan çerçeve. Tıklama `CameraController`'a odak verir, sağ tık `UnitCommandService.MoveTo`. İkinci kamera kullanılmaz (SetPass).
 
 ### Tam Sandbox 🟡
-- **Yapıldı:** Bina ve birim yerleştirme, iki taraf (Production Menu sekmeleri).
-- **Nasıl devam eder:** Kaynak sekmesi, kaynak `ResourceNodeService.TryPlace`. Silme aracı `BuildingService.Remove` ve `UnitService.Remove`. Zaman kontrolü `GameClock.SetPaused` ve `TimeScale`. Baskını elle başlatma `RaidService`'e bir metot.
+- **Yapıldı:** Bina, birim ve kaynak yerleştirme, iki taraf, silme, zaman kontrolü, yapay zekâ ve debug düğmeleri (Bölüm 33, 33b).
+- **Kalan:** Baskını elle başlatma (`RaidService`'e bir metot ve Sandbox'ta takvimi açma).
 
 ### Rastgele Zemin Üretimi ⏳
 - **Nasıl:** `Map/MapGenerator` seed'le tilemap'leri doldurur, `TilemapGridSource` ondan sonra grid'i kurar; geri kalan her şey değişmeden çalışır. Ada şekli, platolar ve merdivenler noise ile; yol doğrulaması `ResourceDistributor`'daki flood fill ile aynı yöntem. Ayarlar `MapGenerationSettings`'te.
@@ -586,7 +608,7 @@ Her biri mevcut yapıya şöyle oturacak. Yapılınca kendi bölümüne taşın�
 - **Nasıl:** Root scope'ta `AudioService` (müzik ve havuzlu `AudioSource`'lar). Gameplay'de bir köprü event'leri seslere çevirir (`UnitAttackedEvent` → kılıç, `BuildingDestroyedEvent` → yıkım, baskın başlangıcı → borozan). Oyun kodu ses bilmez.
 
 ### Komut Kısayolları ⏳
-- Kontrol grupları (Ctrl+1-9), AttackMove (A), Stop (S), HoldPosition (X), boştaki köylü (.), oyun hızı (+/-). Hepsi Gameplay action map'ine eylem ve `UnitCommandService`'e metot. Duruş (`HoldPosition`) `UnitModel`'de bir alan; `BattleAiSystem` ona bakar.
+- Kontrol grupları (Ctrl+1-9), AttackMove (A), Stop (S), HoldPosition (X), boştaki köylü (.). (Oyun hızı, duraklatma ve Delete yapıldı, Bölüm 33b.) Hepsi Gameplay action map'ine eylem ve `UnitCommandService`'e metot. Duruş (`HoldPosition`) `UnitModel`'de bir alan; `BattleAiSystem` ona bakar.
 
 ### Efekt Turu ⏳
 - Hasar saldırı animasyonunun vuruş karesinde işlesin: `UnitDefinition.hitFrame`, `CombatSystem` vuruşu bekletir.

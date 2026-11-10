@@ -14,15 +14,17 @@ using VContainer;
 namespace BarracksAndBolts.UI.Production
 {
     /// <summary>
-    /// Lists every building in an endless scroll. Clicking one starts placing it. In sandbox mode a second tab lists
-    /// the units, which are placed straight onto the map; a normal game makes units in buildings only.
+    /// Lists every building in an endless scroll. Clicking one starts placing it. In sandbox mode two more tabs list
+    /// the units and the resources (trees, rocks, mines, sheep), which go straight onto the map; a normal game makes
+    /// units in buildings only.
     /// </summary>
     public sealed class ProductionMenuView : MonoBehaviour
     {
         private enum Tab
         {
             Buildings,
-            Units
+            Units,
+            Resources
         }
 
         [SerializeField] private RecyclingScrollView scrollView;
@@ -30,6 +32,7 @@ namespace BarracksAndBolts.UI.Production
         [Header("Tabs (sandbox only)")]
         [SerializeField] private Button buildingsTab;
         [SerializeField] private Button unitsTab;
+        [SerializeField] private Button resourcesTab;
         [Tooltip("The list area. Without tabs it grows up into their space.")]
         [SerializeField] private RectTransform viewport;
         [Tooltip("Height the tabs take above the list, gap included.")]
@@ -48,6 +51,7 @@ namespace BarracksAndBolts.UI.Production
         private readonly CompositeDisposable _subscriptions = new();
         private readonly List<BuildingDefinition> _buildings = new();
         private readonly List<UnitDefinition> _units = new();
+        private readonly List<ResourceNodeDefinition> _nodes = new();
 
         [Inject]
         private void Construct(GameDatabase database, TeamService teams, PlacementService placement, SandboxService sandbox, TooltipView tooltip, IEventBus eventBus)
@@ -76,6 +80,9 @@ namespace BarracksAndBolts.UI.Production
 
             if (unitsTab != null)
                 unitsTab.onClick.RemoveListener(OnUnitsTabClicked);
+
+            if (resourcesTab != null)
+                resourcesTab.onClick.RemoveListener(OnResourcesTabClicked);
         }
 
         private void CollectItems()
@@ -93,11 +100,21 @@ namespace BarracksAndBolts.UI.Production
 
             foreach (var unit in _database.Units)
                 _units.Add(unit);
+
+            // Every resource the map is made of, once each.
+            foreach (var group in _database.ResourceDistribution.Groups)
+            {
+                foreach (var node in group.Definitions)
+                {
+                    if (node != null && !_nodes.Contains(node))
+                        _nodes.Add(node);
+                }
+            }
         }
 
         private void SetUpTabs()
         {
-            if (buildingsTab == null || unitsTab == null)
+            if (buildingsTab == null || unitsTab == null || resourcesTab == null)
                 return;
 
             if (!_sandbox.IsEnabled)
@@ -105,6 +122,7 @@ namespace BarracksAndBolts.UI.Production
                 // Buildings only, so the list takes the tabs' place.
                 buildingsTab.gameObject.SetActive(false);
                 unitsTab.gameObject.SetActive(false);
+                resourcesTab.gameObject.SetActive(false);
                 if (viewport != null)
                     viewport.offsetMax += new Vector2(0f, tabsSpace);
 
@@ -113,6 +131,7 @@ namespace BarracksAndBolts.UI.Production
 
             buildingsTab.onClick.AddListener(OnBuildingsTabClicked);
             unitsTab.onClick.AddListener(OnUnitsTabClicked);
+            resourcesTab.onClick.AddListener(OnResourcesTabClicked);
             UpdateTabLook();
         }
 
@@ -124,6 +143,11 @@ namespace BarracksAndBolts.UI.Production
         private void OnUnitsTabClicked()
         {
             SelectTab(Tab.Units);
+        }
+
+        private void OnResourcesTabClicked()
+        {
+            SelectTab(Tab.Resources);
         }
 
         private void SelectTab(Tab tab)
@@ -141,6 +165,7 @@ namespace BarracksAndBolts.UI.Production
         {
             SetTabColor(buildingsTab, _tab == Tab.Buildings);
             SetTabColor(unitsTab, _tab == Tab.Units);
+            SetTabColor(resourcesTab, _tab == Tab.Resources);
         }
 
         private void SetTabColor(Button tab, bool isActive)
@@ -153,8 +178,20 @@ namespace BarracksAndBolts.UI.Production
         {
             // The menu shows everything in the color of the side being built for.
             _colors = _teams.GetColorSet(_sandbox.ActiveFaction);
-            var count = _tab == Tab.Units ? _units.Count : _buildings.Count;
-            scrollView.Initialize<ProductionMenuCell>(count, OnCellCreated, BindCell);
+            scrollView.Initialize<ProductionMenuCell>(GetItemCount(), OnCellCreated, BindCell);
+        }
+
+        private int GetItemCount()
+        {
+            switch (_tab)
+            {
+                case Tab.Units:
+                    return _units.Count;
+                case Tab.Resources:
+                    return _nodes.Count;
+                default:
+                    return _buildings.Count;
+            }
         }
 
         private void OnCellCreated(ProductionMenuCell cell)
@@ -174,6 +211,13 @@ namespace BarracksAndBolts.UI.Production
                 return;
             }
 
+            if (_tab == Tab.Resources)
+            {
+                var node = _nodes[index];
+                cell.Bind(index, node.DisplayName, node.Frames.Count > 0 ? node.Frames[0] : null);
+                return;
+            }
+
             var building = _buildings[index];
             cell.Bind(index, building.DisplayName, _colors.GetBuildingSprite(building));
         }
@@ -187,6 +231,13 @@ namespace BarracksAndBolts.UI.Production
                 return;
             }
 
+            if (_tab == Tab.Resources)
+            {
+                var node = _nodes[cell.Index];
+                _tooltip.Show(node.DisplayName, TooltipText.ForResource(node), cell.RectTransform);
+                return;
+            }
+
             var building = _buildings[cell.Index];
             _tooltip.Show(building.DisplayName, TooltipText.ForBuilding(building, isNormalMode: !_sandbox.IsEnabled), cell.RectTransform);
         }
@@ -194,10 +245,18 @@ namespace BarracksAndBolts.UI.Production
         private void OnCellClicked(ProductionMenuCell cell)
         {
             _tooltip.Hide();
-            if (_tab == Tab.Units)
-                _placement.BeginUnit(_units[cell.Index], _sandbox.ActiveFaction);
-            else
-                _placement.Begin(_buildings[cell.Index], _sandbox.ActiveFaction);
+            switch (_tab)
+            {
+                case Tab.Units:
+                    _placement.BeginUnit(_units[cell.Index], _sandbox.ActiveFaction);
+                    break;
+                case Tab.Resources:
+                    _placement.BeginNode(_nodes[cell.Index]);
+                    break;
+                default:
+                    _placement.Begin(_buildings[cell.Index], _sandbox.ActiveFaction);
+                    break;
+            }
         }
     }
 }

@@ -59,6 +59,7 @@
 | 23 | Mini harita çerçevesi | Mini harita | 🛠 `Papers_*` / `WoodTable_*` 9-slice |
 | 24 | ~~Kuledeki okçu~~ | ✅ `Archer` kareleri kulenin platformunda, takım rengine göre | – |
 | 25 | ~~Toplanma noktası bayrağı~~ | ✅ Kurdeleden üretildi: `Textures/Markers/<Renk>/Texture_Markers_<Renk>_RallyFlag` (atlas'a eklendi) | – |
+| – | ~~Debug yol noktası~~ | ✅ Kodla çizilen 8x8 nokta: `Textures/Markers/Texture_Markers_PathDot` (atlas'ta) | – |
 | – | ~~Birim durum ikonları~~ | ✅ Birimlerin paletiyle çizildi: `Textures/Markers/Texture_Markers_Status_Idle`, `_EnemySpotted` (klasörle atlas'a giriyor) | – |
 
 ## P3 – Cila

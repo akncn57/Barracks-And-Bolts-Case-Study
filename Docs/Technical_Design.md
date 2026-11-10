@@ -80,7 +80,7 @@ Scripts/
 ├── Popup/       BarracksAndBolts.Popup      Hazır popup sistemi (şu an kullanılmıyor)
 ├── Utils/       BarracksAndBolts.Utils      Unity'den bağımsız yardımcılar (MinHeap, CompositeDisposable)
 └── Tests/
-    └── EditMode/ BarracksAndBolts.Tests.EditMode   447 test
+    └── EditMode/ BarracksAndBolts.Tests.EditMode   459 test
 ```
 - Kayıt (save) ve ayarlar servisi henüz yok; geldiğinde Core'a girer.
 - Tek seferlik editör araçları `Assets/Editor/` altında asmdef'siz durur ve iş bitince silinir.
@@ -111,9 +111,11 @@ Gameplay/
 │                   ProjectileSpawner, ProjectileView, CombatEvents
 ├── Hover/          HoverService, HoverInputHandler, HoverHighlightView, ToolCursor, ToolCursorPicker, ToolCursorView
 ├── Feedback/       FloatingTextRequestedEvent (çizen: UI/Feedback/FloatingTextSpawner)
-├── Selection/      SelectionService, SelectionInputHandler, BoxSelectionView
+├── Selection/      SelectionService, SelectionInputHandler, BoxSelectionView, DeletionService, DeleteInputHandler
 ├── Commands/       UnitCommandService, CommandInputHandler, MoveMarkerView (AttackMove vb. gelince: IUnitCommand)
-├── Sandbox/        SandboxService (minimal: taraf seçimi; tam palet P2)
+├── Sandbox/        SandboxService (taraf, Enemy AI ve Debug düğmeleri)
+├── TimeControl/    TimeControlService, TimeControlInputHandler (iki modda)
+├── DebugView/      DebugOverlayView (Sandbox: grid ve A* yolu)
 ├── Teams/          Faction, TeamService (TeamColor, menüden taşındığı için Core.Session içinde)
 ├── ResourceNodes/  ResourceNodeService, ResourceNodeModel, ResourceDistributor, ResourceMapInitializer,
 │                   ResourceRoamSystem, ResourceNodeView, ResourceNodeViewSpawner
@@ -136,10 +138,10 @@ UI/
 ├── Scroll/         RecyclingScrollView, RecyclingScrollCell, RecyclingScrollMath
 ├── Production/     ProductionMenuView, ProductionMenuCell
 ├── Information/    InformationPanelView, ProducibleUnitCell, UnitSelectionCardView
-├── Hud/            ResourceBarView, CalendarLabelView, DayNightOverlayView, NoticeBannerView, GameEndView
+├── Hud/            ResourceBarView, CalendarLabelView, DayNightOverlayView, NoticeBannerView, GameEndView, TimeControlView
 ├── Feedback/       FloatingTextSpawner, FloatingTextView, HoverLabelView
 ├── Tooltips/       TooltipView, TooltipPlacement, TooltipText
-└── Sandbox/        SandboxFactionToggleView
+└── Sandbox/        SandboxFactionToggleView, SandboxSwitchesView
 ```
 
 ---
@@ -267,7 +269,7 @@ public interface IEventBus
 - **Mini harita (planlandı):** İkinci bir kamera kullanılmaz. Grid verisinden üretilen tek bir `Texture2D` kullanılır.
 - **UI:** Statik ve sık değişen elemanlar ayrı Canvas'lara bölünür (`StaticCanvas` / `DynamicCanvas`).
 - **Gece efekti:** Ekranı kaplayan tek bir yarı saydam UI görseli (`DayNightOverlayView`), alfası takvimden gelir. Işık sistemi kullanılmıyor.
-- **Çizim sırası (Order in Layer):** su -5, köpük -4, zemin -3, plato ve merdiven -2, bölge katmanı ve halkalar -1, bina, birim ve kaynak 0, yerleştirme önizlemesi 99-100, ok 150, inşaat çubuğu 155, durum ikonu 160, hover çerçevesi 190, seçim kutusu 200.
+- **Çizim sırası (Order in Layer):** su -5, köpük -4, zemin -3, plato ve merdiven -2, bölge katmanı ve halkalar -1, bina, birim ve kaynak 0, yerleştirme önizlemesi 99-100, ok ve debug yol noktaları 150, inşaat çubuğu 155, durum ikonu 160, hover çerçevesi 190, seçim kutusu 200.
 - Ölçüm Frame Debugger ve Game view Stats ile yapılır: savaş sırasında **10 SetPass**. Son özelliklerden sonra tekrar ölçülecek, sonuç README'ye yazılacak.
 
 ---
@@ -288,7 +290,7 @@ public interface IEventBus
 ---
 
 ## 12. Input
-- Varsayılan `InputSystem_Actions` şablonu kaldırıldı. Yerine `Settings/Input/GameInputActions.inputactions` geldi; C# sınıfı otomatik üretiliyor. Map'ler: **Camera** (her zaman açık), **Gameplay** ve **Placement** (ikisinden biri açık). Pause map'i oyun içi menüyle gelecek.
+- Varsayılan `InputSystem_Actions` şablonu kaldırıldı. Yerine `Settings/Input/GameInputActions.inputactions` geldi; C# sınıfı otomatik üretiliyor. Map'ler: **Camera** (her zaman açık), **Gameplay** ve **Placement** (ikisinden biri açık). Gameplay map'inde ayrıca `Delete`, `TogglePause`, `SpeedUp`, `SpeedDown` var; hız tuşları karakterle (`<Keyboard>/#(+)`) bağlı, her klavye düzeninde çalışır. Pause map'i oyun içi menüyle gelecek. Asset değişince üretilen sınıf da değişmeli; Unity asset'i import edince kendisi yeniden üretir.
 - Tek bir büyük input servisi yok; her özelliğin kendi küçük handler'ı var:
 
 | Sınıf | Görevi |
@@ -298,6 +300,8 @@ public interface IEventBus
 | `SelectionInputHandler` | Sol tık ve kutu seçimi |
 | `CommandInputHandler` | Sağ tık; bağlama göre karar `UnitCommandService.CommandAt`'te: düşman → saldırı, kaynak → toplama, zemin → hareket |
 | `HoverInputHandler` | Farenin altındaki şey |
+| `DeleteInputHandler` | Delete: seçimi siler (kural `DeletionService`'te) |
+| `TimeControlInputHandler` | P duraklatır, + ve - hızı değiştirir |
 | `EscapeInputHandler` (UI) | Esc her basışta en üstteki katmanı kapatır |
 | `CameraController` | Kaydırma, sürükleme, zoom |
 
@@ -392,7 +396,7 @@ Prefab_Core_GameplayLifetimeScope
 ---
 
 ## 15. Testler (EditMode)
-Toplam **447 test**, 36 dosya (`TestDefinitions` ve `TestMaps` yardımcı). Her biri saf C# servislerini Unity sahnesi olmadan çalıştırır.
+Toplam **459 test**, 37 dosya (`TestDefinitions` ve `TestMaps` yardımcı). Her biri saf C# servislerini Unity sahnesi olmadan çalıştırır.
 
 | Alan | Dosyalar | Kapsadığı durumlar |
 |---|---|---|

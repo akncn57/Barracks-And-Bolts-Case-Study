@@ -4,6 +4,7 @@ using BarracksAndBolts.Gameplay.Buildings;
 using BarracksAndBolts.Gameplay.Data;
 using BarracksAndBolts.Gameplay.Economy;
 using BarracksAndBolts.Gameplay.Grid;
+using BarracksAndBolts.Gameplay.ResourceNodes;
 using BarracksAndBolts.Gameplay.Teams;
 using BarracksAndBolts.Gameplay.Territory;
 using BarracksAndBolts.Gameplay.Units;
@@ -31,39 +32,45 @@ namespace BarracksAndBolts.Gameplay.Placement
     }
 
     /// <summary>
-    /// State of the placement mode: which building, or unit, is being placed and where its footprint is.
-    /// Input moves and confirms it; the preview only reads it. Placing units straight onto the map is a sandbox tool;
-    /// a normal game makes them in buildings.
+    /// State of the placement mode: which building, unit or resource is being placed and where its footprint is.
+    /// Input moves and confirms it; the preview only reads it. Placing units and resources straight onto the map is
+    /// a sandbox tool; a normal game makes units in buildings.
     /// </summary>
     public sealed class PlacementService
     {
         private readonly GridMap _gridMap;
         private readonly BuildingService _buildingService;
         private readonly UnitService _units;
+        private readonly ResourceNodeService _nodes;
         private readonly ResourceService _resources;
         private readonly TerritoryService _territory;
         private readonly IEventBus _eventBus;
 
-        public PlacementService(GridMap gridMap, BuildingService buildingService, UnitService units, ResourceService resources,
-            TerritoryService territory, IEventBus eventBus)
+        public PlacementService(GridMap gridMap, BuildingService buildingService, UnitService units, ResourceNodeService nodes,
+            ResourceService resources, TerritoryService territory, IEventBus eventBus)
         {
             _gridMap = gridMap;
             _buildingService = buildingService;
             _units = units;
+            _nodes = nodes;
             _resources = resources;
             _territory = territory;
             _eventBus = eventBus;
         }
 
-        public bool IsActive => Definition != null || Unit != null;
+        public bool IsActive => Definition != null || Unit != null || Node != null;
 
-        /// <summary>The building being placed. Null while a unit is placed.</summary>
+        /// <summary>The building being placed. Null while a unit or a resource is placed.</summary>
         public BuildingDefinition Definition { get; private set; }
 
-        /// <summary>The unit being placed. Null while a building is placed.</summary>
+        /// <summary>The unit being placed. Null otherwise.</summary>
         public UnitDefinition Unit { get; private set; }
 
+        /// <summary>The resource being placed: a tree, rock, mine or sheep. Null otherwise.</summary>
+        public ResourceNodeDefinition Node { get; private set; }
+
         public bool IsPlacingUnit => Unit != null;
+        public bool IsPlacingNode => Node != null;
         public Faction Faction { get; private set; }
 
         /// <summary>False until the pointer is over the map, and while it is over a UI panel.</summary>
@@ -105,11 +112,12 @@ namespace BarracksAndBolts.Gameplay.Placement
                 if (!_gridMap.IsAreaFree(Area))
                     return PlacementBlock.Occupied;
 
-                // Units don't block the grid, but a building placed on one would trap it.
+                // Units don't block the grid, but a building or resource placed on one would trap it.
                 if (_units.HasUnitIn(Area))
                     return PlacementBlock.UnitInTheWay;
 
-                return _resources.CanAfford(Definition.Cost) ? PlacementBlock.None : PlacementBlock.NotEnoughResources;
+                // Resources are free; only the sandbox places them.
+                return IsPlacingNode || _resources.CanAfford(Definition.Cost) ? PlacementBlock.None : PlacementBlock.NotEnoughResources;
             }
         }
 
@@ -133,6 +141,7 @@ namespace BarracksAndBolts.Gameplay.Placement
 
             Definition = definition;
             Unit = null;
+            Node = null;
             Faction = faction;
             HasArea = false;
             _eventBus.Publish(new PlacementStartedEvent(definition, faction));
@@ -146,9 +155,24 @@ namespace BarracksAndBolts.Gameplay.Placement
 
             Definition = null;
             Unit = unit;
+            Node = null;
             Faction = faction;
             HasArea = false;
             _eventBus.Publish(new PlacementStartedEvent(null, faction, unit));
+        }
+
+        /// <summary>Starts placing a resource. Resources belong to nobody, so there is no side.</summary>
+        public void BeginNode(ResourceNodeDefinition node)
+        {
+            if (node == null)
+                throw new ArgumentNullException(nameof(node));
+
+            Definition = null;
+            Unit = null;
+            Node = node;
+            Faction = Faction.Player;
+            HasArea = false;
+            _eventBus.Publish(new PlacementStartedEvent(null, Faction.Player));
         }
 
         /// <summary>Centers the footprint on the world position.</summary>
@@ -157,7 +181,7 @@ namespace BarracksAndBolts.Gameplay.Placement
             if (!IsActive)
                 return;
 
-            Area = _gridMap.GetAreaCenteredAt(worldPosition, IsPlacingUnit ? Vector2Int.one : Definition.Size);
+            Area = _gridMap.GetAreaCenteredAt(worldPosition, GetSize());
             HasArea = true;
         }
 
@@ -172,6 +196,9 @@ namespace BarracksAndBolts.Gameplay.Placement
         {
             if (IsPlacingUnit)
                 return TryConfirmUnit(keepPlacing);
+
+            if (IsPlacingNode)
+                return TryConfirmNode(keepPlacing);
 
             // A normal game builds over time: the building starts as a site for villagers. Sandbox mode builds at once.
             var asSite = !_resources.IsUnlimited && Definition.BuildTime > 0f;
@@ -199,6 +226,25 @@ namespace BarracksAndBolts.Gameplay.Placement
             return true;
         }
 
+        private bool TryConfirmNode(bool keepPlacing)
+        {
+            if (!IsAreaValid || !_nodes.TryPlace(Node, Area.position, out _))
+                return false;
+
+            if (!keepPlacing)
+                End();
+
+            return true;
+        }
+
+        private Vector2Int GetSize()
+        {
+            if (IsPlacingUnit)
+                return Vector2Int.one;
+
+            return IsPlacingNode ? Node.Size : Definition.Size;
+        }
+
         public void Cancel()
         {
             if (IsActive)
@@ -209,6 +255,7 @@ namespace BarracksAndBolts.Gameplay.Placement
         {
             Definition = null;
             Unit = null;
+            Node = null;
             HasArea = false;
             _eventBus.Publish(new PlacementEndedEvent());
         }

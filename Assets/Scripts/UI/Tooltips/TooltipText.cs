@@ -42,6 +42,11 @@ namespace BarracksAndBolts.UI.Tooltips
             return text.ToString();
         }
 
+        public static string ForResource(ResourceNodeDefinition node)
+        {
+            return FormattableString.Invariant($"Size: {node.Size.x}x{node.Size.y}\nKind: {node.Kind}\nAmount: {node.Amount}");
+        }
+
         /// <param name="showCost">False in sandbox mode, where everything is free.</param>
         public static string ForUnit(UnitDefinition unit, bool showCost = false)
         {

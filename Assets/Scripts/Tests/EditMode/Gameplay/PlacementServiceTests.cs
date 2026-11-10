@@ -6,6 +6,7 @@ using BarracksAndBolts.Gameplay.Entities;
 using BarracksAndBolts.Gameplay.Grid;
 using BarracksAndBolts.Gameplay.Pathfinding;
 using BarracksAndBolts.Gameplay.Placement;
+using BarracksAndBolts.Gameplay.ResourceNodes;
 using BarracksAndBolts.Gameplay.Teams;
 using BarracksAndBolts.Gameplay.Units;
 using NUnit.Framework;
@@ -33,7 +34,7 @@ namespace BarracksAndBolts.Tests.EditMode.Gameplay
             var ids = new GameEntityIdGenerator();
             _buildings = new BuildingService(_map, ids, _eventBus);
             _units = new UnitService(_map, new GridSearch(_map), ids, _eventBus);
-            _placement = new PlacementService(_map, _buildings, _units, TestDefinitions.CreateFreeResources(_eventBus),
+            _placement = new PlacementService(_map, _buildings, _units, new ResourceNodeService(_map, new GameEntityIdGenerator(), _eventBus), TestDefinitions.CreateFreeResources(_eventBus),
                 TestDefinitions.CreateFreeTerritory(_map, _buildings, _eventBus), _eventBus);
             _knight = TestDefinitions.CreateUnit("knight");
             _house = TestDefinitions.CreateBuilding("house", new Vector2Int(2, 2), maxHp: 50);

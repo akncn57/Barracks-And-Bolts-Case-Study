@@ -6,6 +6,7 @@ using BarracksAndBolts.Gameplay.Entities;
 using BarracksAndBolts.Gameplay.Grid;
 using BarracksAndBolts.Gameplay.Pathfinding;
 using BarracksAndBolts.Gameplay.Placement;
+using BarracksAndBolts.Gameplay.ResourceNodes;
 using BarracksAndBolts.Gameplay.Sandbox;
 using BarracksAndBolts.Gameplay.Teams;
 using BarracksAndBolts.Gameplay.Territory;
@@ -41,7 +42,7 @@ namespace BarracksAndBolts.Tests.EditMode.Gameplay
             _buildings = new BuildingService(_map, ids, _eventBus);
             _units = new UnitService(_map, new GridSearch(_map), ids, _eventBus);
             _territory = CreateTerritory(GameMode.Normal);
-            _placement = new PlacementService(_map, _buildings, _units, TestDefinitions.CreateFreeResources(_eventBus), _territory, _eventBus);
+            _placement = new PlacementService(_map, _buildings, _units, new ResourceNodeService(_map, new GameEntityIdGenerator(), _eventBus), TestDefinitions.CreateFreeResources(_eventBus), _territory, _eventBus);
 
             _castle = TestDefinitions.CreateTerritorySource("castle", 5f);
             _outpost = TestDefinitions.CreateTerritorySource("outpost", 3f);

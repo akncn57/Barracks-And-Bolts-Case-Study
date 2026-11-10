@@ -12,7 +12,8 @@ namespace BarracksAndBolts.Gameplay.Raids
     /// <summary>
     /// Picks targets in a normal game. Enemies march on the Castle and turn on whatever comes near; since buildings
     /// count too, a wall in their way gets knocked down. Idle soldiers of the player attack what comes near them.
-    /// CombatSystem does the walking and the hitting. Sandbox games keep every order in the player's hands.
+    /// CombatSystem does the walking and the hitting. In sandbox mode it runs only while the tester has switched it on;
+    /// with no Castle there, enemies only turn on what comes near.
     /// </summary>
     public sealed class BattleAiSystem : ISimulationSystem
     {
@@ -27,7 +28,7 @@ namespace BarracksAndBolts.Gameplay.Raids
         private readonly CombatService _combat;
         private readonly RaidSettings _settings;
         private readonly NormalModeSettings _normalMode;
-        private readonly bool _isEnabled;
+        private readonly SandboxService _sandbox;
         private float _scanDelayLeft;
 
         public BattleAiSystem(UnitService units, BuildingService buildings, CombatService combat, RaidSettings settings,
@@ -38,14 +39,14 @@ namespace BarracksAndBolts.Gameplay.Raids
             _combat = combat;
             _settings = settings;
             _normalMode = normalMode;
-            _isEnabled = !sandbox.IsEnabled;
+            _sandbox = sandbox;
         }
 
         public SimulationPhase Phase => SimulationPhase.AI;
 
         public void Tick(float deltaTime)
         {
-            if (!_isEnabled)
+            if (_sandbox.IsEnabled && !_sandbox.IsBattleAiOn)
                 return;
 
             _scanDelayLeft -= deltaTime;

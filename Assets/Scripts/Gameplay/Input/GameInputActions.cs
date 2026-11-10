@@ -336,6 +336,42 @@ namespace BarracksAndBolts.Gameplay.Input
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""Delete"",
+                    ""type"": ""Button"",
+                    ""id"": ""ea2f16c6-f5d9-46ab-93d6-51cadb427845"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""TogglePause"",
+                    ""type"": ""Button"",
+                    ""id"": ""3b91753d-8962-449c-b6d3-67f1908c2b94"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""SpeedUp"",
+                    ""type"": ""Button"",
+                    ""id"": ""66eb4d1f-8e3b-4bc7-9b55-d9bdf8a8de61"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
+                },
+                {
+                    ""name"": ""SpeedDown"",
+                    ""type"": ""Button"",
+                    ""id"": ""e66e6975-f6be-443c-8959-ed77cb850ab1"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -380,6 +416,72 @@ namespace BarracksAndBolts.Gameplay.Input
                     ""processors"": """",
                     ""groups"": ""Keyboard&Mouse"",
                     ""action"": ""PointerPosition"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""37c3b6ae-e78d-4517-874b-8d58f64fe256"",
+                    ""path"": ""<Keyboard>/delete"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""Delete"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""c9eafe58-8566-4cbd-b064-746b5197b5ec"",
+                    ""path"": ""<Keyboard>/p"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""TogglePause"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""4d04647f-07ef-4112-b85f-f0ba2c77c6b3"",
+                    ""path"": ""<Keyboard>/#(+)"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""SpeedUp"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""a95fd5b3-3ebe-40ca-bff4-bce365168e7a"",
+                    ""path"": ""<Keyboard>/numpadPlus"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""SpeedUp"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""4e9b98d0-bb28-405b-a2b2-2391f949345a"",
+                    ""path"": ""<Keyboard>/#(-)"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""SpeedDown"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""d325a9a9-37eb-4c6f-ab1d-91f04d47f783"",
+                    ""path"": ""<Keyboard>/numpadMinus"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""Keyboard&Mouse"",
+                    ""action"": ""SpeedDown"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -517,6 +619,10 @@ namespace BarracksAndBolts.Gameplay.Input
             m_Gameplay_Command = m_Gameplay.FindAction("Command", throwIfNotFound: true);
             m_Gameplay_Cancel = m_Gameplay.FindAction("Cancel", throwIfNotFound: true);
             m_Gameplay_PointerPosition = m_Gameplay.FindAction("PointerPosition", throwIfNotFound: true);
+            m_Gameplay_Delete = m_Gameplay.FindAction("Delete", throwIfNotFound: true);
+            m_Gameplay_TogglePause = m_Gameplay.FindAction("TogglePause", throwIfNotFound: true);
+            m_Gameplay_SpeedUp = m_Gameplay.FindAction("SpeedUp", throwIfNotFound: true);
+            m_Gameplay_SpeedDown = m_Gameplay.FindAction("SpeedDown", throwIfNotFound: true);
             // Placement
             m_Placement = asset.FindActionMap("Placement", throwIfNotFound: true);
             m_Placement_Confirm = m_Placement.FindAction("Confirm", throwIfNotFound: true);
@@ -749,6 +855,10 @@ namespace BarracksAndBolts.Gameplay.Input
         private readonly InputAction m_Gameplay_Command;
         private readonly InputAction m_Gameplay_Cancel;
         private readonly InputAction m_Gameplay_PointerPosition;
+        private readonly InputAction m_Gameplay_Delete;
+        private readonly InputAction m_Gameplay_TogglePause;
+        private readonly InputAction m_Gameplay_SpeedUp;
+        private readonly InputAction m_Gameplay_SpeedDown;
         /// <summary>
         /// Provides access to input actions defined in input action map "Gameplay".
         /// </summary>
@@ -776,6 +886,22 @@ namespace BarracksAndBolts.Gameplay.Input
             /// Provides access to the underlying input action "Gameplay/PointerPosition".
             /// </summary>
             public InputAction @PointerPosition => m_Wrapper.m_Gameplay_PointerPosition;
+            /// <summary>
+            /// Provides access to the underlying input action "Gameplay/Delete".
+            /// </summary>
+            public InputAction @Delete => m_Wrapper.m_Gameplay_Delete;
+            /// <summary>
+            /// Provides access to the underlying input action "Gameplay/TogglePause".
+            /// </summary>
+            public InputAction @TogglePause => m_Wrapper.m_Gameplay_TogglePause;
+            /// <summary>
+            /// Provides access to the underlying input action "Gameplay/SpeedUp".
+            /// </summary>
+            public InputAction @SpeedUp => m_Wrapper.m_Gameplay_SpeedUp;
+            /// <summary>
+            /// Provides access to the underlying input action "Gameplay/SpeedDown".
+            /// </summary>
+            public InputAction @SpeedDown => m_Wrapper.m_Gameplay_SpeedDown;
             /// <summary>
             /// Provides access to the underlying input action map instance.
             /// </summary>
@@ -814,6 +940,18 @@ namespace BarracksAndBolts.Gameplay.Input
                 @PointerPosition.started += instance.OnPointerPosition;
                 @PointerPosition.performed += instance.OnPointerPosition;
                 @PointerPosition.canceled += instance.OnPointerPosition;
+                @Delete.started += instance.OnDelete;
+                @Delete.performed += instance.OnDelete;
+                @Delete.canceled += instance.OnDelete;
+                @TogglePause.started += instance.OnTogglePause;
+                @TogglePause.performed += instance.OnTogglePause;
+                @TogglePause.canceled += instance.OnTogglePause;
+                @SpeedUp.started += instance.OnSpeedUp;
+                @SpeedUp.performed += instance.OnSpeedUp;
+                @SpeedUp.canceled += instance.OnSpeedUp;
+                @SpeedDown.started += instance.OnSpeedDown;
+                @SpeedDown.performed += instance.OnSpeedDown;
+                @SpeedDown.canceled += instance.OnSpeedDown;
             }
 
             /// <summary>
@@ -837,6 +975,18 @@ namespace BarracksAndBolts.Gameplay.Input
                 @PointerPosition.started -= instance.OnPointerPosition;
                 @PointerPosition.performed -= instance.OnPointerPosition;
                 @PointerPosition.canceled -= instance.OnPointerPosition;
+                @Delete.started -= instance.OnDelete;
+                @Delete.performed -= instance.OnDelete;
+                @Delete.canceled -= instance.OnDelete;
+                @TogglePause.started -= instance.OnTogglePause;
+                @TogglePause.performed -= instance.OnTogglePause;
+                @TogglePause.canceled -= instance.OnTogglePause;
+                @SpeedUp.started -= instance.OnSpeedUp;
+                @SpeedUp.performed -= instance.OnSpeedUp;
+                @SpeedUp.canceled -= instance.OnSpeedUp;
+                @SpeedDown.started -= instance.OnSpeedDown;
+                @SpeedDown.performed -= instance.OnSpeedDown;
+                @SpeedDown.canceled -= instance.OnSpeedDown;
             }
 
             /// <summary>
@@ -1090,6 +1240,34 @@ namespace BarracksAndBolts.Gameplay.Input
             /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
             /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
             void OnPointerPosition(InputAction.CallbackContext context);
+            /// <summary>
+            /// Method invoked when associated input action "Delete" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+            /// </summary>
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+            void OnDelete(InputAction.CallbackContext context);
+            /// <summary>
+            /// Method invoked when associated input action "TogglePause" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+            /// </summary>
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+            void OnTogglePause(InputAction.CallbackContext context);
+            /// <summary>
+            /// Method invoked when associated input action "SpeedUp" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+            /// </summary>
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+            void OnSpeedUp(InputAction.CallbackContext context);
+            /// <summary>
+            /// Method invoked when associated input action "SpeedDown" is either <see cref="UnityEngine.InputSystem.InputAction.started" />, <see cref="UnityEngine.InputSystem.InputAction.performed" /> or <see cref="UnityEngine.InputSystem.InputAction.canceled" />.
+            /// </summary>
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.started" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.performed" />
+            /// <seealso cref="UnityEngine.InputSystem.InputAction.canceled" />
+            void OnSpeedDown(InputAction.CallbackContext context);
         }
         /// <summary>
         /// Interface to implement callback methods for all input action callbacks associated with input actions defined by "Placement" which allows adding and removing callbacks.

@@ -23,6 +23,8 @@ namespace BarracksAndBolts.UI
             builder.RegisterComponentInHierarchy<InformationPanelView>();
             builder.RegisterComponentInHierarchy<UnitSelectionCardView>();
             builder.RegisterComponentInHierarchy<SandboxFactionToggleView>();
+            builder.RegisterComponentInHierarchy<SandboxSwitchesView>();
+            builder.RegisterComponentInHierarchy<TimeControlView>();
             builder.RegisterComponentInHierarchy<ResourceBarView>();
             builder.RegisterComponentInHierarchy<CalendarLabelView>();
             builder.RegisterComponentInHierarchy<DayNightOverlayView>();
