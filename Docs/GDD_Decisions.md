@@ -261,6 +261,7 @@ Bu değerler ScriptableObject üzerinden ayarlanabilir olacak, ileride değişti
 
 ### Ayarlar
 - Klasik ayarlar: ses seviyeleri (genel, müzik, efekt), çözünürlük, pencere modu, VSync, kenar kaydırma açık/kapalı. Ekstralar sonra konuşulacak.
+- **Şu anki hali:** Ana menüde Settings butonu, oyunda kaynak barının sağındaki dişli ve Esc ile açılır. Pencere modu, VSync, arayüz boyutu (%90 / %100 / %115), kamera hızı, kenar kaydırma ve FPS paneli var; her değişiklik hemen kaydedilir. Oyunda açıkken oyun durur ve ana menüye dönüş buradan yapılır. Ses ayarları ses gelince eklenecek.
 
 ### Ses
 - Şu an ses ve efekt yok. Sonradan eklenecek, ya bulunacak ya da üretilecek.

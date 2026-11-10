@@ -28,7 +28,29 @@ namespace BarracksAndBolts.Tests.EditMode.UI
             }
         }
 
+        private sealed class FakeMenu : IEscapeMenu
+        {
+            public bool IsOpen { get; set; }
+            public int OpenCount { get; private set; }
+
+            public bool TryCloseTop()
+            {
+                if (!IsOpen)
+                    return false;
+
+                IsOpen = false;
+                return true;
+            }
+
+            public void Open()
+            {
+                IsOpen = true;
+                OpenCount++;
+            }
+        }
+
         private GameInputActions _inputActions;
+        private FakeMenu _menu;
         private UnitDefinition _knight;
         private UnitService _units;
         private SelectionService _selection;
@@ -46,7 +68,8 @@ namespace BarracksAndBolts.Tests.EditMode.UI
             _units = new UnitService(map, new GridSearch(map), ids, eventBus);
             _selection = new SelectionService(_units, new BuildingService(map, ids, eventBus), eventBus);
             _panel = new FakePanel { IsOpen = true };
-            _handler = new EscapeInputHandler(_selection, _panel, _inputActions);
+            _menu = new FakeMenu();
+            _handler = new EscapeInputHandler(_selection, _panel, _menu, _inputActions);
         }
 
         [TearDown]
@@ -106,12 +129,27 @@ namespace BarracksAndBolts.Tests.EditMode.UI
         }
 
         [Test]
-        public void WithNothingOpen_DoesNothing()
+        public void WithNothingOpen_OpensTheSettings()
         {
             _panel.IsOpen = false;
 
-            Assert.DoesNotThrow(() => _handler.CloseTopLayer());
+            _handler.CloseTopLayer();
+
+            Assert.AreEqual(1, _menu.OpenCount);
             Assert.IsFalse(_selection.HasSelection);
+        }
+
+        [Test]
+        public void WithTheSettingsOpen_ClosesThemFirst()
+        {
+            SelectAUnit();
+            _menu.IsOpen = true;
+
+            _handler.CloseTopLayer();
+
+            Assert.IsFalse(_menu.IsOpen);
+            Assert.IsTrue(_selection.HasSelection, "The selection waits for the next press.");
+            Assert.IsTrue(_panel.IsOpen);
         }
     }
 }

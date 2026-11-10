@@ -9,7 +9,7 @@ namespace BarracksAndBolts.UI.Tooltips
     public static class TooltipText
     {
         /// <summary>Added under the production menu tooltips: Shift keeps the placement going, but nothing else tells the player.</summary>
-        public const string PlaceSeveralHint = "\n\n<size=85%><color=#D8C9A8>Hold Shift to place several</color></size>";
+        public const string PlaceSeveralHint = "\n\n<size=85%><color=#6B4E33>Hold Shift to place several</color></size>";
 
         /// <param name="isNormalMode">False in sandbox mode, where everything is free and there is no territory.</param>
         public static string ForBuilding(BuildingDefinition building, bool isNormalMode = false)

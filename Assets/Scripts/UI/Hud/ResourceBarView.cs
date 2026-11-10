@@ -4,6 +4,7 @@ using BarracksAndBolts.Gameplay.Data;
 using BarracksAndBolts.Gameplay.Economy;
 using BarracksAndBolts.Gameplay.Units;
 using BarracksAndBolts.Utils.Disposables;
+using DG.Tweening;
 using TMPro;
 using UnityEngine;
 using VContainer;
@@ -17,6 +18,10 @@ namespace BarracksAndBolts.UI.Hud
     public sealed class ResourceBarView : MonoBehaviour
     {
         private const string InfiniteAmount = "∞";
+
+        // A number that changes gives a short bump, so income and spending catch the eye.
+        private const float BumpScale = 0.25f;
+        private const float BumpSeconds = 0.25f;
 
         [SerializeField] private TMP_Text woodLabel;
         [SerializeField] private TMP_Text stoneLabel;
@@ -32,6 +37,7 @@ namespace BarracksAndBolts.UI.Hud
         private HungerSystem _hunger;
         private IEventBus _eventBus;
         private Color _foodColor;
+        private bool _isShowing;
 
         [Inject]
         private void Construct(ResourceService resources, PopulationService population, HungerSystem hunger, IEventBus eventBus)
@@ -66,6 +72,9 @@ namespace BarracksAndBolts.UI.Hud
             _eventBus.Subscribe<HungerChangedEvent>(_ => ShowHunger()).AddTo(_subscriptions);
             ShowResources();
             ShowPopulation();
+
+            // The starting values come in quietly; only later changes bump.
+            _isShowing = true;
         }
 
         private void OnDestroy()
@@ -75,10 +84,10 @@ namespace BarracksAndBolts.UI.Hud
 
         private void ShowResources()
         {
-            woodLabel.text = _resources.Get(ResourceKind.Wood).ToString();
-            stoneLabel.text = _resources.Get(ResourceKind.Stone).ToString();
-            foodLabel.text = _resources.Get(ResourceKind.Food).ToString();
-            goldLabel.text = _resources.Get(ResourceKind.Gold).ToString();
+            Show(woodLabel, _resources.Get(ResourceKind.Wood).ToString());
+            Show(stoneLabel, _resources.Get(ResourceKind.Stone).ToString());
+            Show(foodLabel, _resources.Get(ResourceKind.Food).ToString());
+            Show(goldLabel, _resources.Get(ResourceKind.Gold).ToString());
         }
 
         private void ShowHunger()
@@ -88,7 +97,21 @@ namespace BarracksAndBolts.UI.Hud
 
         private void ShowPopulation()
         {
-            populationLabel.text = $"{_population.Used}/{_population.Capacity}";
+            Show(populationLabel, $"{_population.Used}/{_population.Capacity}");
+        }
+
+        private void Show(TMP_Text label, string value)
+        {
+            if (label.text == value)
+                return;
+
+            label.text = value;
+            if (!_isShowing)
+                return;
+
+            var target = label.transform;
+            target.DOKill(complete: true);
+            target.DOPunchScale(Vector3.one * BumpScale, BumpSeconds, 6, 0.6f).SetUpdate(true).SetLink(label.gameObject);
         }
     }
 }

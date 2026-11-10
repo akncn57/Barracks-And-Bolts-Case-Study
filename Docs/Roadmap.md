@@ -61,7 +61,7 @@ Oyunu deneyince çıkan kullanılabilirlik istekleri. Sandbox'ta da olmalı, bui
 - [x] Dalga sistemi ve baskın bildirimleri (ses ve mini harita yok; yön yazıyla söyleniyor)
 - [x] Kazanma ve kaybetme koşulları ve oyun sonu ekranı
 - [ ] Oyun döngüsünün dengesi (süreler, maliyetler, dalga büyüklükleri)
-- [ ] Test Runner sonucu (489 test) ve son SetPass ölçümü
+- [ ] Test Runner sonucu (494 test) ve son SetPass ölçümü
 
 ## P2 – Derinlik (zaman kaldıkça, aşağıdaki sırayla)
 **Hedef: 12 Kasım Perşembe.**
@@ -83,7 +83,8 @@ Oyunu deneyince çıkan kullanılabilirlik istekleri. Sandbox'ta da olmalı, bui
 - [ ] Kayıt sistemi (manuel kayıt, birden fazla slot)
 - [ ] Zorluk seviyeleri
 - [ ] Sonsuz mod
-- [ ] Ayarlar menüsü
+- [x] Ayarlar menüsü (pencere modu, VSync, arayüz boyutu, kamera hızı, kenar kaydırma, FPS paneli; ses ayarları ses gelince)
+- [x] Arayüz cilası: konturlu ve gölgeli yazı malzemeleri, buton hover/basma animasyonu, kaynak sayısı punch, ana menü arka planı ve giriş animasyonları, FPS paneli sağ üstte
 - [ ] Ses ve müzik
 - [ ] Tutorial
 - [ ] Kontrol grupları, AttackMove, HoldPosition (oyun hızı ve duraklatma yapıldı, iki modda da)

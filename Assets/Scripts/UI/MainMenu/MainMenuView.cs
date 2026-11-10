@@ -2,6 +2,7 @@ using System;
 using BarracksAndBolts.Core.Scenes;
 using BarracksAndBolts.Core.Session;
 using Cysharp.Threading.Tasks;
+using DG.Tweening;
 using UnityEngine;
 using UnityEngine.UI;
 using VContainer;
@@ -14,6 +15,12 @@ namespace BarracksAndBolts.UI.MainMenu
         [SerializeField] private Button sandboxButton;
         [SerializeField] private Button quitButton;
 
+        [Header("Entrance")]
+        [Tooltip("Pop in one after another, from the top. Settings is here too; its click is handled by SettingsButtonView.")]
+        [SerializeField] private RectTransform[] entranceOrder;
+        [SerializeField, Min(0f)] private float entranceDelay = 0.35f;
+        [SerializeField, Min(0f)] private float entranceStep = 0.08f;
+
         private SceneLoader _sceneLoader;
         private GameSessionSettings _sessionSettings;
 
@@ -22,6 +29,17 @@ namespace BarracksAndBolts.UI.MainMenu
         {
             _sceneLoader = sceneLoader;
             _sessionSettings = sessionSettings;
+        }
+
+        private void Start()
+        {
+            // Scale only: the layout group owns the buttons' positions.
+            for (var i = 0; i < entranceOrder.Length; i++)
+            {
+                var item = entranceOrder[i];
+                item.localScale = Vector3.zero;
+                item.DOScale(1f, 0.35f).SetDelay(entranceDelay + i * entranceStep).SetEase(Ease.OutBack).SetLink(item.gameObject);
+            }
         }
 
         private void OnEnable()

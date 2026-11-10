@@ -80,7 +80,7 @@ Scripts/
 ├── Popup/       BarracksAndBolts.Popup      Hazır popup sistemi (şu an kullanılmıyor)
 ├── Utils/       BarracksAndBolts.Utils      Unity'den bağımsız yardımcılar (MinHeap, CompositeDisposable)
 └── Tests/
-    └── EditMode/ BarracksAndBolts.Tests.EditMode   489 test
+    └── EditMode/ BarracksAndBolts.Tests.EditMode   494 test
 ```
 - Kayıt (save) ve ayarlar servisi henüz yok; geldiğinde Core'a girer.
 - Tek seferlik editör araçları `Assets/Editor/` altında asmdef'siz durur ve iş bitince silinir.
@@ -397,7 +397,7 @@ Prefab_Core_GameplayLifetimeScope
 ---
 
 ## 15. Testler (EditMode)
-Toplam **489 test**, 39 dosya (`TestDefinitions` ve `TestMaps` yardımcı). Her biri saf C# servislerini Unity sahnesi olmadan çalıştırır.
+Toplam **494 test**, 39 dosya (`TestDefinitions` ve `TestMaps` yardımcı). Her biri saf C# servislerini Unity sahnesi olmadan çalıştırır.
 
 | Alan | Dosyalar | Kapsadığı durumlar |
 |---|---|---|

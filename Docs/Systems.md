@@ -3,7 +3,7 @@
 > Oyundaki her sistemin kodda **nasıl** yapıldığını anlatır: yapılanlar ve planlananlar.
 > Kurallar ve mimari: [Technical_Design.md](Technical_Design.md) · Oyun tasarımı: [GDD_Decisions.md](GDD_Decisions.md) · Öncelikler: [Roadmap.md](Roadmap.md) · Assetler: [Missing_Assets.md](Missing_Assets.md)
 >
-> **Son güncelleme:** 10 Kasım 2026 · vuruş zamanlaması, efektler, can barları, tarla (köylü çitin içinde), açlık, toplanma noktası, Sandbox araçları (baskın, temizleme, test savaşı, istatistik) · 489 EditMode testi
+> **Son güncelleme:** 10 Kasım 2026 · vuruş zamanlaması, efektler, can barları, tarla (köylü çitin içinde), açlık, toplanma noktası, Sandbox araçları, ayarlar, yazı malzemeleri, arayüz animasyonları, ana menü arka planı · 494 EditMode testi
 >
 > **Durum işaretleri:** ✅ yapıldı · 🟡 kısmen · ⏳ planlandı
 
@@ -62,6 +62,8 @@
 30. [HUD](#30-hud)
 31. [Geri Bildirim](#31-geri-bildirim)
 32. [Esc Katmanları](#32-esc-katmanları)
+32b. [Ayarlar ve Popup'lar](#32b-ayarlar-ve-popuplar)
+32c. [Yazı Malzemeleri ve Arayüz Animasyonları](#32c-yazı-malzemeleri-ve-arayüz-animasyonları)
 33. [Sandbox](#33-sandbox)
 33b. [Zaman Kontrolü ve Silme](#33b-zaman-kontrolü-ve-silme)
 
@@ -515,11 +517,12 @@ Haritada düşman kalmadı ─► Castle'ın yanında belirir ─► işine dön
 # F. Arayüz
 
 ## 27. Ana Menü
-**Durum:** 🟡 (Play, Sandbox, Quit) · **Dosyalar:** `UI/MainMenu/*`
+**Durum:** 🟡 (Play, Sandbox, Settings, Quit) · **Dosyalar:** `UI/MainMenu/*` · **Görsel:** `Textures/Backgrounds/Texture_Backgrounds_MainMenu`
 
 - Play Normal modu, Sandbox Sandbox'ı yeni bir seed'le başlatır. Basınca butonlar kilitlenir; `SceneLoader` da yükleme sürerken gelen ikinci isteği yok sayar.
-- Quit editörde Play modunu kapatır, build'de uygulamayı.
-- Planlanan: renk ve zorluk seçimi, seed girişi, kayıt yükleme, ayarlar (bkz. G).
+- Settings ayarlar popup'ını açar (Bölüm 32b). Quit editörde Play modunu kapatır, build'de uygulamayı.
+- **Arka plan:** Oyunun kendi tile ve sprite'larından birleştirilmiş 1920x1080 tek bir resim (sahnede sprite yok, tek draw call): iki tarafın kalesi, kuleleri, evleri, ormanlar ve karşı karşıya duran iki küçük ordu; ortası menüye boş bırakıldı, kenarlar hafif karartıldı. Atlas dışında (`Textures/Backgrounds`), çünkü UI atlası bu boyutta bir resmi şişirirdi. Her ekran oranında ekranı kaplar (`MainMenuBackgroundView.FitPicture`). Başlık *Outline Shadow* malzemesinde. Prefab: `Prefab_UI_MainMenu_Background`, canvas varyantında panelin arkasında.
+- Planlanan: renk ve zorluk seçimi, seed girişi, kayıt yükleme (bkz. G).
 
 ## 28. Production Menu
 **Durum:** ✅ · **Dosyalar:** `UI/Scroll/*`, `UI/Production/*`, `UI/Common/SlideOutPanel.cs` · **Test:** `RecyclingScrollMathTests`
@@ -551,6 +554,8 @@ Haritada düşman kalmadı ─► Castle'ın yanında belirir ─► işine dön
 | `NoticeBannerView` | `GameNoticeEvent` metinleri (baskın, sığınma) |
 | `GameEndView` | Kazandın / kaybettin, iki buton |
 | `TimeControlView` | Takvimin solunda duraklat ve 1x / 2x / 3x; seçili olan parlak (Bölüm 33b) |
+| `StatsPanelView` | Sağ altta, ekranın hep boş köşesinde (`Prefab_UI_Stats_Panel`, DynamicCanvas'ta; yazısı saniyede iki kez değişir, statik canvas'ı yeniden kurmasın): FPS, birim ve bina sayısı, saniyede A* araması, ortalama ve en uzun süre (ms); editörde SetPass ve draw call. Ayarlardaki FPS Panel ile açılıp kapanır, iki modda da |
+| `SettingsButtonView` | Barda zaman butonlarının yanındaki dişli (barın layout grubu dizer); ayarları açar (Bölüm 32b) |
 
 ## 31. Geri Bildirim
 **Durum:** ✅ · **Dosyalar:** `UI/Feedback/*`, `UI/Tooltips/*`, `Gameplay/Feedback/*`, `Gameplay/Commands/MoveMarkerView.cs` · **Test:** `TooltipTests`
@@ -564,7 +569,34 @@ Haritada düşman kalmadı ─► Castle'ın yanında belirir ─► işine dön
 ## 32. Esc Katmanları
 **Durum:** ✅ · **Dosyalar:** `UI/Common/EscapeInputHandler.cs`, `ICloseablePanel.cs` · **Test:** `EscapeInputHandlerTests`
 
-Her Esc en üstteki tek katmanı kapatır: yerleştirme (Placement map'inde, `PlacementInputHandler`) → seçim → Production Menu. Sıra tek yerde (`CloseTopLayer`) okunur. Oyun içi menü gelince en alt katman o olacak.
+Her Esc en üstteki tek katmanı kapatır: yerleştirme (Placement map'inde, `PlacementInputHandler`) → açık popup (ayarlar) → seçim → Production Menu. Kapatacak bir şey kalmadıysa ayarları açar. Sıra tek yerde (`CloseTopLayer`) okunur; popup tarafı `IEscapeMenu` arkasında, testte sahte sürümü kullanılır.
+
+## 32b. Ayarlar ve Popup'lar
+**Durum:** ✅ · **Dosyalar:** `Core/Settings/*`, `UI/Settings/*`, `Popup/*` · **Veri:** `GameDatas/UI/Data_Popup_Settings` · **Test:** `GameSettingsTests`, `EscapeInputHandlerTests`
+
+```
+Ana menüde Settings butonu / oyunda kaynak barının sağındaki dişli / Esc (kapatacak bir şey yoksa)
+   ─► SettingsButtonView ─► PopupSystem.Open(Data_Popup_Settings) ─► SettingsPopup
+   satıra tık ─► GameSettings.Toggle/Cycle ─► PlayerPrefs'e hemen yazılır ─► Changed
+      ├─► DisplaySettingsApplier: pencere modu, VSync
+      ├─► UiScaleApplier: canvas boyutu
+      ├─► CameraController: kaydırma hızı, kenar kaydırma (her karede okur)
+      └─► StatsPanelView: FPS panelinin görünmesi
+```
+- **Ayarlar (`GameSettings`, Core, root scope):** Window (Fullscreen / Windowed), VSync, UI Size (Small %90 / Normal / Large %115), Camera Speed (Slow 0,6x / Normal / Fast 1,6x), Edge Scrolling, FPS Panel. Her biri tıklandıkça sıradaki değere geçer ve hemen kaydedilir. Bilinmeyen kayıtlı değer Normal'e düşer. Kayıt `ISettingsStorage` arkasında; testler sözlükle çalışır.
+- **UI boyutu:** `UiScaleApplier` canvas'ın referans çözünürlüğünü ayara böler (1920x1080 / ölçek). Bütün arayüz birlikte büyür ya da küçülür, tek tek boyut ayarlamaya gerek kalmaz.
+- **Bağlam (`ISettingsContext`):** Ana menüde boş. Oyunda (`GameplaySettingsContext`) popup açılınca oyun duraklar, kapanınca daha önce çalışıyorsa devam eder; "Main Menu" satırı sadece oyunda görünür.
+- **Popup modülü (`Popup/*`):** Projede hazır duruyordu, ilk kez kullanıldı. `PopupSystem` `Prefab_UI_Canvas_Main` içindeki `PopupCanvas`'ta (kendi Canvas'ı, sıralama 100; sahnelerin eklediği her panelin üstünde). Popup'lar scope'un container'ıyla oluşturulur, `[Inject]` çalışır. Modal popup arkasına yarı saydam engel koyar; engele tıklamak popup'ı kapatır. Engel ebeveyne gerilir (anchor 0-1), sabit boyut değil; popup açıkken UI boyutu değişse de bütün ekranı kaplar. Açılış OutBack, kapanış InBack ölçek animasyonu (`PopupData`), duraklatılmış oyunda da oynar (unscaled).
+- **Esc:** Önce açık popup'ı kapatır, sonra seçimi, sonra Production Menu'yü; kapatacak bir şey yoksa ayarları açar (`IEscapeMenu`, Bölüm 32).
+
+## 32c. Yazı Malzemeleri ve Arayüz Animasyonları
+**Durum:** ✅ · **Dosyalar:** `Materials/Font/MedievalSharp-Regular SDF - *.mat`, `UI/Common/ButtonFeedback.cs`, `ButtonFeedbackInstaller.cs`, `UI/MainMenu/MainMenuBackgroundView.cs`
+
+- **Malzemeler:** Aynı font atlası üstünde üç TMP preset'i. *Outline* (koyu kahve kontur): buton, başlık, hücre adları, hover etiketi. *Shadow* (yumuşak gölge): HP yazıları, FPS paneli. *Outline Shadow* (ikisi birden, en okunaklısı): kaynak sayıları, takvim, duyuru bandı, uçan yazı, oyun ve ayarlar başlığı. Kâğıt üstündeki koyu yazılar (tooltip, bilgi paneli, bitiş ekranı) düz malzemede kaldı; koyu yazıya koyu kontur okunurluğu düşürür.
+- **Buton hissi (`ButtonFeedback`):** Fare üstündeyken %5 büyür, basınca %5 küçülür, bırakınca OutBack ile döner. `ButtonFeedbackInstaller` ana canvas'ta sahnedeki bütün butonlara çalışırken ekler, popup'lar kendi butonlarına ekler; hiçbir prefab'ın taşıması gerekmez. Unscaled zaman.
+- **Kaynak sayıları:** Değer değişince sayı kısa bir punch alır (`ResourceBarView`); oyunun ilk değerleri sessiz gelir.
+- **Ana menü:** Arka plan resmi 24 sn'lik döngüyle çok yavaş yakınlaşıp kayar, başlık yukarıdan zıplayarak iner ve sonra hafifçe süzülür, butonlar sırayla OutBack ile açılır. Butonlar layout grubunda olduğu için sadece ölçekleri oynatılır, konumları değil.
+- Var olanlar: Production Menu kayması (`SlideOutPanel`), duyuru bandı, popup aç/kapa.
 
 ## 33. Sandbox
 **Durum:** ✅ · **Dosyalar:** `Gameplay/Sandbox/SandboxService.cs`, `SandboxBattleSpawner.cs`, `UI/Sandbox/SandboxFactionToggleView.cs`, `SandboxSwitchesView.cs`, `Gameplay/DebugView/DebugOverlayView.cs` · **Test:** `SandboxServiceTests`, `SandboxToolsTests`, `GameLoopTests`
@@ -578,7 +610,7 @@ Her Esc en üstteki tek katmanı kapatır: yerleştirme (Placement map'inde, `Pl
   - **Start Raid:** Listedeki sıradaki baskın hemen gelir (Bölüm 24). Baskın sürerken düğme kilitli ve "Raid 3: wave 2 of 4" yazar.
   - **Clear Map:** Bütün birim, bina ve kaynakları siler (`DeletionService.ClearMap`). Yanlış tıklamaya karşı ikinci tıklama ister ("Sure? Click again", 3 sn). Silme ölüm event'leriyle olduğu için efektler aynı anda en fazla 48 tane oynar (`EffectSpawner`). Süren baskın durur.
   - **+100 Units:** `SandboxBattleSpawner` ekranın ortasının solunda oyuncunun, sağında düşmanın 50'şer karışık askerini (Knight, Spearman, Archer) koyar ve yapay zekâyı açar. Yol bulma, savaş ve çizimi kalabalıkta denemek için.
-  - **İstatistik paneli:** Yarım saniyede bir FPS, birim ve bina sayısı, saniyede yol araması, ortalama ve en uzun arama süresi (ms). Editörde ve development build'de SetPass ve draw call da (`ProfilerRecorder`). Arama süresini `AStarPathfinder` tutar (`Stopwatch`, arama başına iki okuma, `TakeStats`).
+  - **İstatistik paneli:** Artık sandbox sütununda değil, sağ altta ve iki modda da (`StatsPanelView`, Bölüm 30). Arama süresini `AStarPathfinder` tutar (`Stopwatch`, arama başına iki okuma, `TakeStats`).
 - **Silme:** Delete tuşu seçili her şeyi siler (iki taraf). Hiçbir şey seçili değilse farenin altındaki kaynak silinir (Bölüm 33b).
 - **Debug görünümü (`DebugOverlayView`):**
   - Haritanın tamamını kaplayan tek doku, hücre başına 8 piksel: hücre çizgileri, zemin yüzünden yürünemeyen hücre (su, uçurum) koyu, bina ya da kaynağın tuttuğu hücre kırmızı, merdiven mavi. `GridChangedEvent` gelince bir sonraki gösterimde yeniden çizilir.
@@ -628,9 +660,6 @@ Her biri mevcut yapıya şöyle oturacak. Yapılınca kendi bölümüne taşın�
 ### Zorluk ve Sonsuz Mod ⏳
 - **Zorluk:** Ana menüde Kolay / Normal / Zor seçimi, `GameSessionSettings.Difficulty`'ye yazar. Açlık bunu zaten okuyor (Bölüm 22d); dalga çarpanı ve başlangıç kaynağı `RaidService` ve `NormalModeStarter`'a eklenecek.
 - **Sonsuz mod:** Son baskından sonra `RaidService` formülle yeni baskın üretir. `GameEndView`'e *Continue*; hayatta kalınan gün HUD'da.
-
-### Oyun İçi Menü ve Ayarlar ⏳
-- **Nasıl:** Pause action map'i, `GameClock.SetPaused`. Esc'in en alt katmanı menüyü açar. `SettingsService` (Core) ses, çözünürlük, pencere modu, VSync, kenar kaydırma; `PlayerPrefs`'e yazar.
 
 ### Ses ⏳
 - **Nasıl:** Root scope'ta `AudioService` (müzik ve havuzlu `AudioSource`'lar). Gameplay'de bir köprü event'leri seslere çevirir (`UnitAttackedEvent` → kılıç, `BuildingDestroyedEvent` → yıkım, baskın başlangıcı → borozan). Oyun kodu ses bilmez.

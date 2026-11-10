@@ -1,9 +1,11 @@
+using BarracksAndBolts.Popup;
 using BarracksAndBolts.UI.Common;
 using BarracksAndBolts.UI.Feedback;
 using BarracksAndBolts.UI.Hud;
 using BarracksAndBolts.UI.Information;
 using BarracksAndBolts.UI.Production;
 using BarracksAndBolts.UI.Sandbox;
+using BarracksAndBolts.UI.Settings;
 using BarracksAndBolts.UI.Tooltips;
 using VContainer;
 using VContainer.Unity;
@@ -34,6 +36,11 @@ namespace BarracksAndBolts.UI
             builder.RegisterComponentInHierarchy<HoverLabelView>();
             builder.RegisterComponentInHierarchy<TooltipView>();
             builder.RegisterComponentInHierarchy<SlideOutPanel>().As<ICloseablePanel>();
+            builder.RegisterComponentInHierarchy<StatsPanelView>();
+            builder.RegisterComponentInHierarchy<UiScaleApplier>();
+            builder.RegisterComponentInHierarchy<PopupSystem>();
+            builder.RegisterComponentInHierarchy<SettingsButtonView>().As<IEscapeMenu>().AsSelf();
+            builder.Register<GameplaySettingsContext>(Lifetime.Singleton).As<ISettingsContext>();
             builder.RegisterEntryPoint<EscapeInputHandler>();
         }
     }

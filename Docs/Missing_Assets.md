@@ -70,7 +70,8 @@
 | 27 | **Müzik:** ana menü, gündüz, baskın | Atmosfer | 🔍 (CC0: OpenGameArt, Pixabay) |
 | 28 | **SFX:** UI tıklama, bina yerleştirme, inşa, odun kesme, maden kazma, kılıç vuruşu, ok atışı, ölüm, bina yıkılması, borozan, iyileştirme, kazanma, kaybetme, hata | Geri bildirim | 🔍 (Kenney CC0 paketleri) |
 | 29 | Tutorial göstergeleri (vurgulama çerçevesi, ok) | Tutorial | 🛠 Seçim imleci + ok ikonu |
-| 30 | Kayıt slotu ve ayarlar paneli görselleri | Kayıt / ayarlar | 🛠 `Banners_Slots`, `Papers_*` |
+| 30 | Kayıt slotu ve ~~ayarlar paneli~~ görselleri | Kayıt | 🛠 `Banners_Slots`, `Papers_*`. Ayarlar paneli ✅ `WoodTable` + kırmızı butonlarla yapıldı |
+| 31 | ~~Ana menü arka planı~~ | Menü düz duruyordu | ✅ Oyunun tile ve sprite'larından birleştirildi: `Textures/Backgrounds/Texture_Backgrounds_MainMenu` |
 
 ---
 

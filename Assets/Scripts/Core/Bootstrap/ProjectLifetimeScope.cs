@@ -1,5 +1,6 @@
 using BarracksAndBolts.Core.Scenes;
 using BarracksAndBolts.Core.Session;
+using BarracksAndBolts.Core.Settings;
 using VContainer;
 using VContainer.Unity;
 
@@ -15,6 +16,9 @@ namespace BarracksAndBolts.Core.Bootstrap
         {
             builder.Register<GameSessionSettings>(Lifetime.Singleton);
             builder.Register<SceneLoader>(Lifetime.Singleton);
+            builder.Register<PlayerPrefsSettingsStorage>(Lifetime.Singleton).As<ISettingsStorage>();
+            builder.Register<GameSettings>(Lifetime.Singleton);
+            builder.RegisterEntryPoint<DisplaySettingsApplier>();
         }
     }
 }

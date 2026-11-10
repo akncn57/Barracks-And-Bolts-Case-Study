@@ -105,6 +105,17 @@ namespace BarracksAndBolts.Popup
             });
         }
 
+        // Closes the popup the player is looking at, as its own close button would. For the Esc key.
+        // Returns false when no popup is open.
+        public bool CloseTop()
+        {
+            var top = Top();
+            if (top == null) return false;
+
+            top.RequestClose();
+            return true;
+        }
+
         private PopupBase Top() => _stack.Count == 0 ? null : _stack[_stack.Count - 1];
 
         // Hides or restores a popup together with its own dark overlay.
@@ -157,21 +168,24 @@ namespace BarracksAndBolts.Popup
             var parent = popupContainer as RectTransform;
             var screen = ScreenRectIn(parent);
 
+            // Stretched to the parent and pushed out to the screen edges by offsets, not a fixed size:
+            // when the canvas is rescaled while the popup is open (the UI Size setting), the blocker
+            // keeps covering the whole screen instead of staying at its old size.
+            rt.anchorMin = Vector2.zero;
+            rt.anchorMax = Vector2.one;
+            rt.pivot = new Vector2(0.5f, 0.5f);
+
             if (screen.HasValue)
             {
-                rt.anchorMin = rt.anchorMax = new Vector2(0.5f, 0.5f);
-                rt.pivot = new Vector2(0.5f, 0.5f);
-                rt.sizeDelta = screen.Value.size;
-                rt.anchoredPosition = screen.Value.center - parent.rect.center;
+                rt.offsetMin = screen.Value.min - parent.rect.min;
+                rt.offsetMax = screen.Value.max - parent.rect.max;
             }
             else
             {
                 // No canvas above us: fall back to filling the parent. Better a
                 // blocker that stops at the safe area than none at all.
-                rt.anchorMin = Vector2.zero;
-                rt.anchorMax = Vector2.one;
-                rt.sizeDelta = Vector2.zero;
-                rt.anchoredPosition = Vector2.zero;
+                rt.offsetMin = Vector2.zero;
+                rt.offsetMax = Vector2.zero;
             }
 
             var img = go.GetComponent<Image>();

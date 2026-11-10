@@ -1,3 +1,4 @@
+using BarracksAndBolts.Core.Settings;
 using BarracksAndBolts.Gameplay.Grid;
 using BarracksAndBolts.Gameplay.Input;
 using Unity.Cinemachine;
@@ -19,6 +20,7 @@ namespace BarracksAndBolts.Gameplay.CameraControl
         [SerializeField] private CinemachineCamera cinemachineCamera;
 
         private GridMap _gridMap;
+        private GameSettings _settings;
         private GameInputActions.CameraActions _actions;
         private Rect _bounds;
         private float _targetZoom;
@@ -33,10 +35,11 @@ namespace BarracksAndBolts.Gameplay.CameraControl
         private static Vector2 ScreenSize => new(Screen.width, Screen.height);
 
         [Inject]
-        private void Construct(GridMap gridMap, GameInputActions inputActions)
+        private void Construct(GridMap gridMap, GameInputActions inputActions, GameSettings settings)
         {
             _gridMap = gridMap;
             _actions = inputActions.Camera;
+            _settings = settings;
         }
 
         /// <summary>
@@ -79,7 +82,7 @@ namespace BarracksAndBolts.Gameplay.CameraControl
             var isPointerOverUi = EventSystem.current != null && EventSystem.current.IsPointerOverGameObject();
 
             var center = UpdateZoom((Vector2)transform.position, deltaTime, isPointerOverUi);
-            center += GetPanDirection() * (config.PanSpeed * Zoom * 2f * deltaTime);
+            center += GetPanDirection() * (config.PanSpeed * _settings.CameraSpeedFactor * Zoom * 2f * deltaTime);
             center -= GetDragDelta(isPointerOverUi);
 
             // Clamped every frame, so a resized window or a zoom change can never show outside the map.
@@ -115,7 +118,7 @@ namespace BarracksAndBolts.Gameplay.CameraControl
         private Vector2 GetPanDirection()
         {
             var keyboard = _actions.Pan.ReadValue<Vector2>();
-            if (keyboard != Vector2.zero || _isDragging || !config.IsEdgePanEnabled || !Application.isFocused)
+            if (keyboard != Vector2.zero || _isDragging || !config.IsEdgePanEnabled || !_settings.IsEdgePanOn || !Application.isFocused)
                 return Vector2.ClampMagnitude(keyboard, 1f);
 
             return CameraMath.GetEdgePanDirection(_actions.PointerPosition.ReadValue<Vector2>(), ScreenSize, config.EdgeThickness);
