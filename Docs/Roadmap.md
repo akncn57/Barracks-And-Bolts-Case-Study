@@ -84,7 +84,7 @@ Oyunu deneyince çıkan kullanılabilirlik istekleri. Sandbox'ta da olmalı, bui
 - [ ] Zorluk seviyeleri
 - [ ] Sonsuz mod
 - [x] Ayarlar menüsü (pencere modu, VSync, arayüz boyutu, kamera hızı, kenar kaydırma, FPS paneli; ses ayarları ses gelince)
-- [x] Arayüz cilası: konturlu ve gölgeli yazı malzemeleri, buton hover/basma animasyonu, kaynak sayısı punch, ana menü arka planı ve giriş animasyonları, FPS paneli sağ üstte
+- [x] Arayüz cilası: konturlu ve gölgeli yazı malzemeleri, buton hover/basma animasyonu, kaynak sayısı punch, ana menü arka planı ve giriş animasyonları, FPS paneli sağ altta
 - [ ] Ses ve müzik
 - [ ] Tutorial
 - [ ] Kontrol grupları, AttackMove, HoldPosition (oyun hızı ve duraklatma yapıldı, iki modda da)

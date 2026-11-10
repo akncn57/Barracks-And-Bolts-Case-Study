@@ -32,13 +32,13 @@ Assets/
 │   ├── Music/                  Music_<İsim>
 │   └── SFX/                    SFX_<Kategori>_<İsim>
 ├── Fonts/
-├── GameDatas/                  ScriptableObject verileri
+├── GameDatas/                  ScriptableObject verileri (UI/ altında popup verileri: Data_Popup_<İsim>)
 │   ├── Buildings/              Data_Building_<İsim>.asset
 │   ├── Units/                  Data_Unit_<İsim>.asset
 │   ├── ResourceNodes/          Data_Resource_<İsim>.asset
 │   ├── TeamColors/             Data_TeamColor_<Renk>.asset
 │   └── Configs/                Data_Config_<İsim>.asset (harita, takvim, zorluk...)
-├── Materials/
+├── Materials/                  Font/ altında TMP preset'leri (Outline, Shadow, Outline Shadow)
 ├── Editor/                     Tek seferlik editör araçları (iş bitince silinir)
 ├── Plugins/                    3. parti kütüphaneler (dokunulmaz)
 ├── Prefabs/
@@ -53,12 +53,13 @@ Assets/
 │   │   ├── Commands/
 │   │   ├── Hover/
 │   │   └── Territory/
-│   └── UI/                     Prefab_UI_<Kategori>_<İsim>, Canvases/ (Main + MainMenu ve Gameplay varyantları)
+│   └── UI/                     Prefab_UI_<Kategori>_<İsim>, Canvases/ (Main + MainMenu ve Gameplay varyantları), Popups/
 ├── Resources/                  Sadece kütüphanelerin zorunlu tuttuğu dosyalar (ör. DOTweenSettings). Bu isimdeki klasör build'e komple girer, başka yerde kullanılmaz
 ├── Scenes/                     Bootstrap, MainMenu, Gameplay
 ├── Scripts/                    (bkz. Bölüm 3)
 ├── Settings/                   URP, Renderer2D, Input Actions
 ├── Textures/                   Texture_<Klasör yolu>_<İsim>.png (renge göre: Red/, Yellow/)
+│   ├── Backgrounds/            Menü arka planı; UI atlasına girmesin diye UI/ dışında
 │   └── Markers/                Dünya üzerindeki işaretler (seçim halkası, yerleştirme hücresi, durum ikonları); renkliler Markers/<Renk>/
 │   (Buildings/Neutral/ takım rengi olmayan yapılar, ör. tarla)
 ├── Tiles/
@@ -74,21 +75,21 @@ Her modül kendi `.asmdef` dosyasına sahiptir. Bu, derleme süresini kısaltır
 
 ```
 Scripts/
-├── Core/        BarracksAndBolts.Core       Altyapı: EventBus, simülasyon döngüsü, oyun saati, sahne yükleme, oturum ayarları, root scope
+├── Core/        BarracksAndBolts.Core       Altyapı: EventBus, simülasyon döngüsü, oyun saati, sahne yükleme, oturum ayarları, oyuncu ayarları, root scope
 ├── Gameplay/    BarracksAndBolts.Gameplay   Oyun mantığı ve dünya görünümleri
-├── UI/          BarracksAndBolts.UI         Ana menü, paneller, HUD, sonsuz scroll, tooltip, uçan yazı
-├── Popup/       BarracksAndBolts.Popup      Hazır popup sistemi (şu an kullanılmıyor)
+├── UI/          BarracksAndBolts.UI         Ana menü, paneller, HUD, ayarlar, sonsuz scroll, tooltip, uçan yazı
+├── Popup/       BarracksAndBolts.Popup      Hazır popup sistemi (ayarlar penceresi bunu kullanıyor)
 ├── Utils/       BarracksAndBolts.Utils      Unity'den bağımsız yardımcılar (MinHeap, CompositeDisposable)
 └── Tests/
     └── EditMode/ BarracksAndBolts.Tests.EditMode   494 test
 ```
-- Kayıt (save) ve ayarlar servisi henüz yok; geldiğinde Core'a girer.
+- Oyuncu ayarları `Core/Settings`'te (`GameSettings`, PlayerPrefs). Kayıt (save) henüz yok; geldiğinde Core'a girer.
 - Tek seferlik editör araçları `Assets/Editor/` altında asmdef'siz durur ve iş bitince silinir.
 
 **Bağımlılık yönü** (oklar "bağımlıdır" anlamındadır):
 ```
 UI ──► Gameplay ──► Core ──► Utils
- └──► Popup ──────► Core
+ └──► Popup (bizim modüllerimize bağlı değil)
 Tests.EditMode ──► Gameplay, UI, Core, Utils
 ```
 
@@ -134,12 +135,14 @@ Planlanan klasörler: `Map/` (zemin üretimi), `Upgrades/`, `Storage/`, `Minimap
 ```
 UI/
 ├── Bootstrap/      GameplayUiLifetimeScope
-├── MainMenu/       MainMenuLifetimeScope, MainMenuView
-├── Common/         SlideOutPanel, ContentFitPanel, PanelSizeMath, EscapeInputHandler, ICloseablePanel
+├── MainMenu/       MainMenuLifetimeScope, MainMenuView, MainMenuBackgroundView
+├── Common/         SlideOutPanel, ContentFitPanel, PanelSizeMath, EscapeInputHandler, ICloseablePanel, IEscapeMenu,
+│                   UiScaleApplier, ButtonFeedback, ButtonFeedbackInstaller
+├── Settings/       SettingsPopup, SettingsButtonView, ISettingsContext (MainMenu / Gameplay)
 ├── Scroll/         RecyclingScrollView, RecyclingScrollCell, RecyclingScrollMath
 ├── Production/     ProductionMenuView, ProductionMenuCell
 ├── Information/    InformationPanelView, ProducibleUnitCell, UnitSelectionCardView
-├── Hud/            ResourceBarView, CalendarLabelView, DayNightOverlayView, NoticeBannerView, GameEndView, TimeControlView
+├── Hud/            ResourceBarView, CalendarLabelView, DayNightOverlayView, NoticeBannerView, GameEndView, TimeControlView, StatsPanelView
 ├── Feedback/       FloatingTextSpawner, FloatingTextView, HoverLabelView
 ├── Tooltips/       TooltipView, TooltipPlacement, TooltipText
 └── Sandbox/        SandboxFactionToggleView, SandboxSwitchesView
@@ -177,11 +180,11 @@ Her bina ve birimin bir `GameEntityId` değeri vardır (artan `int`). Servisler 
 ## 5. VContainer Scope'ları
 | Scope | Sahne | Ömür | Kayıtlar |
 |---|---|---|---|
-| `ProjectLifetimeScope` | Root prefab | Uygulama boyunca (DontDestroyOnLoad) | `SceneLoader`, `GameSessionSettings`. Planlanan: `SettingsService`, `SaveService`, `AudioService` |
+| `ProjectLifetimeScope` | Root prefab | Uygulama boyunca (DontDestroyOnLoad) | `SceneLoader`, `GameSessionSettings`, `GameSettings` + `PlayerPrefsSettingsStorage`, `DisplaySettingsApplier`. Planlanan: `SaveService`, `AudioService` |
 | `BootstrapLifetimeScope` | Bootstrap | Sahne | `BootstrapFlow` (MainMenu'yü yükler) |
-| `MainMenuLifetimeScope` | MainMenu | Sahne | `MainMenuView` |
+| `MainMenuLifetimeScope` | MainMenu | Sahne | `MainMenuView`, `UiScaleApplier`, `PopupSystem`, `SettingsButtonView`, `MainMenuSettingsContext` |
 | `GameplayLifetimeScope` | Gameplay | Sahne | `EventBus`, `GameClock`, `SimulationRunner`, tüm gameplay servisleri ve sistemleri, dünya View'ları (`RegisterComponentInHierarchy`) |
-| `GameplayUiLifetimeScope` | Gameplay (canvas) | Sahne, parent = Gameplay | Bütün UI view'ları ve `EscapeInputHandler`. UI tipleri Gameplay assembly'sinden görünmediği için ayrı scope |
+| `GameplayUiLifetimeScope` | Gameplay (canvas) | Sahne, parent = Gameplay | Bütün UI view'ları, `PopupSystem`, `SettingsButtonView` (`IEscapeMenu`), `GameplaySettingsContext` ve `EscapeInputHandler`. UI tipleri Gameplay assembly'sinden görünmediği için ayrı scope |
 
 - `EventBus` **Gameplay scope'una** kaydedilir. Sahne kapanınca tüm abonelikler de onunla birlikte yok olur, sahneler arası abonelik sızıntısı olmaz.
 - `GameSessionSettings` yeni oyun ayarlarını (mod, renk, zorluk, seed) menüden Gameplay'e taşır.
@@ -268,7 +271,9 @@ public interface IEventBus
 - **Derinlik sıralaması:** Renderer2D'de Transparency Sort Mode = Custom Axis (0, 1, 0). Pivotlar tabanda olur. Bina ve birim köklerinde Sorting Group var.
 - **Kodla üretilen dokular:** Bölge katmanı (`TerritoryOverlayView`) ve kapsama halkaları (`CoverageRingView`) çalışırken `Texture2D` olarak bir kez çizilir; atlas dışı oldukları için her biri bir çizim ekler, sadece yerleştirme ya da seçim sırasında görünürler.
 - **Mini harita (planlandı):** İkinci bir kamera kullanılmaz. Grid verisinden üretilen tek bir `Texture2D` kullanılır.
-- **UI:** Statik ve sık değişen elemanlar ayrı Canvas'lara bölünür (`StaticCanvas` / `DynamicCanvas`).
+- **UI:** Statik ve sık değişen elemanlar ayrı Canvas'lara bölünür (`StaticCanvas` / `DynamicCanvas`); FPS paneli de bu yüzden `DynamicCanvas`'ta. Popup'lar kendi `PopupCanvas`'ında (sıralama 100).
+- **Ana menü arka planı:** Oyunun sprite'larından önceden birleştirilmiş tek bir PNG, tek Image ile çizilir. UI atlasına girmez; atlası büyütmesin diye `Textures/UI` dışında.
+- **Yazı malzemeleri:** Kontur ve gölge TMP preset'leri aynı font atlasını kullanır; ek doku yok, sadece malzeme başına bir çizim.
 - **Gece efekti:** Ekranı kaplayan tek bir yarı saydam UI görseli (`DayNightOverlayView`), alfası takvimden gelir. Işık sistemi kullanılmıyor.
 - **Çizim sırası (Order in Layer):** su -5, köpük -4, zemin -3, plato ve merdiven -2, bölge katmanı ve halkalar -1, bina, birim ve kaynak 0, tarlanın içindeki köylü 1, yerleştirme önizlemesi 99-100, patlama efekti 145, ok ve debug yol noktaları 150, inşaat çubuğu 155, can barı 158, durum ikonu 160, hover çerçevesi 190, seçim kutusu 200.
 - Ölçüm Frame Debugger ve Game view Stats ile yapılır: savaş sırasında **10 SetPass**. Son özelliklerden sonra tekrar ölçülecek, sonuç README'ye yazılacak.
@@ -303,7 +308,7 @@ public interface IEventBus
 | `HoverInputHandler` | Farenin altındaki şey |
 | `DeleteInputHandler` | Delete: seçimi siler (kural `DeletionService`'te) |
 | `TimeControlInputHandler` | P duraklatır, + ve - hızı değiştirir |
-| `EscapeInputHandler` (UI) | Esc her basışta en üstteki katmanı kapatır |
+| `EscapeInputHandler` (UI) | Esc her basışta en üstteki katmanı kapatır (yerleştirme, popup, seçim, menü); kapatacak bir şey yoksa ayarları açar |
 | `CameraController` | Kaydırma, sürükleme, zoom |
 
 - Her handler fare UI üzerindeyse (`EventSystem.IsPointerOverGameObject`) dünyaya tıklamayı yok sayar.
@@ -407,7 +412,7 @@ Toplam **494 test**, 39 dosya (`TestDefinitions` ve `TestMaps` yardımcı). Her 
 | Birim | `UnitServiceTests`, `UnitMovementTests`, `UnitCommandServiceTests`, `UnitProductionServiceTests`, `UnitPlacementTests`, `SelectionServiceTests`, `HoverServiceTests` | Spawn, yeniden yol, dağılma, dost ateşi reddi, Sandbox'ta birim yerleştirme, kutu seçimi |
 | Savaş | `CombatTests`, `BuildingDefenseTests` | Bekleme süresi, ölümün tek kez işlenmesi, binaya kenardan vurma, kule hedef seçimi |
 | Normal mod | `NormalModeTests`, `VillagerBehaviourTests`, `GameLoopTests`, `ResourceDistributorTests` | Harcama, toplama döngüsü, tükenme, sığınma, takvim, baskın, oyun sonu, seed |
-| Diğer | `SandboxServiceTests`, `TeamServiceTests`, `CameraMathTests`, UI testleri (`EscapeInputHandler`, `PanelSizeMath`, `RecyclingScrollMath`, `Tooltip`) | Renk ataması, kamera sınırı, sonsuz scroll matematiği |
+| Diğer | `SandboxServiceTests`, `TeamServiceTests`, `CameraMathTests`, `GameSettingsTests`, UI testleri (`EscapeInputHandler`, `PanelSizeMath`, `RecyclingScrollMath`, `Tooltip`) | Renk ataması, kamera sınırı, ayarların kaydı ve bozuk kayıt, Esc'in ayarları açıp kapatması, sonsuz scroll matematiği |
 
 Testler *Window → General → Test Runner → EditMode → Run All* ile çalışır. README'de anlatılacak.
 
