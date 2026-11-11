@@ -1,6 +1,6 @@
-# Barracks & Bolts – GDD Kararları (Taslak)
+# Barracks & Bolts – GDD Kararları
 
-> Kaynak: Panteon "Game Developer – Strategy Game Demo" case study PDF'i.
+> Kaynak: "Game Developer – Strategy Game Demo" case study brief'i (PDF). Metinde "PDF" geçen yerler bu brief'in zorunlu tuttuğu maddelerdir.
 > Bu dosya oyun tasarımı kararlarının kaydıdır. "Şu anki hali" notları oyunda yapılmış olanı, geri kalanı hedeflenen tasarımı anlatır.
 > Kodun nasıl çalıştığı: [Systems.md](Systems.md)
 
@@ -21,7 +21,7 @@
   - Oyuncu kendi savaşlarını kurabilir: kendi ordusu ile düşman birim ve binalarını karşı karşıya koyabilir.
   - **Şu anki hali:** Sandbox araçları "Production" butonunun altındaki tek bir *Sandbox* panelinde, iki grup halinde: Settings (Side, Difficulty, Enemy AI, Debug) ve Actions (Start Raid, +100 Units, Clear Map). Side düğmesi yeni bina ve birimlerin tarafını değiştirir. Production Menu'de *Buildings*, *Units* ve *Resources* sekmeleri var: binalar, birimler (Knight, Spearman, Archer, Villager) ve kaynaklar (ağaç, kaya, altın madeni, koyun) doğrudan haritaya konur, Shift ile arka arkaya. Barracks'tan üretim de duruyor (PDF). Delete seçili her şeyi, seçim yoksa farenin altındaki kaynağı siler. Duraklat ve 1x/2x/3x butonları kaynak barında. "Enemy AI" düğmesi düşmanın ve boştaki askerlerin kendiliğinden saldırmasını açar (varsayılan kapalı). "Debug" düğmesi grid'i, engelleri ve seçili birimlerin A* yolunu gösterir. Takvim Sandbox'ta yok; baskın "Start Raid" ile elle gelir ve yapay zekâyı açar. "Clear Map" haritayı boşaltır (iki tıkla). "+100 Units" iki ordu kurup savaştırır. Sağ alttaki istatistik paneli (iki modda da, ayarlardan açılıp kapanır) FPS, A* arama süresi ve SetPass gösterir.
 - **Zorluk Seviyesi (Normal Mod):** Kolay, Normal, Zor. Düşman sayısını, düşman gücünü ve başlangıç kaynaklarını etkiler. Değerler bir `DifficultySettings` ScriptableObject'inde tutulur.
-  > **Şu anki hali:** Ana menüde Play'den sonra seçiliyor. Baskın grupları ×0,6 / ×1 / ×1,5, başlangıç kaynakları ×1,5 / ×1 / ×0,75, açlık 1 / 2 / 4 yemek. Düşman gücü (can, hasar) değişmiyor, PDF değerleri korunuyor. Ayrı bir `DifficultySettings` yok: her değer kendi alanının asset'inde (`Data_Config_Raids`, `Data_Config_NormalMode`). Sandbox'ta araç sütunundaki *Difficulty* butonu baskının büyüklüğünü değiştiriyor.
+  > **Şu anki hali:** Ana menüde Play'den sonra seçiliyor. Baskın grupları ×0,6 / ×1 / ×1,5, başlangıç kaynakları ×1,5 / ×1 / ×0,75, açlık 1 / 2 / 4 yemek. Düşman gücü (can, hasar) değişmiyor, PDF değerleri korunuyor. Ayrı bir `DifficultySettings` yok: her değer kendi alanının asset'inde (`Data_Config_Raids`, `Data_Config_NormalMode`). Sandbox panelindeki *Difficulty* butonu baskının büyüklüğünü değiştiriyor.
 
 ### Nüfus (Power Plant karşılığı = House)
 - Oyuncu 1 nüfusla başlar, bu da 1 köylüdür.
@@ -38,7 +38,7 @@
 |---|---|---|
 | Odun | Ağaçlar | İnşa, yükseltme |
 | Taş | Taş kayalıkları | İnşa, yükseltme |
-| Yemek | **Koyunlar** (köylü keser). İleride tarla eklenecek, asseti bulunacak ya da yapılacak. | Nüfusu besleme |
+| Yemek | **Koyunlar** (köylü keser) ve **tarla** (bir köylü çalışır, hiç bitmez) | Nüfusu besleme |
 | Altın | **Altın madenleri** | Bina yükseltme (diğer kaynaklarla birlikte harcanır) |
 
 - **Bina yükseltme:** Altın ve diğer kaynaklardan belirli miktarlar harcanarak yapılır.
@@ -152,7 +152,7 @@ Bu değerler ScriptableObject üzerinden ayarlanabilir olacak, ileride değişti
 - Yemek tekrar gelince HP kaybı durur.
 - Açlık nüfusu 0'a düşürebilir. Kaybetme koşulu için "Takvim ve Dalgalar" bölümüne bakın.
 - UI'da yemek yetersizse uyarı gösterilir.
-- **Şu anki hali:** Değerler zorluğa göre (`Data_Config_NormalMode` > Hunger): Kolay günde birim başına 1 yemek ve 15 saniyede 1 HP, Normal 2 ve 10 sn, Zor 4 ve 5 sn. İlk sabah yemek yenmez. Yetmeyen yemek borç olur, gelen yemek önce borcu öder ve kayıp durur. Ana menüde zorluk seçimi olmadığı için oyun Normal ile başlıyor.
+- **Şu anki hali:** Değerler zorluğa göre (`Data_Config_NormalMode` > Hunger): Kolay günde birim başına 1 yemek ve 15 saniyede 1 HP, Normal 2 ve 10 sn, Zor 4 ve 5 sn. İlk sabah yemek yenmez. Yetmeyen yemek borç olur, gelen yemek önce borcu öder ve kayıp durur.
 
 > **Şu anki hali:** Düşmanlar kıyıdan çıkıyor. Sonraki baskınlar daha kalabalık ve daha çok şövalyeli; can ve hasar çarpanı yok, PDF değerleri korunuyor. Zorluk seçimi yapıldı; sonsuz mod, ses ve mini harita yapılmadı.
 
@@ -201,7 +201,7 @@ Bu değerler ScriptableObject üzerinden ayarlanabilir olacak, ileride değişti
 - Renk setleri arasında küçük bir fark var: Sarıda `Warrior_Guard` var, Kırmızıda yok. Kod, bir animasyon eksikse varsayılan animasyona (Idle / Run) düşmelidir.
 - **Dost ateşi yok:** Oyuncu kendi birimlerine ve binalarına saldırma emri veremez.
 - **Karşılık verme:** Boşta duran birim, kendisine vurana saldırır. Yürüyen ya da hedefi olan birim işine devam eder.
-- **Durum ikonları:** Boştaki köylünün başında "Zz" yazan krem baloncuk durur. Oyuncunun askeri düşmanı kendi fark edince ya da vurulup karşılık verince başında 1,5 saniye kırmızı "!" çıkar; oyuncunun verdiği saldırı emrinde çıkmaz. Yükünü bırakma noktasına götüren köylünün başında taşıdığı kaynağın küçük ikonu (odun, taş, et, altın) durur; teslim edince kaybolur. İkonlar ağaç ve binaların arkasında kalmaz.
+- **Durum ikonları:** Boştaki köylünün başında "Zz" yazan krem baloncuk durur. Oyuncunun askeri düşmanı kendi fark edince ya da vurulup karşılık verince başında 1,5 saniye kırmızı "!" çıkar; oyuncunun verdiği saldırı emrinde ve son 3 saniyede zaten savaşmış askerde çıkmaz (büyük savaşta sadece savaşın başlangıcını gösterir). Yükünü bırakma noktasına götüren köylünün başında taşıdığı kaynağın küçük ikonu (odun, taş, et, altın) durur; teslim edince kaybolur. İkonlar ağaç ve binaların arkasında kalmaz.
 - **Düşman yerleşkeleri (ileride konuşulacak):** Haritada rastgele küçük düşman yerleşkeleri olabilir. Böylece PDF'teki "binaya saldırma" maddesi düşman binaları üzerinden de karşılanır.
 
 ### Birlikte Hareket
@@ -332,6 +332,6 @@ Tuşlar Age of Empires, StarCraft ve Warcraft III gibi RTS oyunlarının alış�
 
 ## Açık Sorular
 1. ~~Asset paketi: Barracks hangi bina, boyutlar, HP ve maliyetler.~~ Karar verildi; değerler tanım asset'lerinde (geçici, dengeyle değişebilir).
-2. **Tarla kuralları.** Asset hazır (`Texture_Buildings_Neutral_Farm`). Öneri: 3x3, 40 odun, bir köylü çalıştırır, hiç bitmez, koyundan yavaş yemek verir. Onay bekliyor.
+2. ~~Tarla kuralları.~~ Karar verildi ve yapıldı: 3x3, 40 odun, bir köylü çalışır, hiç bitmez, 6 saniyede 5 yemek.
 3. Yükseltme maliyetleri ve maksimum seviye sayısı.
 4. Takvim ve dalga değerleri test edildikten sonra kesinleştirilecek.

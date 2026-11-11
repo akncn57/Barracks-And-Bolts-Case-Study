@@ -16,7 +16,7 @@
 | Animasyon | **Animator yok.** Birimler, renk setindeki sprite karelerini oyun saatine göre kendisi çalar (bkz. Bölüm 13). |
 | Sahneler | **Bootstrap → MainMenu → Gameplay** |
 | Test | Kritik sistemler için **EditMode unit testleri** |
-| Dil | Kod, yorumlar, commit mesajları ve README **İngilizce**. Tasarım dokümanları Türkçe. |
+| Dil | Kod, yorumlar, commit mesajları ve README **İngilizce**. Dokümanlar iki dilde: `Docs/en` (İngilizce) ve `Docs/tr` (Türkçe), aynı dosya adlarıyla. |
 | Git | Sadece `main` branch'i. Her commit derlenebilir ve çalışır halde olur. |
 | Kamera | **Cinemachine 3** gerçek kamerayı sürer. Input, kaydırma, zoom ve harita sınırları bizim `CameraController`'ımızda; kontrolcü takip hedefini ve lens boyutunu yönetir. |
 | Async | Coroutine yerine **UniTask**. UI animasyonları ve geri bildirim efektleri için **DOTween**. |
@@ -76,7 +76,7 @@ Scripts/
 ├── Popup/       BarracksAndBolts.Popup      Hazır popup sistemi (ayarlar penceresi bunu kullanıyor)
 ├── Utils/       BarracksAndBolts.Utils      Unity'den bağımsız yardımcılar (MinHeap, CompositeDisposable)
 └── Tests/
-    └── EditMode/ BarracksAndBolts.Tests.EditMode   494 test
+    └── EditMode/ BarracksAndBolts.Tests.EditMode   521 test
 ```
 - Oyuncu ayarları `Core/Settings`'te (`GameSettings`, PlayerPrefs). Kayıt (save) henüz yok; geldiğinde Core'a girer.
 - Tek seferlik editör araçları gerekirse `Assets/Editor/` altına asmdef'siz konur ve iş bitince silinir (prefab dönüştürme aracı silindi). Ses ve animasyon klasörleri boş olduğu için kaldırıldı; animasyon kareleri renk setlerinde, Animator yok (Bölüm 13).
@@ -103,13 +103,14 @@ Gameplay/
 │                   Production/ (UnitProductionService)
 ├── Units/          UnitService, UnitModel, UnitMovementSystem, UnitView, UnitViewSpawner, Unit*Event
 ├── Territory/      TerritoryService, TerritoryOverlayView
-├── Combat/         CombatService, CombatSystem, BuildingDefenseSystem, DeathCleanupSystem, DamageFlash,
+├── Combat/         CombatService, CombatSystem, BuildingDefenseSystem, DeathCleanupSystem, AttackMoveSystem, DamageFlash,
 │                   ProjectileSpawner, ProjectileView, HealthBarView, CombatEvents
 ├── Effects/        EffectSpawner (ölüm ve yıkılma efekti, scope prefab'dan kurar)
 ├── Hover/          HoverService, HoverInputHandler, HoverHighlightView, ToolCursor, ToolCursorPicker, ToolCursorView
 ├── Feedback/       FloatingTextRequestedEvent (çizen: UI/Feedback/FloatingTextSpawner)
-├── Selection/      SelectionService, SelectionInputHandler, BoxSelectionView, DeletionService, DeleteInputHandler
-├── Commands/       UnitCommandService, CommandInputHandler, MoveMarkerView (AttackMove vb. gelince: IUnitCommand)
+├── Selection/      SelectionService, SelectionInputHandler, BoxSelectionView, DeletionService, DeleteInputHandler,
+│                   ControlGroupService, IdleVillagerFinder
+├── Commands/       UnitCommandService, CommandInputHandler, HotkeyInputHandler, AttackMoveTargeting, MoveMarkerView
 ├── Sandbox/        SandboxService (taraf, Enemy AI ve Debug düğmeleri)
 ├── TimeControl/    TimeControlService, TimeControlInputHandler (iki modda)
 ├── DebugView/      DebugOverlayView (Sandbox: grid ve A* yolu)
@@ -130,16 +131,16 @@ Planlanan klasörler: `Map/` (zemin üretimi), `Upgrades/`, `Storage/`, `Minimap
 ```
 UI/
 ├── Bootstrap/      GameplayUiLifetimeScope
-├── MainMenu/       MainMenuLifetimeScope, MainMenuView, MainMenuBackgroundView
+├── MainMenu/       MainMenuLifetimeScope, MainMenuView, MainMenuBackgroundView, DifficultyPopup
 ├── Common/         SlideOutPanel, ContentFitPanel, PanelSizeMath, EscapeInputHandler, ICloseablePanel, IEscapeMenu,
-│                   UiScaleApplier, ButtonFeedback, ButtonFeedbackInstaller
-├── Settings/       SettingsPopup, SettingsButtonView, ISettingsContext (MainMenu / Gameplay)
+│                   UiScaleApplier, ButtonFeedback, ButtonFeedbackInstaller, DifficultyText
+├── Settings/       SettingsPopup, SettingsButtonView, ISettingsContext (MainMenu / Gameplay), ControlsPopup, ControlsLauncher, ControlsText
 ├── Scroll/         RecyclingScrollView, RecyclingScrollCell, RecyclingScrollMath
 ├── Production/     ProductionMenuView, ProductionMenuCell
 ├── Information/    InformationPanelView, ProducibleUnitCell, UnitSelectionCardView
 ├── Hud/            ResourceBarView, CalendarLabelView, DayNightOverlayView, NoticeBannerView, GameEndView, TimeControlView, StatsPanelView, RaidArrowView, OffScreenArrowMath, CommandBarView, IdleVillagerButtonView
 ├── Feedback/       FloatingTextSpawner, FloatingTextView, HoverLabelView
-├── Tooltips/       TooltipView, TooltipPlacement, TooltipText
+├── Tooltips/       TooltipView, TooltipPlacement, TooltipText, HoverTooltip
 └── Sandbox/        SandboxFactionToggleView, SandboxSwitchesView
 ```
 
@@ -208,10 +209,10 @@ public interface IEventBus
 | Faz | Değer | Sistemler |
 |---|---|---|
 | `Input` | 0 | Boş. Input handler'lar simülasyonun dışında, `IPostTickable` olarak çalışır |
-| `Time` | 100 | `CalendarService` |
-| `AI` | 200 | `RaidService`, `BattleAiSystem`, `ShelterSystem` |
+| `Time` | 100 | `CalendarService`, `HungerSystem` |
+| `AI` | 200 | `RaidService`, `BattleAiSystem`, `ShelterSystem`, `AttackMoveSystem` |
 | `Movement` | 300 | `UnitMovementSystem`, `ResourceRoamSystem` |
-| `Gathering` | 350 | `GatheringSystem`, `ConstructionSystem` |
+| `Gathering` | 350 | `GatheringSystem`, `ConstructionSystem`, `FarmingSystem` |
 | `Combat` | 400 | `CombatSystem`, `BuildingDefenseSystem` |
 | `Cleanup` | 500 | `DeathCleanupSystem` |
 | `Presentation` | 600 | Boş. View'lar kendi `LateUpdate`'lerinde modeli okur |
@@ -262,7 +263,7 @@ public interface IEventBus
 ## 10. Render ve SetPass (< 20)
 - Tüm oyun içi sprite'lar **Sprite Atlas**'larda toplanır. Atlas'lar üst klasörleri referans alır, yeni eklenen alt klasörler otomatik olarak dahil olur.
 - Tek bir sprite materyali kullanılır (URP `Sprite-Lit-Default`). Özel shader sayısı en az tutulur.
-- **Can barları (planlandı):** World-space Canvas yerine SpriteRenderer (atlas'taki bar sprite'ları) kullanılacak, birimlerle aynı batch'e girer. Şu an HP panelde ve kartta.
+- **Can barları:** World-space Canvas yerine SpriteRenderer (`HealthBarView`, atlas'taki bar sprite'ları), birimlerle aynı batch'e girer. Hasarlı ya da seçiliyken görünür.
 - **Derinlik sıralaması:** Renderer2D'de Transparency Sort Mode = Custom Axis (0, 1, 0). Pivotlar tabanda olur. Bina ve birim köklerinde Sorting Group var.
 - **Kodla üretilen dokular:** Bölge katmanı (`TerritoryOverlayView`) ve kapsama halkaları (`CoverageRingView`) çalışırken `Texture2D` olarak bir kez çizilir; atlas dışı oldukları için her biri bir çizim ekler, sadece yerleştirme ya da seçim sırasında görünürler.
 - **Mini harita (planlandı):** İkinci bir kamera kullanılmaz. Grid verisinden üretilen tek bir `Texture2D` kullanılır.
@@ -277,7 +278,7 @@ public interface IEventBus
 
 ## 11. Object Pooling ve Sonsuz Scroll
 - Ayrı bir `PoolService` yok. Sık oluşan görseller Unity'nin `UnityEngine.Pool.ObjectPool<T>` sınıfını doğrudan kullanır: oklar (`ProjectileSpawner`) ve uçan yazılar (`FloatingTextSpawner`). Information Panel'deki asker hücreleri ve yerleştirme önizlemesinin kareleri elle havuzlanır: fazlası silinmez, kapatılır.
-- Birim ve bina görünümleri havuzlanmıyor; ölüm ve yıkım seyrek olduğu için `Instantiate`/`Destroy` yeterli. Efekt turunda ölüm efektleri gelirse onlar havuzdan gelecek.
+- Birim ve bina görünümleri havuzlanmıyor; ölüm ve yıkım seyrek olduğu için `Instantiate`/`Destroy` yeterli. Ölüm ve yıkılma efektlerinin renderer'ları `EffectSpawner`'da havuzlanır.
 - **Production Menu (sonsuz scroll):** `RecyclingScrollView`
 - **Kaynak barı:** `ResourceBarView`, ekranın üstünde tam genişlik. Üstteki paneller barın altından başlar.
 - **Sol kenardan açılan panel:** `SlideOutPanel` (DOTween). Production Menu kapalı başlar; panel kapalıyken de kendi butonu ekranda kalır. Yerleştirme sürerken menü kapanır, bitince geri açılır (`ProductionMenuView`, yerleştirme event'leriyle).
@@ -303,7 +304,9 @@ public interface IEventBus
 | `HoverInputHandler` | Farenin altındaki şey |
 | `DeleteInputHandler` | Delete: seçimi siler (kural `DeletionService`'te) |
 | `TimeControlInputHandler` | P duraklatır, + ve - hızı değiştirir |
-| `EscapeInputHandler` (UI) | Esc her basışta en üstteki katmanı kapatır (yerleştirme, popup, seçim, menü); kapatacak bir şey yoksa ayarları açar |
+| `HotkeyInputHandler` | Kısayollar: F (Attack Move), X, H, ., Ctrl+1-9 / 1-9, Home. Birim kartının üstündeki butonlar da aynı metotları çağırır |
+| `ControlsLauncher` (UI) | F1 Controls sayfasını açar ve kapatır |
+| `EscapeInputHandler` (UI) | Esc her basışta en üstteki katmanı kapatır (yerleştirme, nokta bekleyen Attack Move, popup, seçim, menü); kapatacak bir şey yoksa ayarları açar |
 | `CameraController` | Kaydırma, sürükleme, zoom |
 
 - Her handler fare UI üzerindeyse (`EventSystem.IsPointerOverGameObject`) dünyaya tıklamayı yok sayar.
@@ -315,7 +318,7 @@ public interface IEventBus
 - `UnitView`, kareyi `GameClock.ElapsedTime`'dan hesaplar: oyun durunca birimler donar, hızlanınca hızlanır. Faz birim id'sinden gelir, grup aynı anda nefes almaz. Öncelik: saldırı > çalışma > koşma > bekleme.
 - Kaynaklar (ağaç, koyun) ve kuledeki okçu da aynı şekilde kare çalar; ağaçların hepsini tek döngüde `ResourceNodeViewSpawner` günceller.
 - Bir renkte eksik kare varsa uyarı yazılır ve boş set döner. Binalar animasyonsuzdur. Renk değişimi `TeamColorDefinition` üzerinden sprite değiştirilerek yapılır.
-- Ölüm ve yıkılma animasyonu yok; efekt turunda `Textures/VFX` kareleriyle gelecek.
+- Ölüm ve yıkılma için ayrı animasyon yok; `EffectSpawner` `Textures/VFX` karelerinden toz ve patlama oynatır (oyun saatiyle).
 - Kod hiçbir yerde renkten taraf çıkarmaz: `Faction` (Player/Enemy) ile `TeamColor` (Red/Yellow) birbirinden bağımsızdır.
 
 ---
@@ -397,17 +400,17 @@ Prefab_Core_GameplayLifetimeScope
 ---
 
 ## 15. Testler (EditMode)
-Toplam **494 test**, 39 dosya (`TestDefinitions` ve `TestMaps` yardımcı). Her biri saf C# servislerini Unity sahnesi olmadan çalıştırır.
+Toplam **521 test**, 42 dosya (`TestDefinitions` ve `TestMaps` yardımcı). Her biri saf C# servislerini Unity sahnesi olmadan çalıştırır.
 
 | Alan | Dosyalar | Kapsadığı durumlar |
 |---|---|---|
 | Altyapı | `EventBusTests`, `GameClockTests`, `SimulationRunnerTests`, `CompositeDisposableTests`, `MinHeapTests`, `GameEntityId*Tests` | Yayın sırasında abonelik değişimi, hata veren handler, pause, oyun hızı, faz sırası |
 | Grid ve yol | `GridMapTests`, `AStarPathfinderTests`, `GridSearchTests` | Köşe kesmeme, hedef yürünemez, yol yok, harita sınırı, grup hedefleri, suyu geçmeme |
 | Bina | `BuildingServiceTests`, `PlacementServiceTests`, `TerritoryTests`, `CoverageRingTests`, `ConstructionTests` | Çakışma, taşma, birim altında yerleştirme, bölge dışı, açılacak alan önizlemesi, halka çizimi, inşaat ve araç imleci |
-| Birim | `UnitServiceTests`, `UnitMovementTests`, `UnitCommandServiceTests`, `UnitProductionServiceTests`, `UnitPlacementTests`, `SelectionServiceTests`, `HoverServiceTests` | Spawn, yeniden yol, dağılma, dost ateşi reddi, Sandbox'ta birim yerleştirme, kutu seçimi |
+| Birim | `UnitServiceTests`, `UnitMovementTests`, `UnitCommandServiceTests`, `UnitProductionServiceTests`, `UnitPlacementTests`, `SelectionServiceTests`, `HoverServiceTests`, `ShortcutTests` | Spawn, yeniden yol, dağılma, dost ateşi reddi, Sandbox'ta birim yerleştirme, kutu seçimi, Stop, Hold Position, Attack Move, boş köylü, kontrol grupları |
 | Savaş | `CombatTests`, `BuildingDefenseTests` | Bekleme süresi, ölümün tek kez işlenmesi, binaya kenardan vurma, kule hedef seçimi |
-| Normal mod | `NormalModeTests`, `VillagerBehaviourTests`, `GameLoopTests`, `ResourceDistributorTests` | Harcama, toplama döngüsü, tükenme, sığınma, takvim, baskın, oyun sonu, seed |
-| Diğer | `SandboxServiceTests`, `TeamServiceTests`, `CameraMathTests`, `GameSettingsTests`, UI testleri (`EscapeInputHandler`, `PanelSizeMath`, `RecyclingScrollMath`, `Tooltip`) | Renk ataması, kamera sınırı, ayarların kaydı ve bozuk kayıt, Esc'in ayarları açıp kapatması, sonsuz scroll matematiği |
+| Normal mod | `NormalModeTests`, `VillagerBehaviourTests`, `GameLoopTests`, `ResourceDistributorTests`, `FarmHungerRallyTests` | Harcama, toplama döngüsü, taşınan yük, tükenme, sığınma, takvim, baskın, zorluk, oyun sonu, seed, tarla, açlık, toplanma noktası |
+| Diğer | `SandboxServiceTests`, `TeamServiceTests`, `CameraMathTests`, `GameSettingsTests`, UI testleri (`EscapeInputHandler`, `PanelSizeMath`, `RecyclingScrollMath`, `Tooltip`, `OffScreenArrowMath`) | Renk ataması, kamera sınırı, ayarların kaydı ve bozuk kayıt, Esc'in ayarları açıp kapatması, sonsuz scroll matematiği, baskın okunun ekran kenarındaki yeri |
 
 Testler *Window → General → Test Runner → EditMode → Run All* ile çalışır. README'de anlatılacak.
 

@@ -15,7 +15,7 @@
 | `Avatars/<Renk>/Texture_UI_Avatars_<Renk>_<Birim>` | Birim portreleri, iki renkte: Knight, Spearman, Archer, Monk, Villager. Renk setlerinde birimlere atandı (Monk birimi henüz yok) |
 | `Texture_Cursors_Default`, `_Pointer`, `_Forbidden` | Varsayılan imleç, tıklanabilir (el), yasak |
 | `Texture_Cursors_Selection` (köşe çerçevesi) | Seçim / hedef göstergesi |
-| `Texture_UI_Tools_Hammer`, `_Axe`, `_Sword`, `_Pickaxe` | İmleç durumları: inşa/tamir, odun, saldırı, maden. Balta, kazma ve çekiçten 32x32 imleç kopyaları üretildi: `Textures/Cursors/Texture_Cursors_Axe/Pickaxe/Hammer` (kılıç henüz kullanılmıyor) |
+| `Texture_UI_Tools_Hammer`, `_Axe`, `_Sword`, `_Pickaxe` | İmleç durumları: inşa/tamir, odun, saldırı, maden. Balta, kazma ve çekiçten 32x32 imleç kopyaları üretildi: `Textures/Cursors/Texture_Cursors_Axe/Pickaxe/Hammer`; Attack Move için UI kılıç ikonundan `Texture_Cursors_Sword` |
 | `Texture_UI_Bars_Big_*`, `_Small_*` | Can barı, ilerleme barı |
 | `Texture_UI_Ribbons_Small_<Renk>_<Fork/Point>`, `_Banners_*`, `_Papers_*`, `_WoodTable_*` | Panel arka planları, başlıklar, slotlar |
 
@@ -42,8 +42,8 @@
 | 11 | ~~Baskın uyarı ikonu ve ekran kenarı yön oku~~ | ✅ Paketteki `Texture_UI_Icons_Arrow_Orange` döndürülüyor, ortasında `Texture_UI_Icons_Sword` (`Prefab_UI_Raid_Arrow`) | – |
 | 12 | ~~Koyun kesme imleci~~ | ✅ Koyunda da balta imleci (`Texture_Cursors_Axe`) | – |
 | 13 | ~~Kaynak taşıyan köylü~~ | ✅ Köylünün başında küçük kaynak ikonu: `Textures/Markers/Texture_Markers_Carry_*` (UI ikonlarından küçültüldü, Gameplay atlas'ında) | – |
-| 14 | Kaynak toplama ve hasar sayıları (ör. "+5", "-10") | Geri bildirim | 💻 Uçan yazı sistemi hazır (`FloatingTextSpawner`, şu an uyarılar için); sayılar efekt turunda |
-| 15 | Ana menü arka planı | Ana menü | 🛠 Oyun sahnesinden bir görüntü veya Banner/Paper ile |
+| 14 | Kaynak toplama ve hasar sayıları (ör. "+5", "-10") | Geri bildirim | 💻 Uçan yazı sistemi hazır (`FloatingTextSpawner`; uyarılar ve teslimde "+5 Wood"); hasar sayıları henüz yok |
+| 15 | ~~Ana menü arka planı~~ | ✅ Bkz. 31 | – |
 | 16 | Kazandın / Kaybettin ekranı görseli | Oyun sonu | 🛠 Banner + Ribbon |
 
 ## P2 – Derinlik
@@ -76,10 +76,10 @@
 ---
 
 ## En Önemli Eksikler (önce bunlar)
-P0 ve P1 için kritik asset eksiği kalmadı. Açık kalanlar: gün/gece ve baskın ikonları (P1, mevcut ikonlardan türetilecek), inşa görseli (P2, kodla), müzik ve ses efektleri (P3).
+P0, P1 ve P2 için kritik asset eksiği kalmadı. Açık kalanlar: gün/gece ikonu (takvim yazıyla gösteriliyor), kazanma ve kaybetme ekranı görseli, rütbe simgesi ve mini harita çerçevesi (ikisi de sistemleriyle gelecek), müzik ve ses efektleri.
 
 ## Projeye Kopyalanmamış Paket Dosyası
 - `Shadow.png` (Tiny Swords, Terrain/Tileset): Yüksek zeminin altındaki gölge. Haritada gölge kullanılmamasına karar verildi, gerekli değil.
 
 ## Lisans Notu
-Dışarıdan eklenen her asset için kaynak ve lisans bilgisi README'ye "Credits" bölümüne yazılacak.
+Dışarıdan eklenen her asset için kaynak ve lisans bilgisi README'nin "Credits" bölümünde.

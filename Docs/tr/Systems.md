@@ -3,7 +3,7 @@
 > Oyundaki her sistemin kodda **nasıl** yapıldığını anlatır: yapılanlar ve planlananlar.
 > Kurallar ve mimari: [Technical_Design.md](Technical_Design.md) · Oyun tasarımı: [GDD_Decisions.md](GDD_Decisions.md) · Öncelikler: [Roadmap.md](Roadmap.md) · Assetler: [Missing_Assets.md](Missing_Assets.md)
 >
-> **Son güncelleme:** 10 Kasım 2026 · vuruş zamanlaması, efektler, can barları, tarla (köylü çitin içinde), açlık, toplanma noktası, Sandbox araçları, ayarlar, yazı malzemeleri, arayüz animasyonları, ana menü arka planı · 494 EditMode testi
+> **Son güncelleme:** 11 Kasım 2026 · taşınan kaynak ikonu, yerleştirirken kayan Production Menu, baskın yön oku, kısayollar (F/X/H, kontrol grupları, ., Home, F1) ve komut çubuğu, Controls sayfası, zorluk seçimi, Sandbox paneli, açlık bildirimi düzeltmesi, sakin askerde "!" · 521 EditMode testi, hepsi geçiyor
 >
 > **Durum işaretleri:** ✅ yapıldı · 🟡 kısmen · ⏳ planlandı
 
@@ -114,14 +114,14 @@ Gameplay ─► GameplayLifetimeScope (servisler, sistemler, dünya view'ları)
 
 ```
 1. SimulationRunner.Tick        (ITickable)      GameClock.Advance → sistemler faz sırasıyla
-       Time(100)        CalendarService
-       AI(200)          RaidService, BattleAiSystem, ShelterSystem
+       Time(100)        CalendarService, HungerSystem
+       AI(200)          RaidService, BattleAiSystem, ShelterSystem, AttackMoveSystem
        Movement(300)    UnitMovementSystem, ResourceRoamSystem
-       Gathering(350)   GatheringSystem, ConstructionSystem
+       Gathering(350)   GatheringSystem, ConstructionSystem, FarmingSystem
        Combat(400)      CombatSystem, BuildingDefenseSystem
        Cleanup(500)     DeathCleanupSystem
 2. MonoBehaviour Update                          CameraController kamerayı taşır
-3. IPostTickable                                 Placement, Selection, Command, Hover, Delete, TimeControl, Escape input handler'ları
+3. IPostTickable                                 Placement, Selection, Command, Hotkey, Hover, Delete, TimeControl, Escape input handler'ları, ControlsLauncher
 4. LateUpdate                                    View'lar modeli okuyup çizer
 ```
 - **`GameClock`** oyun zamanının tek sahibi: `IsPaused`, `TimeScale`, `ElapsedTime`. Kare süresi en fazla 0,1 sn sayılır. `Time.timeScale` hiç değişmez; UI ve DOTween oyun dururken de çalışır.
@@ -151,16 +151,16 @@ Gameplay ─► GameplayLifetimeScope (servisler, sistemler, dünya view'ları)
 | `HungerChangedEvent` | `HungerSystem` | `ResourceBarView` (yemek kırmızı) |
 | `EntityDamagedEvent` | `CombatService` | Bina ve birim spawner'ları (kırmızı flaş), `InformationPanelView`, `UnitSelectionCardView` |
 | `MoveCommandIssuedEvent` / `AttackCommandIssuedEvent` | `UnitCommandService` | `MoveMarkerView` |
-| `SelectionChangedEvent` | `SelectionService` | Bina ve birim spawner'ları, `InformationPanelView`, `UnitSelectionCardView` |
+| `SelectionChangedEvent` | `SelectionService` | Bina ve birim spawner'ları, `InformationPanelView`, `UnitSelectionCardView`, `CommandBarView` |
 | `HoverChangedEvent` | `HoverService` | `HoverLabelView` |
-| `PlacementStartedEvent` / `PlacementEndedEvent` | `PlacementService` | `InputModeController` |
+| `PlacementStartedEvent` / `PlacementEndedEvent` | `PlacementService` | `InputModeController`, `ProductionMenuView` (menü kenara çekilir) |
 | `ResourceNodePlacedEvent` / `ResourceNodeRemovedEvent` | `ResourceNodeService` | `ResourceNodeViewSpawner` |
 | `ResourcesChangedEvent` | `ResourceService` | `ResourceBarView` |
-| `DayStartedEvent` | `CalendarService` | `RaidService`, `ResourceRespawnService`, `CalendarLabelView` |
+| `DayStartedEvent` | `CalendarService` | `RaidService`, `ResourceRespawnService`, `HungerSystem`, `CalendarLabelView` |
 | `RaidEndedEvent` | `RaidService` | `GameOutcomeService`, `CalendarLabelView` |
 | `GameNoticeEvent` | `RaidService`, `ShelterSystem`, `HungerSystem` | `NoticeBannerView` |
-| `GameEndedEvent` | `GameOutcomeService` | `GameEndView` |
-| `FloatingTextRequestedEvent` | `PlacementInputHandler`, `InformationPanelView`, `GatheringSystem` | `FloatingTextSpawner` |
+| `GameEndedEvent` | `GameOutcomeService` | `GameEndView`, `TimeControlService`, `RaidArrowView` |
+| `FloatingTextRequestedEvent` | `PlacementInputHandler`, `InformationPanelView`, `GatheringSystem`, `FarmingSystem`, `UnitCommandService`, `HotkeyInputHandler`, `DeleteInputHandler` | `FloatingTextSpawner` |
 | `SandboxFactionChangedEvent` | `SandboxService` | `ProductionMenuView`, `InformationPanelView` |
 | `SandboxSwitchesChangedEvent` | `SandboxService` | `SandboxSwitchesView` (`DebugOverlayView` ve `BattleAiSystem` her karede okur) |
 | `SandboxMapClearedEvent` | `DeletionService.ClearMap` | `RaidService` (Sandbox baskınını durdurur) |
@@ -182,7 +182,7 @@ Gameplay ─► GameplayLifetimeScope (servisler, sistemler, dünya view'ları)
 | `TerritoryService.IsEnabled` | Her hücre bölge içi | Bölge kuralı |
 | `NormalModeStarter` | Hiçbir şey yapmaz | Castle, köylü, başlangıç kaynağı |
 | `PlacementService.TryConfirm` | Bina anında hazır | `buildTime` > 0 ise inşaat alanı olarak konur |
-| `ToolCursorView` | Normal imleç | Kaynakta ve inşaatta araç imleci |
+| `ToolCursorView` | Normal imleç (Attack Move beklerken kılıç) | Kaynakta ve inşaatta araç imleci, Attack Move beklerken kılıç |
 | `BattleAiSystem` | Düğmeyle açılır (varsayılan kapalı) | Hep açık |
 | `DeletionService` | Her şey silinir, fare altındaki kaynak da | Sadece oyuncunun birim ve binası, Castle hariç |
 | Production Menu | Buildings, Units, Resources sekmeleri | Sadece binalar |
@@ -347,7 +347,7 @@ Sol tık bırakılınca ─► SelectionInputHandler
 - **Boştaki köylü (`IdleVillagerFinder`):** "." ya da alttaki "Idle: N" butonu sıradaki boş köylüyü (id sırasıyla, sonda başa döner) seçer ve kamerayı ona götürür. Home kamerayı Castle'a götürür.
 
 ## 17. Komutlar ve Hareket
-**Durum:** ✅ · **Dosyalar:** `Gameplay/Commands/*`, `Gameplay/Units/UnitMovementSystem.cs`, `UnitModel.cs` · **Test:** `UnitCommandServiceTests`, `UnitMovementTests`
+**Durum:** ✅ · **Dosyalar:** `Gameplay/Commands/*`, `Gameplay/Units/UnitMovementSystem.cs`, `UnitModel.cs` · **Test:** `UnitCommandServiceTests`, `UnitMovementTests`, `ShortcutTests`
 
 ```
 Sağ tık ─► CommandInputHandler ─► UnitCommandService.CommandAt(seçim, nokta)
@@ -412,7 +412,7 @@ Cleanup fazı: DeathCleanupSystem ─► CombatService.RemoveDead ─► UnitSer
 
 - `ResourceService`: odun, taş, yemek, altın. `CanAfford`, `TrySpend`, `Add`; her değişimde `ResourcesChangedEvent`. Sandbox'ta `IsUnlimited`.
 - `ResourceCost` bir kaynaktan bir miktar; bina, birim ve başlangıç kaynağı bununla yazılır.
-- **Başlangıç (`NormalModeStarter`, `IStartable`):** Kaynaklar verilir, Castle haritanın ortasına konur, köylüler çıkar. Normal menüde Castle yok; tek Castle başlangıçta gelir.
+- **Başlangıç (`NormalModeStarter`, `IStartable`):** Kaynaklar verilir (zorluğa göre), Castle haritanın ortasına konur, köylüler çıkar. Normal menüde Castle yok; tek Castle başlangıçta gelir.
 - Maliyet tooltip'te `Cost:` satırında görünür (sadece Normal modda).
 
 ## 21. Nüfus
@@ -477,7 +477,7 @@ Köylüyle kendi bitmiş tarlana sağ tık ─► UnitCommandService.Farm ─►
 
 - Her sabah (ilk sabah hariç) oyuncunun her birimi yemek yer: Kolay 1, Normal 2, Zor 4. Yetmeyen kısım borç olur; olan yemek yine yenir.
 - Borç varken her birim belli aralıkla 1 HP kaybeder: Kolay 15, Normal 10, Zor 5 saniye. Gelen yemek önce borcu öder, ödenince kayıp durur.
-- Başlarken "Not enough food! Your people are starving", bitince "There is food again" bildirimi; kaynak barında yemek sayısı kırmızı (`HungerChangedEvent`).
+- Başlarken "Not enough food! Your people are starving", bitince "There is food again" bildirimi; kaynak barında yemek sayısı kırmızı (`HungerChangedEvent`). "Önceden aç mıydı?" o sabahın borcu eklenmeden önce okunur; yoksa o sabah başlayan açlık zaten sürüyormuş gibi görünüyor ve bildirim hiç çıkmıyordu.
 - Hasar saldırgansız verilir (`CombatService.ApplyDamage(..., GameEntityId.None)`); birim bu yüzden kimseye dönmez, "!" çıkmaz. Ölüm normal ölüm event'leriyle olur, yani son birim de ölürse mevcut kaybetme koşulu çalışır.
 - Zorluk `GameSessionSettings.Difficulty`'den okunur; ana menüde Play'den sonra seçilir (Bölüm 27). Sandbox'ta açlık yok.
 
@@ -529,7 +529,7 @@ Haritada düşman kalmadı ─► Castle'ın yanında belirir ─► işine dön
 # F. Arayüz
 
 ## 27. Ana Menü
-**Durum:** 🟡 (Play, Sandbox, Settings, Quit) · **Dosyalar:** `UI/MainMenu/*` · **Görsel:** `Textures/Backgrounds/Texture_Backgrounds_MainMenu`
+**Durum:** 🟡 (Play + zorluk seçimi, Sandbox, Settings + Controls, Quit; renk ve seed seçimi yok) · **Dosyalar:** `UI/MainMenu/*` · **Görsel:** `Textures/Backgrounds/Texture_Backgrounds_MainMenu`
 
 - **Play** önce "Choose Difficulty" penceresini açar (`DifficultyPopup`, `Data_Popup_Difficulty`): Easy, Normal, Hard, her birinin altında ne değiştirdiği (`DifficultyText`). Seçim `GameSessionSettings.Difficulty`'ye yazılır ve Normal oyun başlar; Back vazgeçer. **Sandbox** hemen başlar, zorluğu oyunun içindeki butondan değişir. İkisi de yeni bir seed'le. Basınca butonlar kilitlenir; `SceneLoader` da yükleme sürerken gelen ikinci isteği yok sayar.
 - Settings ayarlar popup'ını açar (Bölüm 32b). Quit editörde Play modunu kapatır, build'de uygulamayı.
@@ -557,14 +557,14 @@ Haritada düşman kalmadı ─► Castle'ın yanında belirir ─► işine dön
 - **Birim kartı** alt ortada: portre, ad, HP; grupta `5 Units` ve toplam HP. Fareyi yakalamaz, sağ tık kartın içinden geçer.
 
 ## 30. HUD
-**Durum:** ✅ · **Dosyalar:** `UI/Hud/*`
+**Durum:** ✅ · **Dosyalar:** `UI/Hud/*` · **Test:** `OffScreenArrowMathTests`
 
 | View | Gösterdiği |
 |---|---|
 | `ResourceBarView` | Üstte odun, taş, yemek, altın ve nüfus. Sandbox'ta ∞ |
 | `CalendarLabelView` | `Day 3 / 10` ve günün saati |
 | `DayNightOverlayView` | Gece kararması |
-| `NoticeBannerView` | `GameNoticeEvent` metinleri (baskın, sığınma) |
+| `NoticeBannerView` | `GameNoticeEvent` metinleri (baskın, sığınma, açlık) |
 | `GameEndView` | Kazandın / kaybettin, iki buton |
 | `CommandBarView` | Birim kartının üstünde, oyuncunun birimi seçiliyken: *Attack Move (F)*, *Stop (X)*, *Hold (H)*. Tuşla aynı metotlar (`HotkeyInputHandler`); hover'da tooltip. Attack Move nokta beklerken buton turuncu. `Prefab_UI_Command_Bar` |
 | `IdleVillagerButtonView` | Kartın solunda *Idle: N*, sadece boş köylü varken; tıklayınca ya da "." ile sıradaki. Sayı saniyede 4 kez sayılır. `Prefab_UI_Idle_Villager_Button` |
@@ -579,7 +579,7 @@ Haritada düşman kalmadı ─► Castle'ın yanında belirir ─► işine dön
 - **Uçan yazı:** Herhangi bir sistem `FloatingTextRequestedEvent` yayınlar, UI'daki `FloatingTextSpawner` havuzdan çizer. Gameplay TextMeshPro'yu bilmez. Tür (`Info`, `Warning`) verilir, renk Inspector'da.
 - **Tooltip:** Tek `TooltipView`; metni `TooltipText`, yerini `TooltipPlacement` hesaplar (saf, testli). 0,25 sn gecikme, fareyi yakalamaz, ekrandan taşmaz.
 - **Hover etiketi:** Hedefin üstünde adı (`Enemy Barracks`), her karede ekran pozisyonu güncellenir.
-- **Araç imleci (`ToolCursorView`, `ToolCursorPicker`):** Normal modda fare kaynağın üstündeyse araç çıkar: ağaç ve koyunda balta, taş ve altında kazma; oyuncunun inşaat alanında çekiç. Karar saf bir fonksiyonda (testli), view sadece imleç değişince `Cursor.SetCursor` çağırır. Dokular `Textures/Cursors/Texture_Cursors_Axe/Pickaxe/Hammer`, 32x32, import tipi *Cursor*, tıklama noktası ortada. Bileşen `Prefab_Gameplay_Hover_Highlight` üzerinde. Sahne kapanırken normal imleç geri gelir.
+- **Araç imleci (`ToolCursorView`, `ToolCursorPicker`):** Normal modda fare kaynağın üstündeyse araç çıkar: ağaç ve koyunda balta, taş ve altında kazma; oyuncunun inşaat alanında çekiç. Karar saf bir fonksiyonda (testli), view sadece imleç değişince `Cursor.SetCursor` çağırır. Attack Move nokta beklerken iki modda da kılıç (`Texture_Cursors_Sword`). Dokular `Textures/Cursors/Texture_Cursors_Axe/Pickaxe/Hammer/Sword`, 32x32, import tipi *Cursor*, tıklama noktası ortada. Bileşen `Prefab_Gameplay_Hover_Highlight` üzerinde. Sahne kapanırken normal imleç geri gelir.
 - **Komut halkası:** `MoveMarkerView` tıklanan yerde küçülüp solar: hareket yeşil, saldırı kırmızı.
 
 ## 32. Esc Katmanları
@@ -631,7 +631,7 @@ Ana menüde Settings butonu / oyunda kaynak barının sağındaki dişli / Esc (
   - **Start Raid:** Listedeki sıradaki baskın hemen gelir (Bölüm 24). Baskın sürerken düğme kilitli ve "Raid 3: wave 2 of 4" yazar.
   - **Clear Map:** Bütün birim, bina ve kaynakları siler (`DeletionService.ClearMap`). Yanlış tıklamaya karşı ikinci tıklama ister ("Sure? Click again", 3 sn). Silme ölüm event'leriyle olduğu için efektler aynı anda en fazla 48 tane oynar (`EffectSpawner`). Süren baskın durur.
   - **+100 Units:** `SandboxBattleSpawner` ekranın ortasının solunda oyuncunun, sağında düşmanın 50'şer karışık askerini (Knight, Spearman, Archer) koyar ve yapay zekâyı açar. Yol bulma, savaş ve çizimi kalabalıkta denemek için.
-  - **İstatistik paneli:** Artık sandbox sütununda değil, sağ altta ve iki modda da (`StatsPanelView`, Bölüm 30). Arama süresini `AStarPathfinder` tutar (`Stopwatch`, arama başına iki okuma, `TakeStats`).
+  - **İstatistik paneli:** Sandbox panelinde değil, sağ altta ve iki modda da (`StatsPanelView`, Bölüm 30). Arama süresini `AStarPathfinder` tutar (`Stopwatch`, arama başına iki okuma, `TakeStats`).
 - **Silme:** Delete tuşu seçili her şeyi siler (iki taraf). Hiçbir şey seçili değilse farenin altındaki kaynak silinir (Bölüm 33b).
 - **Debug görünümü (`DebugOverlayView`):**
   - Haritanın tamamını kaplayan tek doku, hücre başına 8 piksel: hücre çizgileri, zemin yüzünden yürünemeyen hücre (su, uçurum) koyu, bina ya da kaynağın tuttuğu hücre kırmızı, merdiven mavi. `GridChangedEvent` gelince bir sonraki gösterimde yeniden çizilir.

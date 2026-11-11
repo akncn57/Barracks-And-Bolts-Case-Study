@@ -1,6 +1,6 @@
 # Barracks & Bolts – Öncelik ve Takvim
 
-> **Durum (10 Kasım):** P0 ve P0+ bitti, sadece README kaldı. P1 oyun döngüsü kuruldu ve oynandı. P2'den kule, bölge sistemi, köylünün inşaatı, tam Sandbox, toplanma noktası ve açlık yapıldı; P3'ten tarla ve efekt turu (vuruş karesi, ölüm ve yıkılma efekti, can barları). SetPass 16 (150 birimlik savaşta, son özelliklerle), Windows build 8 Kasım'da denendi. **Sıradaki adım:** Test Runner sonucu, SetPass ölçümü, yeni build, denge, README en son.
+> **Durum (11 Kasım):** P0 (PDF), P0+ ve P1 bitti; P2'den kule, bölge, köylünün inşaatı, tam Sandbox, toplanma noktası, açlık, efekt turu, tarla, zorluk seçimi ve kısayollar yapıldı. 521 test geçiyor, 150 birimlik savaşta SetPass 16. **Sıradaki adım:** Normal modu baştan sona bir kez oynamak, temiz klondan Windows build ve Release, en son README.
 > Sistemlerin kodda nasıl çalıştığı: [Systems.md](Systems.md)
 
 > **Teslim tarihi:** 13 Kasım 2026, Cuma
