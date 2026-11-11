@@ -1,5 +1,7 @@
 # Barracks & Bolts – GDD Kararları
 
+[English](../en/GDD_Decisions.md) | **Türkçe**
+
 > Kaynak: "Game Developer – Strategy Game Demo" case study brief'i (PDF). Metinde "PDF" geçen yerler bu brief'in zorunlu tuttuğu maddelerdir.
 > Bu dosya oyun tasarımı kararlarının kaydıdır. "Şu anki hali" notları oyunda yapılmış olanı, geri kalanı hedeflenen tasarımı anlatır.
 > Kodun nasıl çalıştığı: [Systems.md](Systems.md)

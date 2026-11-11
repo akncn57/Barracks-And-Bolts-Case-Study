@@ -1,5 +1,7 @@
 # Barracks & Bolts – Missing Assets
 
+**English** | [Türkçe](../tr/Missing_Assets.md)
+
 > Priorities are the same as in [Roadmap.md](Roadmap.md).
 > **Solution** column: 👤 Added by the user · 🛠 Made from existing assets · 💻 Solved in code or with a simple sprite · 🔍 To be found
 

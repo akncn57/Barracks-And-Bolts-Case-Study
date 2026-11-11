@@ -1,5 +1,7 @@
 # Barracks & Bolts – Teknik Tasarım Dokümanı
 
+[English](../en/Technical_Design.md) | **Türkçe**
+
 > Oyun tasarımı: [GDD_Decisions.md](GDD_Decisions.md) · Sistemlerin nasıl çalıştığı: [Systems.md](Systems.md) · Öncelikler: [Roadmap.md](Roadmap.md) · Assetler: [Missing_Assets.md](Missing_Assets.md)
 > Unity 6000.3.16f1 (6.3 LTS) · URP 2D · Input System · VContainer · UniTask · DOTween · Cinemachine 3
 >

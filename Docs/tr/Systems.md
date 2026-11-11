@@ -1,5 +1,7 @@
 # Barracks & Bolts – Sistem Rehberi
 
+[English](../en/Systems.md) | **Türkçe**
+
 > Oyundaki her sistemin kodda **nasıl** yapıldığını anlatır: yapılanlar ve planlananlar.
 > Kurallar ve mimari: [Technical_Design.md](Technical_Design.md) · Oyun tasarımı: [GDD_Decisions.md](GDD_Decisions.md) · Öncelikler: [Roadmap.md](Roadmap.md) · Assetler: [Missing_Assets.md](Missing_Assets.md)
 >

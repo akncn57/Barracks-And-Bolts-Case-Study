@@ -1,5 +1,7 @@
 # Barracks & Bolts – Systems Guide
 
+**English** | [Türkçe](../tr/Systems.md)
+
 > Describes **how** every system of the game is built in code: what is done and what is planned.
 > Rules and architecture: [Technical_Design.md](Technical_Design.md) · Game design: [GDD_Decisions.md](GDD_Decisions.md) · Priorities: [Roadmap.md](Roadmap.md) · Assets: [Missing_Assets.md](Missing_Assets.md)
 >

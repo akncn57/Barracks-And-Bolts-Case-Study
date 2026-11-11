@@ -1,5 +1,7 @@
 # Barracks & Bolts – Öncelik ve Takvim
 
+[English](../en/Roadmap.md) | **Türkçe**
+
 > **Durum (11 Kasım):** P0 (PDF), P0+ ve P1 bitti; P2'den kule, bölge, köylünün inşaatı, tam Sandbox, toplanma noktası, açlık, efekt turu, tarla, zorluk seçimi ve kısayollar yapıldı. 521 test geçiyor, 150 birimlik savaşta SetPass 16. **Sıradaki adım:** Normal modu baştan sona bir kez oynamak, temiz klondan Windows build ve Release, en son README.
 > Sistemlerin kodda nasıl çalıştığı: [Systems.md](Systems.md)
 

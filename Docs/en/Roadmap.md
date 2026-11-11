@@ -1,5 +1,7 @@
 # Barracks & Bolts – Priorities and Schedule
 
+**English** | [Türkçe](../tr/Roadmap.md)
+
 > **Status (11 November):** P0 (brief), P0+ and P1 are done. From P2: the tower, territory, villager construction, the full Sandbox, rally points, hunger, the effects pass, the farm, difficulty selection and shortcuts. 521 tests pass; SetPass is 16 in a 150-unit battle. **Next:** play Normal mode end to end once, a Windows build from a clean clone and a release, the README last.
 > How the systems work in code: [Systems.md](Systems.md)
 

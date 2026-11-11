@@ -1,5 +1,7 @@
 # Barracks & Bolts
 
+**English** | [Türkçe](README.tr.md)
+
 A 2D medieval real-time strategy game made in Unity 6: build a base, run a villager economy, survive ten days of raids, or play freely in a creative sandbox.
 
 It started as a one-week "strategy game demo" case study for a game developer role. Every item of that brief is covered (see [Brief Coverage](#brief-coverage)), and the rest of the week went into turning the demo into a small, complete game with a clean, tested architecture.

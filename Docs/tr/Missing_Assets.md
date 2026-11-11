@@ -1,5 +1,7 @@
 # Barracks & Bolts – Eksik Asset Listesi
 
+[English](../en/Missing_Assets.md) | **Türkçe**
+
 > Öncelikler [Roadmap.md](Roadmap.md) ile aynıdır.
 > **Çözüm** sütunu: 👤 Kullanıcı ekleyecek · 🛠 Mevcut assetten üretilecek · 💻 Kodla veya basit bir sprite ile çözülür · 🔍 Bulunacak
 

@@ -1,5 +1,7 @@
 # Barracks & Bolts – GDD Decisions
 
+**English** | [Türkçe](../tr/GDD_Decisions.md)
+
 > Source: the brief (PDF) of a "Game Developer – Strategy Game Demo" case study. Where the text says "brief", it means an item the brief requires.
 > This file records the game design decisions. "Current state" notes describe what is in the game; the rest is the intended design.
 > How the code works: [Systems.md](Systems.md)
