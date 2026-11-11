@@ -363,13 +363,13 @@ X ─► Stop        H ─► HoldPosition        (HotkeyInputHandler; the butto
 Movement phase: UnitMovementSystem ─► UnitModel.MoveAlongPath(speed * dt)
 ```
 - Only the player's units take orders; friendly fire is prevented in `CombatService.GetHostileAt`. A right click on an own building is a move.
-- **Spreading out:** `CollectDestinations` finds as many cells as there are units; cells where another unit stands or is walking to aren't taken. Targets from near to far, each given to the nearest unit left.
+- **Spreading out:** `CollectDestinations` finds as many cells as there are units; cells where another unit stands or is walking to aren't taken. The cells are ordered from near the target to far, and each goes to the nearest unit left.
 - **When the path changes:** On `GridChangedEvent`, only the units whose remaining path crosses the changed area look for a new one.
 - When a waypoint is reached, the leftover distance carries over to the next one; in a long frame a unit doesn't overshoot and jitter.
 - **Stances (`UnitModel.IsHoldingPosition`, `AttackMoveCell`):** Every new order of the player ends both (`ClearStance` inside `AnnounceOrder`).
   - **Stop:** path, target and work (gathering, construction, farm) are cancelled.
   - **Hold Position:** Stop + stays in place. `CombatSystem` drops a target out of range instead of chasing it; `BattleAiSystem` gives it only enemies within its own range. It doesn't run off when hit from afar either.
-  - **Attack Move:** Spreads out like `MoveTo`, and every unit writes its own destination cell to `AttackMoveCell`. `AttackMoveSystem` (AI phase, 4 times a second, also while the sandbox AI is off, since it is the player's order) turns on enemies within 5 cells on the way, walks on when the enemy dies, and ends the stance on arrival. It also ends if there is no way closer, so A* isn't searched 4 times a second. A red ring shows.
+  - **Attack Move:** Spreads out like `MoveTo`, and every unit writes its own destination cell to `AttackMoveCell`. `AttackMoveSystem` (AI phase, 4 times a second, also while the sandbox AI is off, since it is the player's order) turns on enemies within 5 cells on the way, walks on when the enemy dies, and ends the stance on arrival. It also ends if there is no way closer; otherwise the unit would search for a path 4 times a second for nothing. A red ring shows.
   - Targeting mode (`AttackMoveTargeting`): while it is on, a left click doesn't select (on the frame it ends either, `IsUsingClicks`), a right click or Esc cancels, and it closes on its own if no player unit is left in the selection or placement starts.
 
 ## 18. Combat and Removal
@@ -398,7 +398,7 @@ Cleanup phase: DeathCleanupSystem ─► CombatService.RemoveDead ─► UnitSer
 ## 19. Unit View and Status Icons
 **Status:** ✅ · **Files:** `Gameplay/Units/UnitView.cs`, `UnitViewSpawner.cs`
 
-- **No Animator.** Frames come from the color set (`UnitSpriteSet`) and are computed from the game clock: `Floor(time * fps + phase) % frameCount`. They freeze when the game pauses. The phase comes from the unit id.
+- **No Animator.** Frames come from the color set (`UnitSpriteSet`) and are computed from the game clock: `Floor(time * fps + phase) % frameCount`. They freeze when the game pauses. The animation's starting phase comes from the unit id, so a group doesn't breathe in sync.
 - Priority: attack (plays once) > construction (hammer) > gathering (axe or pickaxe) > running > idle. The sprite is set only when the frame changes.
 - Pivots are at the feet; `flipX` turns the character around its own axis.
 - The selection ring is under the feet, colored by side.
@@ -516,7 +516,7 @@ No enemy left on the map ─► appears next to the Castle ─► back to work (
 ```
 - Gathering or construction work is kept with `Suspend` and continues with `Resume` on return.
 - A unit inside moves from `_units` to `_sheltered`. Selection, hover, combat and placement look at `_units`, so no other check is needed. Population counts both.
-- A player's order (`UnitOrderedEvent`) comes before fleeing for 10 seconds.
+- If the player gives a villager an order (`UnitOrderedEvent`), it follows that order instead of fleeing for 10 seconds.
 - If its way is blocked, the villager goes back to work and tries again 10 seconds later.
 
 ## 26. Game Over

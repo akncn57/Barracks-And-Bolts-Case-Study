@@ -216,7 +216,7 @@ These values are set in a ScriptableObject and can change later.
 - A right click with a building selected sets a rally point. New units walk there on their own. **Current state:** Done. If the point is on a resource or an enemy, the new unit acts as on a right click (a villager gathers, a soldier attacks). While the building is selected, a flag in the team color stands at the point.
 
 ### Villagers Fleeing
-> **Current state:** During a raid a villager keeps working; when an enemy comes within 7 cells, it runs into the Castle. Its load counts at that moment. When no enemies are left on the map, it comes out and goes back to work. An order from the player comes before fleeing for 10 seconds. There is no sheltering in Houses and no building capacity; losing the Castle ends the game, so nobody has to come out of it.
+> **Current state:** During a raid a villager keeps working; when an enemy comes within 7 cells, it runs into the Castle. Its load counts at that moment. When no enemies are left on the map, it comes out and goes back to work. If the player gives a villager an order, it follows that order instead of fleeing for 10 seconds. There is no sheltering in Houses and no building capacity; losing the Castle ends the game, so nobody has to come out of it.
 
 - A villager under attack drops its work and runs to the nearest House or the Castle.
 - Inside, it is hidden and can't be attacked. When the danger is over (the raid is beaten or no enemy is near), it comes out and returns to its previous work on its own.

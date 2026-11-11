@@ -216,7 +216,7 @@ Bu değerler ScriptableObject üzerinden ayarlanabilir olacak, ileride değişti
 - Bina seçiliyken sağ tıklanırsa bir toplanma noktası (rally point) belirlenir. Yeni doğan birimler oraya kendiliğinden yürür. **Şu anki hali:** Yapıldı. Nokta bir kaynağın ya da düşmanın üstündeyse yeni birim sağ tıktaki gibi davranır (köylü toplar, asker saldırır). Bina seçiliyken noktada takım renginde bayrak durur.
 
 ### Köylü Kaçışı
-> **Şu anki hali:** Köylü baskında işine devam ediyor, düşman 7 hücre yaklaşınca Castle'a koşup içeri giriyor. Taşıdığı yük o an sayılıyor. Haritada düşman kalmayınca çıkıp işine dönüyor. Oyuncunun verdiği emir 10 saniye kaçıştan önce geliyor. House'a sığınma ve bina kapasitesi yok; Castle yıkılınca oyun bittiği için içeridekilerin çıkması da gerekmiyor.
+> **Şu anki hali:** Köylü baskında işine devam ediyor, düşman 7 hücre yaklaşınca Castle'a koşup içeri giriyor. Taşıdığı yük o an sayılıyor. Haritada düşman kalmayınca çıkıp işine dönüyor. Oyuncu köylüye bir emir verirse köylü 10 saniye boyunca kaçmak yerine o emri uyguluyor. House'a sığınma ve bina kapasitesi yok; Castle yıkılınca oyun bittiği için içeridekilerin çıkması da gerekmiyor.
 
 - Saldırıya uğrayan köylü işini bırakır ve en yakın House'a ya da Castle'a kaçar.
 - İçeri giren köylü gizlenir ve saldırıya uğramaz. Tehlike geçince (baskın bittiğinde ya da yakında düşman kalmadığında) dışarı çıkar ve önceki işine kendiliğinden döner.

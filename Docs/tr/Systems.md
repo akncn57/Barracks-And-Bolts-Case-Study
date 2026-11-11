@@ -107,7 +107,7 @@ Gameplay ─► GameplayLifetimeScope (servisler, sistemler, dünya view'ları)
          └► GameplayUiLifetimeScope (UI view'ları), parent = GameplayLifetimeScope
 ```
 - `GameSessionSettings` menüden oyuna mod, renk, zorluk ve seed taşır. Gameplay sahnesi editörde doğrudan açılırsa varsayılanlarla (Sandbox, kırmızı, rastgele seed) çalışır.
-- `RegisterComponentInHierarchy<T>()` sahnede o bileşeni arar; bulamazsa scope kurulmaz ve bütün oyun durur. Yeni bir sahne view'ı eklemek = sahneye koymak + scope'a kaydetmek.
+- `RegisterComponentInHierarchy<T>()` sahnede o bileşeni arar; bulamazsa scope kurulmaz ve bütün oyun durur. Yani yeni bir sahne view'ı eklemek iki adımdır: sahneye koymak ve scope'a kaydetmek.
 - `IStartable` scope kurulduktan sonra çalışır; `IInitializable` kurulum sırasında. Sahnedeki view'ların event'leri kaçırmaması için başlangıç işleri (`ResourceMapInitializer`, `NormalModeStarter`) `IStartable`.
 - `EventBus` Gameplay scope'unda yaşar; sahne kapanınca bütün abonelikler de gider.
 
@@ -126,9 +126,9 @@ Gameplay ─► GameplayLifetimeScope (servisler, sistemler, dünya view'ları)
 3. IPostTickable                                 Placement, Selection, Command, Hotkey, Hover, Delete, TimeControl, Escape input handler'ları, ControlsLauncher
 4. LateUpdate                                    View'lar modeli okuyup çizer
 ```
-- **`GameClock`** oyun zamanının tek sahibi: `IsPaused`, `TimeScale`, `ElapsedTime`. Kare süresi en fazla 0,1 sn sayılır. `Time.timeScale` hiç değişmez; UI ve DOTween oyun dururken de çalışır.
+- **`GameClock`** oyun zamanının tek sahibi: `IsPaused`, `TimeScale`, `ElapsedTime`. Bir kare ne kadar uzun sürerse sürsün en fazla 0,1 saniye sayılır. `Time.timeScale` hiç değişmez; UI ve DOTween oyun dururken de çalışır.
 - **Input neden sonra?** Handler'lar kameranın bu karedeki yerini görmeli; yoksa fare bir kare geriden gelir. Emir simülasyona bir sonraki karede girer, bu fark edilmez.
-- **Ölümler neden Cleanup'ta?** Aynı karede birbirine vuran iki birimin sırası sonucu değiştirmesin, sözlük dönerken eleman silinmesin.
+- **Ölümler neden Cleanup'ta?** Aynı karede birbirine vuran iki birimden hangisinin önce işlendiği sonucu değiştirmesin ve bir sözlük üzerinde dönülürken ondan eleman silinmesin diye.
 - **Yeni sistem:** `ISimulationSystem` uygula, `Phase` seç, `builder.RegisterSimulationSystem<T>()` ile kaydet.
 
 ## 4. EventBus ve Event Haritası
@@ -237,7 +237,7 @@ ResourceMapInitializer (IStartable) ─► ResourceDistributor (seed) ─► Res
 **Durum:** ✅ · **Dosyalar:** `Gameplay/Pathfinding/*`, `Utils/Collections/MinHeap.cs` · **Test:** `AStarPathfinderTests`, `GridSearchTests`, `MinHeapTests`
 
 - **A\*:** 8 yön, köşe kesme yok, octile sezgisel, kendi `MinHeap`'imiz. Diziler bir kez ayrılır, her aramaya yeni bir damga (stamp) verilir; arama çöp üretmez.
-- **Ulaşılamayan hedef:** Hedefe en yakın açılan hücreye yol verilir (`PathStatus.Partial`). Binaya saldırmak için yanına gitmek de böyle çalışır.
+- **Ulaşılamayan hedef:** Arama sırasında hedefe en çok yaklaşılan hücreye kadar yol çizilir (`PathStatus.Partial`). Binaya saldırmak için yanına gitmek de böyle çalışır.
 - **`GridSearch`:**
   - `TryFindNearestWalkable`: en yakın boş hücre (spawn noktası doluysa, binaya tıklanınca).
   - `CollectDestinations`: gruba ayrı hedef hücreleri; sadece yürünebilir hücreler üzerinden BFS, grup gölün iki yanına bölünmez.
@@ -259,7 +259,7 @@ LateUpdate: PlacementPreviewView servisi okur, çizer
 - `PlacementService` sadece durumu tutar: hangi bina, hangi taraf, footprint nerede. Input okumaz; testte `MoveTo(new Vector2(3, 3))` ile sürülür.
 - **`Block`** alanın neden geçersiz olduğunu söyler: `NoArea`, `OutsideMap`, `Occupied`, `UnitInTheWay`, `OutsideTerritory`, `NotEnoughResources`. Uyarı metnini `PlacementInputHandler` seçer.
 - **`IsCellFree(hücre)`** önizlemedeki her kareyi yeşil ya da kırmızı yapar: yürünebilir, üzerinde birim yok, bölge içinde.
-- Footprint fareye ortalanır (`GridMap.GetAreaCenteredAt`); çift boyutta grid çizgisine oturur. `RoundToInt` yerine `Floor(x + 0.5)`, sınırda zıplamasın diye.
+- Footprint fareye ortalanır (`GridMap.GetAreaCenteredAt`); çift boyutta grid çizgisine oturur. Sınırda ileri geri zıplamaması için `RoundToInt` yerine `Floor(x + 0.5)` kullanılır.
 - Fiyat bina konduktan sonra alınır; konamazsa para gitmez. Shift basılıysa mod açık kalır. Bunu Production Menu tooltip'lerinin altındaki "Hold Shift to place several" satırı söyler (`TooltipText.PlaceSeveralHint`).
 - **Birim modu (Sandbox):** `BeginUnit(birim, taraf)` aynı modu birim için açar: footprint tek hücre, kural "hücre yürünebilir mi". Hücrede başka birim olması sorun değil, yeni birim en yakın boş hücreye çıkar (`UnitService.TrySpawn`). Bölge ve inşaat yok. Input haritaları, Esc, sağ tık iptali ve Shift ile arka arkaya koyma bina ile aynı. Önizlemede birimin ilk bekleme karesi ve tek hücrelik yeşil/kırmızı kare görünür. `Definition` ve `Unit`'ten aynı anda sadece biri dolu.
 - Önizleme kareleri gizli bir şablondan kopyalanır; büyük bina için açılanlar silinmez, kapatılır.
@@ -283,8 +283,8 @@ Oyuncunun bölge açan binası biter ya da yıkılır ─► TerritoryService.Re
 Yerleştirme: PlacementService.IsCellFree ─► TerritoryService.IsInside(hücre)
 Görsel: TerritoryOverlayView, Version değişince ya da açılacak alan önizlemesi değişince yeniden çizer
 ```
-- Tüm harita için tek `bool[]`. İnşaat alanı bölge açmaz; Karakol bitince açar. Yeniden hesap sadece kaynak bina bitince ya da yıkılınca yapılır; yerleştirmenin her karedeki sorgusu ucuzdur.
-- Hücre, merkezi dairenin **içindeyse** bölgededir (`IsInCircle`, kesin `<`). Böylece dairenin yanlarında tek hücrelik çıkıntı olmaz.
+- Tüm harita için tek `bool[]`. İnşaat alanı bölge açmaz; Karakol bitince açar. Yeniden hesap sadece kaynak bina bitince ya da yıkılınca yapılır; böylece yerleştirme sırasında her karede yapılan sorgu ucuz kalır.
+- Bir hücre, merkezi dairenin **içinde** kalıyorsa bölgeye dahildir (`IsInCircle`, kesin `<`). Böylece dairenin yanlarında tek hücrelik çıkıntı olmaz.
 - Binanın bütün hücreleri bölgede olmalı. Bölge küçülünce dışarıda kalan binalar yerinde kalır ve çalışır.
 - Servis oluşurken mevcut binaları da tarar; Castle önce konmuş olsa da görür.
 - **Açılacak alan:** `PlacementService.ShowsTerritoryPreview` bölge açan bina bölge içinde konacakken açık. `PlacementPreviewView` merkezi ve yarıçapı görsele verir; şekil, bina konunca açılacak alanla aynıdır.
@@ -302,7 +302,7 @@ Combat fazı: BuildingDefenseSystem ─► HasDefense olan her bina
 - İnşaat bitmeden kule ateş etmez ve üstünde okçu görünmez; okçu `BuildingCompletedEvent` ile çıkar.
 - Okçu bir birim değil, binanın parçası: seçilmez, nüfus tutmaz, ölmez. Durum `BuildingModel`'de, sayılar tanımda. Yeni bir savunma binası sadece veriyle eklenir.
 - Hedef ölene ya da menzilden çıkana kadar tutulur. Sürekli en yakına geçseydi hasar birimlere dağılırdı.
-- Kimse yoksa saniyede 4 kez bakar (`ScanInterval`). Sadece birimleri vurur. Her modda ve iki tarafta da çalışır.
+- Menzilde kimse yoksa saniyede 4 kez yeniden bakar (`ScanInterval`). Sadece birimleri vurur. Her modda ve iki tarafta da çalışır.
 - Kuledeki okçunun zamanlaması `Defender` biriminin verisinden gelir: ok bırakış karesinde çıkar, hasar ok varınca işler (Bölüm 18).
 
 ## 14. Kapsama Halkaları
@@ -329,7 +329,7 @@ Panelde asker butonu ─► InformationPanelView ─► UnitProductionService.Tr
 - Süre yok, PDF öyle istiyor. Birim binanın tarafını alır.
 - **Toplanma noktası (`RallyPointService`):** Sadece bir üretim binası seçiliyken sağ tık noktayı yazar (`CommandInputHandler`: birim emri geçmezse bina dener). Oyuncunun, bitmiş ve bu modda birim üreten binası olmalı. Üretilen her birim `UnitProductionService.UnitProduced` ile o noktaya, sağ tıkla aynı emirle gönderilir (`UnitCommandService.CommandAt`): zemin yürüme, düşman saldırı, kaynak toplama, inşaat yapma. Bina seçiliyken noktada takım renginde bayrak görünür (`BuildingView.rallyFlag`, kendi Sorting Group'u).
 
-- "Bu hücrede birim var mı?" sorusu `UnitService.HasUnitAt` ile konumlardan cevaplanır (O(n), şu sayılar için yeterli).
+- "Bu hücrede birim var mı?" sorusu `UnitService.HasUnitAt` ile konumlardan cevaplanır (O(n), bu birim sayıları için yeterince hızlı).
 - `UnitModel.Body`: ayakların çevresinde görünen karakter kadar bir dikdörtgen. Tıklama ve kutu seçimi buna bakar.
 
 ## 16. Seçim ve Hover
@@ -363,13 +363,13 @@ X ─► Stop        H ─► HoldPosition        (HotkeyInputHandler; butonlar 
 Movement fazı: UnitMovementSystem ─► UnitModel.MoveAlongPath(hız * dt)
 ```
 - Sadece oyuncunun birimleri emir alır; dost ateşi `CombatService.GetHostileAt`'te engellenir. Kendi binana sağ tık hareket olur.
-- **Dağılma:** `CollectDestinations` birim sayısı kadar hücre bulur; başka birimin durduğu ya da yürüdüğü hücre alınmaz. Hedefler yakından uzağa, her birine kalanlar içinde en yakın birim.
+- **Dağılma:** `CollectDestinations` birim sayısı kadar hücre bulur; başka birimin durduğu ya da yürüdüğü hücre alınmaz. Hücreler hedefe yakından uzağa sıralanır; her hücreye, kalan birimler arasından ona en yakın olanı gider.
 - **Yol değişince:** `GridChangedEvent` gelince sadece kalan yolu değişen alandan geçen birimler yeni yol bulur.
-- Durağa varınca artan mesafe sonraki durağa devredilir; uzun karede birim durağı aşıp titremez.
+- Birim bir ara noktaya vardığında o karede yürüyeceği mesafenin kalanı bir sonraki noktaya aktarılır; böylece uzun bir karede noktayı aşıp ileri geri titremez.
 - **Duruşlar (`UnitModel.IsHoldingPosition`, `AttackMoveCell`):** Oyuncunun her yeni emri ikisini de bitirir (`AnnounceOrder` içinde `ClearStance`).
   - **Stop:** yol, hedef ve iş (toplama, inşaat, tarla) iptal.
   - **Hold Position:** Stop + yerinde kalır. `CombatSystem` menzil dışındaki hedefi kovalamaz, bırakır; `BattleAiSystem` ona sadece kendi menzilindeki düşmanı verir. Uzaktan vurulunca da dönüp koşmaz.
-  - **Attack Move:** `MoveTo` gibi dağılır, her birim kendi varış hücresini `AttackMoveCell`'e yazar. `AttackMoveSystem` (AI fazı, saniyede 4 kez, sandbox'ta yapay zekâ kapalıyken de çalışır; oyuncunun emri) yürürken 5 hücre içindeki düşmana döner, düşman ölünce yoluna devam eder, varınca duruş biter. Oraya yol kalmadıysa da biter, saniyede 4 kez A* aranmaz. Kırmızı halka çıkar.
+  - **Attack Move:** `MoveTo` gibi dağılır, her birim kendi varış hücresini `AttackMoveCell`'e yazar. `AttackMoveSystem` (AI fazı, saniyede 4 kez, sandbox'ta yapay zekâ kapalıyken de çalışır; oyuncunun emri) yürürken 5 hücre içindeki düşmana döner, düşman ölünce yoluna devam eder, varınca duruş biter. Hedefe yol kalmadıysa da biter; yoksa birim saniyede 4 kez boşuna yol arardı. Kırmızı halka çıkar.
   - Hedef seçme modu (`AttackMoveTargeting`): açıkken sol tık seçim yapmaz (bittiği karede de, `IsUsingClicks`), sağ tık ya da Esc iptal eder, seçimde oyuncu birimi kalmazsa ya da yerleştirme başlarsa kendi kapanır.
 
 ## 18. Savaş ve Yok Olma
@@ -386,9 +386,9 @@ Cleanup fazı: DeathCleanupSystem ─► CombatService.RemoveDead ─► UnitSer
 ```
 - `CombatService.TryGetTarget` birim ve bina hedefini tek yerde toplar: mesafe, nişan noktası, yürünecek hücre. Binaya mesafe en yakın kenara ölçülür; Castle'a yandan vurulur.
 - `ApplyDamage`: HP 0'ın altına inmez, ölüm tek kez kuyruğa girer. **Karşılık verme:** boşta duran birim ona vurana döner; işi olan devam eder.
-- Bekleme süresi saldırı anında başlar, ilk vuruş beklemez; hedef değiştirerek hızlı vurulamaz.
+- Bekleme süresi saldırı anında başlar, yani ilk vuruş beklemez; hedef değiştirerek bekleme süresi atlatılamaz.
 - **Vuruş zamanlaması:** `UnitDefinition.hitDelay` saldırı animasyonunun başından vuruş karesine kadar geçen süre (Şövalye 0,2, Mızrakçı 0,1, Okçu 0,5, Köylü 0,2). `projectileSpeed` olan birimin hasarı ok uçup varınca işler (Okçu 12 hücre/sn). İkisi de 0 ise hasar hemen işler; eski davranış ve testler böyle kalır.
-- `CombatService.ScheduleHit` zamanlanmış vuruşları tutar, `CombatSystem` her tick önce onları ilerletir. Bırakıştan önce saldıran ölürse vuruş iptal; havadaki ok yine de varır.
+- `CombatService.ScheduleHit` zamanlanmış vuruşları tutar, `CombatSystem` her tick önce onları ilerletir. Kılıç inmeden ya da ok bırakılmadan saldıran ölürse vuruş iptal olur; havadaki ok ise yine de hedefe ulaşır.
 - Menzilli birim (`IsRanged`, menzil > 2) havuzdan ok atar. Ok oyun saatiyle uçar (`ProjectileView`), bırakışa kadar gizli bekler; duraklatma ve hız değişince hasarla eş zamanlı kalır.
 - **Ölüm ve yıkılma efekti (`EffectSpawner`):** Birim ölünce (ya da silinince) küçük toz, bina yıkılınca boyuna göre patlama ve tabanında büyük toz. Kareler `Textures/VFX` (Effects atlas'ı), oyun saatiyle oynar, renderer'lar havuzdan. Sahnede obje yok: `GameplayLifetimeScope` `Prefab_Gameplay_Effect_Spawner`'ı `RegisterComponentInNewPrefab` ile kurar.
 - **Can barı (`HealthBarView`):** İnce çerçeve ve tarafın renginde dolgu (oyuncu yeşil, düşman kırmızı), birimde başın üstünde, binada çatının üstünde. Sadece hasarlıyken ya da seçiliyken görünür; inşaat alanında onun yerine ilerleme çubuğu durur. Dolgu tam piksel, can kaldıkça en az bir piksel (`GetFillWidth`, testli). Sorting Group sırası 158.
@@ -398,7 +398,7 @@ Cleanup fazı: DeathCleanupSystem ─► CombatService.RemoveDead ─► UnitSer
 ## 19. Birim Görünümü ve Durum İkonları
 **Durum:** ✅ · **Dosyalar:** `Gameplay/Units/UnitView.cs`, `UnitViewSpawner.cs`
 
-- **Animator yok.** Kareler renk setinden (`UnitSpriteSet`) gelir, oyun saatinden hesaplanır: `Floor(süre * fps + faz) % kareSayısı`. Oyun durunca donar. Faz birim id'sinden.
+- **Animator yok.** Kareler renk setinden (`UnitSpriteSet`) gelir, oyun saatinden hesaplanır: `Floor(süre * fps + faz) % kareSayısı`. Oyun durunca donar. Animasyonun başlangıç fazı birimin id'sinden gelir; böylece bir grup aynı anda nefes almaz.
 - Öncelik: saldırı (bir kez oynar) > inşaat (çekiç) > toplama (balta ya da kazma) > koşma > bekleme. Sprite sadece kare değişince atanır.
 - Pivotlar ayakta; `flipX` karakteri kendi ekseninde çevirir.
 - Seçim halkası ayakların altında, rengi tarafa göre.
@@ -432,7 +432,7 @@ Köylüye kaynağa sağ tık ─► UnitCommandService.Gather ─► GatheringSy
    WalkingToNode ─► Harvesting (harvestDuration) ─► WalkingToDropOff (en yakın IsDropOff bina) ─► ResourceService.Add ─► WalkingToNode ...
 ```
 - **Nerede durur:** `TryPickWorkCell` kaynağın yanındaki hücrelere ceza ekler: yan 0, alt 3, üst 6, köşe 9, başka köylünün tuttuğu 20. Son adım hücre içinde kaynağa en yakın noktaya atılır (`workDistance`), balta kaynağa değsin diye.
-- **Kaynak biterse:** 12 hücre içinde aynı türden yenisine geçer; yoksa elindekini bırakıp durur ve "Zz" çıkar.
+- **Kaynak biterse:** 12 hücre içinde aynı türden yenisine geçer; yoksa durur ve başında "Zz" çıkar.
 - **Emir değişirse** (hareket, saldırı, karşılık verme) iş biter, yük kaybolur. **Kaçarken** iş `Suspend` ile saklanır, dönünce `Resume` ile devam eder.
 - Koyun tek kesimde ölür, bütün yemeği tek seferde taşınır. Kesilirken `Hold()` onu durdurur.
 - Çalışma kareleri: ağaç ve koyunda balta, taş ve altında kazma (`UnitModel.HarvestingKind`).
@@ -499,7 +499,7 @@ Dalga doğar ─► hepsi ölür ─► 8 sn ─► sonraki dalga ... ─► "Ra
 ```
 - Baskın günleri 3, 6, 8 ve 10. Her baskın birkaç dalga; sonrakiler daha kalabalık ve daha çok şövalyeli. Can ve hasar çarpanı yok, PDF değerleri korunur.
 - **Doğma noktası (`PickSpawnCell`):** Castle'dan yürünerek ulaşılan, kıyıda, en az 20 hücre uzak rastgele hücre. O anda hesaplanır, çünkü binalar haritayı değiştirmiş olabilir. Yön yazıyla söylenir ("from the north-east"), dalga ekran dışındayken kenarda bir ok da gösterir (`RaidArrowView`, Bölüm 30).
-- Zamanlar seed'den; aynı seed aynı baskın zamanları.
+- Baskın saatleri seed'den hesaplanır; aynı seed aynı saatleri verir.
 - **`BattleAiSystem`** saniyede 4 kez hedef seçer; yürüme ve vurma `CombatSystem`'de:
   - Düşman: hedefi Castle (Sandbox'ta Castle yoksa oyuncunun en yakın binası ya da birimi, uzaklık sınırı olmadan). Yakınında (`aggroRange` 5) oyuncu birimi ya da binası varsa ona döner; 10 hücreden uzaklaşırsa bırakır. Binalar da hedef olduğu için yolu kapatan binayı yıkar; ayrı "engel yıkma" kodu yok.
   - Oyuncunun boştaki askeri yakındaki düşmana saldırır; hareket emri alanı rahatsız etmez.
@@ -516,7 +516,7 @@ Haritada düşman kalmadı ─► Castle'ın yanında belirir ─► işine dön
 ```
 - Toplama ya da inşaat işi `Suspend` ile saklanır, dönüşte `Resume` ile devam eder.
 - İçerideki birim `_units`'ten `_sheltered`'a taşınır. Seçim, hover, savaş ve yerleştirme `_units`'e baktığı için başka kontrol gerekmez. Nüfus ikisini de sayar.
-- Oyuncunun emri (`UnitOrderedEvent`) 10 saniye kaçıştan önce gelir.
+- Oyuncu köylüye bir emir verirse (`UnitOrderedEvent`) köylü 10 saniye boyunca kaçmak yerine o emri uygular.
 - Yolu kapalıysa köylü işine döner, 10 saniye sonra yine dener.
 
 ## 26. Oyun Sonu
@@ -541,7 +541,7 @@ Haritada düşman kalmadı ─► Castle'ın yanında belirir ─► işine dön
 ## 28. Production Menu
 **Durum:** ✅ · **Dosyalar:** `UI/Scroll/*`, `UI/Production/*`, `UI/Common/SlideOutPanel.cs` · **Test:** `RecyclingScrollMathTests`
 
-- **Sonsuz scroll (`RecyclingScrollView`, generic):** Sadece görünen satır + 1 kadar hücre oluşur. Veri indeksi `PositiveModulo(satır * sütun + sütun, öğeSayısı)`; liste iki yöne de biter. Hücre sadece gösterdiği öğe değişince yeniden bağlanır, liste dururken hiçbir RectTransform değişmez.
+- **Sonsuz scroll (`RecyclingScrollView`, generic):** Sadece görünen satır + 1 kadar hücre oluşur. Veri indeksi `PositiveModulo(satır * sütun + sütun, öğeSayısı)`; liste iki yönde de hiç bitmez. Hücre sadece gösterdiği öğe değişince yeniden bağlanır, liste dururken hiçbir RectTransform değişmez.
 - Offset döngü uzunluğuna sarılır; saatlerce kaydırılsa da float hassasiyeti bozulmaz. Sürükleme, fırlatma ve tekerlek bileşenin kendisinde, `ScrollRect` yok.
 - `ProductionMenuView` binaları `GameDatabase` sırasıyla, aktif tarafın rengiyle gösterir; Normal modda Castle'ı, Sandbox'ta Karakolu gizler. Tıklama `PlacementService.Begin` çağırır.
 - **Sekmeler (Sandbox):** Başlığın altında *Buildings*, *Units* ve *Resources*. Resources sekmesi ağaç, kaya, maden ve koyunları ilk kareleriyle listeler, tıklama `PlacementService.BeginNode`. Units sekmesi `GameDatabase.Units`'i portreleriyle listeler, tıklama `PlacementService.BeginUnit` çağırır. Seçili olmayan sekme koyulaşır. Normal modda sekmeler gizli ve liste onların yerine uzar (`tabsSpace`); orada birimler sadece binadan, parayla gelir. Hücre (`ProductionMenuCell`) ne gösterdiğini bilmez, sadece listedeki sırasını (`Index`) tutar; menü sırayı o anki sekmenin listesinde arar.
@@ -616,7 +616,7 @@ Ana menüde Settings butonu / oyunda kaynak barının sağındaki dişli / Esc (
 - **Buton hissi (`ButtonFeedback`):** Fare üstündeyken %5 büyür, basınca %5 küçülür, bırakınca OutBack ile döner. `ButtonFeedbackInstaller` ana canvas'ta sahnedeki bütün butonlara çalışırken ekler, popup'lar kendi butonlarına ekler; hiçbir prefab'ın taşıması gerekmez. Unscaled zaman.
 - **Kaynak sayıları:** Değer değişince sayı kısa bir punch alır (`ResourceBarView`); oyunun ilk değerleri sessiz gelir.
 - **Ana menü:** Arka plan resmi 24 sn'lik döngüyle çok yavaş yakınlaşıp kayar, başlık yukarıdan zıplayarak iner ve sonra hafifçe süzülür, butonlar sırayla OutBack ile açılır. Butonlar layout grubunda olduğu için sadece ölçekleri oynatılır, konumları değil.
-- Var olanlar: Production Menu kayması (`SlideOutPanel`), duyuru bandı, popup aç/kapa.
+- Daha önce yapılmış animasyonlar: Production Menu'nün kayması (`SlideOutPanel`), duyuru bandı, popup'ların açılıp kapanması.
 
 ## 33. Sandbox
 **Durum:** ✅ · **Dosyalar:** `Gameplay/Sandbox/SandboxService.cs`, `SandboxBattleSpawner.cs`, `UI/Sandbox/SandboxFactionToggleView.cs`, `SandboxSwitchesView.cs` (prefab: `Prefab_UI_Production_Menu` > `Panel_Sandbox`), `Gameplay/DebugView/DebugOverlayView.cs` · **Test:** `SandboxServiceTests`, `SandboxToolsTests`, `GameLoopTests`

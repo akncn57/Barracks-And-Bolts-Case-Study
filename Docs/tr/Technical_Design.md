@@ -317,7 +317,7 @@ public interface IEventBus
 
 ## 13. Animasyon ve Renk Sistemi
 - **Karar: Animator yok.** İlk plan her birim için Animator Controller ve her renk için override idi. 4 birim x 2 renk için bunun yerine sprite dizileri seçildi: `TeamColorDefinition.UnitSpriteSet` birimin bekleme, koşma, saldırı, balta ve kazma karelerini tutar.
-- `UnitView`, kareyi `GameClock.ElapsedTime`'dan hesaplar: oyun durunca birimler donar, hızlanınca hızlanır. Faz birim id'sinden gelir, grup aynı anda nefes almaz. Öncelik: saldırı > çalışma > koşma > bekleme.
+- `UnitView`, kareyi `GameClock.ElapsedTime`'dan hesaplar: oyun durunca birimler donar, hızlanınca hızlanır. Animasyonun başlangıç fazı birimin id'sinden gelir; böylece bir grup aynı anda nefes almaz. Öncelik: saldırı > çalışma > koşma > bekleme.
 - Kaynaklar (ağaç, koyun) ve kuledeki okçu da aynı şekilde kare çalar; ağaçların hepsini tek döngüde `ResourceNodeViewSpawner` günceller.
 - Bir renkte eksik kare varsa uyarı yazılır ve boş set döner. Binalar animasyonsuzdur. Renk değişimi `TeamColorDefinition` üzerinden sprite değiştirilerek yapılır.
 - Ölüm ve yıkılma için ayrı animasyon yok; `EffectSpawner` `Textures/VFX` karelerinden toz ve patlama oynatır (oyun saatiyle).
