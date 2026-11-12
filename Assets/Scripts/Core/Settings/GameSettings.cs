@@ -34,7 +34,8 @@ namespace BarracksAndBolts.Core.Settings
         public GameSettings(ISettingsStorage storage)
         {
             _storage = storage;
-            IsFullscreen = storage.GetInt(FullscreenKey, 1) == 1;
+            // Windowed on first start, like the player settings; fullscreen is one click in Settings.
+            IsFullscreen = storage.GetInt(FullscreenKey, 0) == 1;
             IsVSyncOn = storage.GetInt(VSyncKey, 1) == 1;
             UiSize = ToEnum(storage.GetInt(UiSizeKey, (int)UiSize.Normal), UiSize.Normal);
             CameraSpeed = ToEnum(storage.GetInt(CameraSpeedKey, (int)CameraSpeed.Normal), CameraSpeed.Normal);

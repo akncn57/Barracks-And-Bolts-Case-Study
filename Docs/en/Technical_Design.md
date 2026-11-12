@@ -420,7 +420,7 @@ Tests run from *Window → General → Test Runner → EditMode → Run All*. Th
 
 ## 16. Build and Project Settings
 - [x] **Player Settings → Resizable Window: on** (the brief requires it)
-- [x] Fullscreen Mode: **Windowed**, default resolution 1600x900
+- [x] Fullscreen Mode: **Windowed**, default resolution 1600x900 (*Default Is Native Resolution* off). `GameSettings` also starts Windowed on first launch; otherwise it switched to fullscreen at start.
 - [x] Company Name: `Akin Can Hancer` (ASCII; it is used in the save path)
 - [x] Build Settings scene order: Bootstrap, MainMenu, Gameplay
 - [x] Camera: when the aspect ratio changes, it is clamped to the map again every frame

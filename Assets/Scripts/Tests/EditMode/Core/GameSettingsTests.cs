@@ -32,7 +32,7 @@ namespace BarracksAndBolts.Tests.EditMode.Core
         {
             var settings = new GameSettings(new MemoryStorage());
 
-            Assert.IsTrue(settings.IsFullscreen);
+            Assert.IsFalse(settings.IsFullscreen);
             Assert.IsTrue(settings.IsVSyncOn);
             Assert.AreEqual(UiSize.Normal, settings.UiSize);
             Assert.AreEqual(CameraSpeed.Normal, settings.CameraSpeed);
@@ -61,7 +61,7 @@ namespace BarracksAndBolts.Tests.EditMode.Core
             Assert.AreEqual(6, storage.SaveCount, "Saved on every change, so a crash loses nothing.");
 
             var nextStart = new GameSettings(storage);
-            Assert.IsFalse(nextStart.IsFullscreen);
+            Assert.IsTrue(nextStart.IsFullscreen);
             Assert.IsFalse(nextStart.IsVSyncOn);
             Assert.AreEqual(UiSize.Large, nextStart.UiSize);
             Assert.AreEqual(CameraSpeed.Fast, nextStart.CameraSpeed);

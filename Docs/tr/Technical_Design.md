@@ -420,7 +420,7 @@ Testler *Window → General → Test Runner → EditMode → Run All* ile çalı
 
 ## 16. Build ve Proje Ayarları
 - [x] **Player Settings → Resizable Window: açık** (PDF zorunlu tutuyor)
-- [x] Fullscreen Mode: **Windowed**, varsayılan çözünürlük 1600x900
+- [x] Fullscreen Mode: **Windowed**, varsayılan çözünürlük 1600x900 (*Default Is Native Resolution* kapalı). `GameSettings` de ilk açılışta Windowed başlar; yoksa açılışta tam ekrana geçerdi.
 - [x] Company Name: `Akin Can Hancer` (ASCII; kayıt yolunda kullanılıyor)
 - [x] Build Settings sahne sırası: Bootstrap, MainMenu, Gameplay
 - [x] Kamera: ekran oranı değişince harita sınırlarına göre her karede yeniden kısıtlanır
